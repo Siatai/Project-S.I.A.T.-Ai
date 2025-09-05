@@ -1,0 +1,14 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+*.db
+*.sqbpro
+
+# Node
+node_modules/
+build/
+dist/
+
+# Environment
+.env

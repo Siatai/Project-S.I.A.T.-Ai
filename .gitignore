@@ -1,0 +1,17 @@
+# Python & Alembic
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Node/React if applicable
+node_modules/
+build/
+dist/
