@@ -2,6 +2,10 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # ✅ Pick DATABASE_URL from .env, fallback to local SQLite
 DATABASE_URL = os.getenv(
@@ -17,7 +21,8 @@ if DATABASE_URL.startswith("sqlite"):
 else:
     engine = create_engine(
         DATABASE_URL,
-        pool_pre_ping=True  # Keeps connections alive (good for Neon/Postgres)
+        pool_pre_ping=True,          # Keeps connection alive
+        connect_args={"sslmode": "require"}  # 🔑 Needed for Render Postgres
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
