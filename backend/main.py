@@ -11,7 +11,7 @@ from backend.api.routes.auth_routes import router as auth_router
 from backend.api.routes.investment_router import router as investment_router
 
 # 🔁 Polling
-from backend.utils.usdt_checker import start_polling
+from backend.utils.usdt_checker import start_trc20_polling
 
 # ⏰ ROI Creditor
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -35,7 +35,7 @@ def run_daily_roi():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Start USDT polling thread
-    threading.Thread(target=start_polling, daemon=True).start()
+    threading.Thread(target=start_trc20_polling, daemon=True).start()
 
     # Start ROI scheduler
     scheduler.add_job(run_daily_roi, "cron", day_of_week="mon-fri", hour=9, minute=0)
