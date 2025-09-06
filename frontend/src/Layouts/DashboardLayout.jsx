@@ -7,7 +7,7 @@ export default function DashboardLayout() {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // 🔹 Logout handler
   const handleLogout = () => {

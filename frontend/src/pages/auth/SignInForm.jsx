@@ -8,7 +8,7 @@ export default function SignInForm() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // Step 1: Request OTP
   const sendOtp = async () => {

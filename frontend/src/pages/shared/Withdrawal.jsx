@@ -8,7 +8,7 @@ export default function Withdrawal() {
   const [otp, setOtp] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
 
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
   // Fetch wallet summary (ROI + commissions)

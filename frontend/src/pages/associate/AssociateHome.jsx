@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
 
   useEffect(() => {
     const fetchUser = async () => {

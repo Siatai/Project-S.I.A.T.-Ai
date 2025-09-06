@@ -4,7 +4,7 @@ import axios from "axios";
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
   const [isAssociate, setIsAssociate] = useState(false);
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // 🔹 Check user status on mount
   useEffect(() => {

@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
 
   useEffect(() => {
     fetchUsers();

@@ -13,7 +13,7 @@ export default function ReferralSignup() {
   const params = new URLSearchParams(location.search);
   const referralCode = params.get("ref") || "";
 
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // Step 1: Send OTP
   const sendOtp = async () => {

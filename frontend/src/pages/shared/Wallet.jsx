@@ -6,7 +6,7 @@ export default function Wallet() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const API = "http://127.0.0.1:8000/api";
+  const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
   // ✅ Decode email from JWT token
