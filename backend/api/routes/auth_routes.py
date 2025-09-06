@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from random import randint
 
 from typing import Dict
-from backend.db import get_db, SessionLocal
-from backend.models.user_model import User
-from backend.models.user_logic import (
+from db import get_db, SessionLocal
+from models.user_model import User
+from models.user_logic import (
     create_or_update_user,
     verify_otp,
     store_otp,
@@ -15,9 +15,9 @@ from backend.models.user_logic import (
     approve_user,
     get_all_users,
 )
-from backend.utils.token_utils import generate_token
-from backend.utils.email_sender import send_email_otp
-from backend.utils.auth_middleware import verify_token
+from utils.token_utils import generate_token
+from utils.email_sender import send_email_otp
+from utils.auth_middleware import verify_token
 
 router = APIRouter(prefix="/api")
 

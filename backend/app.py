@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import routers
-from backend.api.routes.auth_routes import router as auth_router
+from api.routes.auth_routes import router as auth_router
 
-from backend.api.routes.investment_router import router as investment_router
+from api.routes.investment_router import router as investment_router
 
 
 app = FastAPI()

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from datetime import datetime
-from backend.db import Base
+from db import Base
 
 class ReferralEarning(Base):
     __tablename__ = "referral_earnings"

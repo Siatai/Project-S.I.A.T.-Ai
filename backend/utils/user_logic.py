@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from backend.models.roi_model import ROIConfig
+from models.roi_model import ROIConfig
 
 # ─────────────────────────────
 # 📌 OTP Management (in-memory)

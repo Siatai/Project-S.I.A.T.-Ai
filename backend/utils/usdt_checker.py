@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
-from backend.db import SessionLocal
-from backend.models.user_model import User
-from backend.models.withdrawal_model import Investment
-from backend.models.referral_model import ReferralEarning
+from db import SessionLocal
+from models.user_model import User
+from models.withdrawal_model import Investment
+from models.referral_model import ReferralEarning
 
 # Load env
 load_dotenv()

@@ -5,16 +5,16 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from random import randint
 
-from backend.db import get_db
-from backend.models.user_model import User
-from backend.models.withdrawal_model import Investment, Withdrawal
-from backend.models.referral_model import ReferralEarning
-from backend.models.roi_model import ROIConfig
-from backend.models.commission_model import CommissionConfig
-from backend.utils.auth_middleware import verify_token
-from backend.utils.email_sender import send_email_otp
-from backend.utils.user_logic import store_otp, verify_otp, calculate_investor_roi
-from backend.utils.roi_creditor import credit_daily_roi
+from db import get_db
+from models.user_model import User
+from models.withdrawal_model import Investment, Withdrawal
+from models.referral_model import ReferralEarning
+from models.roi_model import ROIConfig
+from models.commission_model import CommissionConfig
+from utils.auth_middleware import verify_token
+from utils.email_sender import send_email_otp
+from utils.user_logic import store_otp, verify_otp, calculate_investor_roi
+from utils.roi_creditor import credit_daily_roi
 
 router = APIRouter(prefix="/api")
 

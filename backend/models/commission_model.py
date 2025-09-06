@@ -1,7 +1,7 @@
 # backend/models/commission_model.py
 from sqlalchemy import Column, Integer, Float, DateTime
 from datetime import datetime
-from backend.db import Base
+from db import Base
 
 class CommissionConfig(Base):
     __tablename__ = "commission_config"

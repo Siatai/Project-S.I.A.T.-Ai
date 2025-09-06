@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, DateTime
 from datetime import datetime
-from backend.db import Base
+from db import Base
 
 class ROIConfig(Base):
     __tablename__ = "roi_config"

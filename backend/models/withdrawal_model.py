@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, UniqueConstraint
 from datetime import datetime
-from backend.db import Base
+from db import Base
 
 
 class Investment(Base):

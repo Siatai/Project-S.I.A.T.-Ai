@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from backend.db import SessionLocal, get_db
-from backend.models.user_model import User
+from db import SessionLocal, get_db
+from models.user_model import User
 import secrets
 import string
 from fastapi import Depends, HTTPException
-from backend.utils.auth_middleware import verify_token
+from utils.auth_middleware import verify_token
 # ─────────────────────────────── OTP IN-MEMORY DB ─────────────────────────────── #
 otps_db = {}
 

@@ -1,9 +1,9 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from backend.models.roi_model import ROIConfig
-from backend.models.withdrawal_model import Investment
-from backend.models.user_model import User
+from models.roi_model import ROIConfig
+from models.withdrawal_model import Investment
+from models.user_model import User
 
 
 def credit_daily_roi(db: Session):
