@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Import routers
 from backend.api.routes.auth_routes import router as auth_router
-from backend.api.routes.user_routes import router as user_router
+
 from backend.api.routes.investment_router import router as investment_router
 
 
@@ -20,7 +20,7 @@ app.add_middleware(
 
 # Register API routes
 app.include_router(auth_router)
-app.include_router(user_router)
+
 app.include_router(investment_router, prefix="/api")
 
 # Health check root
