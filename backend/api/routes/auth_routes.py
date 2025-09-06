@@ -19,7 +19,7 @@ from utils.token_utils import generate_token
 from utils.email_sender import send_email_otp
 from utils.auth_middleware import verify_token
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 # ========== TEMP STORE FOR PENDING SIGNUPS ==========
 PENDING_SIGNUPS: Dict[str, Dict[str, str]] = {}

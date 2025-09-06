@@ -16,7 +16,7 @@ from utils.email_sender import send_email_otp
 from utils.user_logic import store_otp, verify_otp, calculate_investor_roi
 from utils.roi_creditor import credit_daily_roi
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 # ────────────────────────────────
 # 📌 SCHEMAS
