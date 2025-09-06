@@ -11,47 +11,44 @@ from datetime import datetime, timezone
 
 load_dotenv()
 
-BSC_API_KEY = os.getenv("BSC_API_KEY")
-MONITORED_ADDRESS = os.getenv("MONITORED_ADDRESS").lower()
-USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955"
+TRC20_USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+MONITORED_ADDRESS = os.getenv("MONITORED_ADDRESS").lower()  # must be base58 Tron address
 
-last_tx_hash = None
+last_tx_id = None
 
-def check_for_deposit():
-    global last_tx_hash
+def check_for_trc20_deposit():
+    global last_tx_id
 
-    url = "https://api.bscscan.com/api"
+    url = f"https://apilist.tronscanapi.com/api/transfer/trc20"
     params = {
-        "module": "account",
-        "action": "tokentx",
-        "address": MONITORED_ADDRESS,
-        "contractaddress": USDT_CONTRACT,
-        "page": 1,
-        "offset": 5,
-        "sort": "desc",
-        "apikey": BSC_API_KEY,
+        "limit": 5,
+        "start": 0,
+        "sort": "-timestamp",
+        "count": True,
+        "relatedAddress": MONITORED_ADDRESS,
+        "contract_address": TRC20_USDT_CONTRACT
     }
 
     try:
         res = requests.get(url, params=params, timeout=10)
         data = res.json()
-        txs = data.get("result", [])
+        txs = data.get("token_transfers", [])
 
         if not txs:
             return
 
         tx = txs[0]
-        tx_to = tx.get("to", "").lower()
-        tx_hash = tx.get("hash")
-        sender = tx.get("from", "").lower()
+        tx_to = tx.get("to_address", "").lower()
+        tx_id = tx.get("transaction_id")
+        sender = tx.get("from_address", "").lower()
 
-        if tx_to != MONITORED_ADDRESS or tx_hash == last_tx_hash:
+        if tx_to != MONITORED_ADDRESS or tx_id == last_tx_id:
             return
 
-        last_tx_hash = tx_hash
-        amount = int(tx["value"]) / 1e18
+        last_tx_id = tx_id
+        amount = int(tx["quant"]) / 1e6  # USDT on TRON has 6 decimals
 
-        print(f"🔔 USDT received: {amount:.2f} from {sender} | TX: {tx_hash}")
+        print(f"🔔 USDT(TRC20) received: {amount:.2f} from {sender} | TX: {tx_id}")
 
         db: Session = SessionLocal()
         user = db.query(User).filter(User.wallet.ilike(sender)).first()
@@ -61,16 +58,16 @@ def check_for_deposit():
             db.close()
             return
 
-        existing = db.query(Investment).filter_by(tx_hash=tx_hash).first()
+        existing = db.query(Investment).filter_by(tx_hash=tx_id).first()
         if existing:
-            print(f"⛔ Duplicate investment already recorded: {tx_hash}")
+            print(f"⛔ Duplicate investment already recorded: {tx_id}")
             db.close()
             return
 
         db.add(Investment(
             user_email=user.email,
             amount=amount,
-            tx_hash=tx_hash,
+            tx_hash=tx_id,
             timestamp=datetime.now(timezone.utc)
         ))
         print(f"✅ Investment recorded for {user.email}")
@@ -90,10 +87,11 @@ def check_for_deposit():
         db.close()
 
     except Exception as e:
-        print("❌ Error in check_for_deposit:", e)
+        print("❌ Error in check_for_trc20_deposit:", e)
 
-def start_polling():
-    print("🌀 Polling started in background...")
+
+def start_trc20_polling():
+    print("🌀 TRC20 Polling started in background...")
     while True:
-        check_for_deposit()
+        check_for_trc20_deposit()
         time.sleep(10)
