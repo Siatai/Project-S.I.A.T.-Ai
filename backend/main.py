@@ -4,18 +4,18 @@ from contextlib import asynccontextmanager
 import threading
 
 # 🧱 DB and Base
-from backend.db import Base, engine, SessionLocal
+from db import Base, engine, SessionLocal
 
 # 🔗 Routers
-from backend.api.routes.auth_routes import router as auth_router
-from backend.api.routes.investment_router import router as investment_router
+from api.routes.auth_routes import router as auth_router
+from api.routes.investment_router import router as investment_router
 
 # 🔁 Polling
-from backend.utils.usdt_checker import start_trc20_polling
+from utils.usdt_checker import start_trc20_polling
 
 # ⏰ ROI Creditor
 from apscheduler.schedulers.background import BackgroundScheduler
-from backend.utils.roi_creditor import credit_daily_roi
+from utils.roi_creditor import credit_daily_roi
 
 
 # ─────────────────────────────── Background Polling + ROI Scheduler ─────────────────────────────── #
