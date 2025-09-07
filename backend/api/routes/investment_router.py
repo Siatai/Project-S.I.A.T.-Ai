@@ -466,3 +466,37 @@ def get_referral_income(email: str, db: Session = Depends(get_db)):
             for e in earnings
         ],
     }
+
+@router.get("/associate/deposits")
+def get_associate_deposits(user=Depends(verify_token), db: Session = Depends(get_db)):
+    # find current user
+    db_user = db.query(User).filter_by(email=user["email"]).first()
+    if not db_user or not db_user.is_associate:
+        raise HTTPException(status_code=403, detail="Associate access required")
+
+    # get all referrals of this associate
+    referrals = db.query(User).filter(User.referred_by == db_user.referral_code).all()
+    referred_emails = [r.email for r in referrals]
+
+    if not referred_emails:
+        return []
+
+    # fetch deposits by referred users
+    deposits = (
+        db.query(Investment)
+        .filter(Investment.user_email.in_(referred_emails))
+        .order_by(Investment.timestamp.desc())
+        .all()
+    )
+
+    result = []
+    for inv in deposits:
+        u = db.query(User).filter_by(email=inv.user_email).first()
+        result.append({
+            "name": u.name if u else inv.user_email,  # fallback to email if no name
+            "amount": inv.amount,
+            "timestamp": inv.timestamp,
+            "tx_hash": inv.tx_hash,
+        })
+
+    return result

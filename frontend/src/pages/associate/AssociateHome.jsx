@@ -5,6 +5,9 @@ export default function AssociateHome() {
   const [user, setUser] = useState(null);
   const [deposits, setDeposits] = useState([]);
   const [totalDeposits, setTotalDeposits] = useState(0);
+  const [teamDeposits, setTeamDeposits] = useState([]);
+  const [totalTeamDeposits, setTotalTeamDeposits] = useState(0);
+
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // Fetch user data + deposits
@@ -17,7 +20,7 @@ export default function AssociateHome() {
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        // Once user is fetched, fetch deposits
+        // Own deposits
         if (res.data?.email) {
           const depRes = await axios.get(
             `${API}/investments?email=${res.data.email}`,
@@ -25,13 +28,24 @@ export default function AssociateHome() {
           );
           setDeposits(depRes.data);
 
-          // Calculate total
           const total = depRes.data.reduce(
             (sum, d) => sum + Number(d.amount),
             0
           );
           setTotalDeposits(total);
         }
+
+        // Team deposits
+        const teamRes = await axios.get(`${API}/associate/deposits`, {
+          headers,
+        });
+        setTeamDeposits(teamRes.data);
+
+        const teamTotal = teamRes.data.reduce(
+          (sum, d) => sum + Number(d.amount),
+          0
+        );
+        setTotalTeamDeposits(teamTotal);
       } catch (err) {
         console.error("Error fetching associate data:", err);
       }
@@ -135,6 +149,57 @@ export default function AssociateHome() {
                 fontSize: "14px",
               }}
             >
+              <span>{d.amount} USDT</span>
+              <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Team Deposits */}
+      <div
+        style={{
+          marginTop: 30,
+          padding: "15px",
+          borderRadius: "8px",
+          background: "#1E293B",
+          maxWidth: "800px",
+        }}
+      >
+        <h3 style={{ marginBottom: "10px" }}>👥 Team Deposits</h3>
+
+        {/* Total Row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "8px 0",
+            borderBottom: "2px solid #374151",
+            fontWeight: "bold",
+          }}
+        >
+          <span>Total Team Deposits</span>
+          <span>{totalTeamDeposits} USDT</span>
+        </div>
+
+        {/* Team Deposit List */}
+        {teamDeposits.length === 0 ? (
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
+            No team deposits yet
+          </p>
+        ) : (
+          teamDeposits.map((d, idx) => (
+            <div
+              key={idx}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "2fr 1fr 1fr",
+                borderBottom: "1px solid #374151",
+                padding: "6px 0",
+                fontSize: "14px",
+              }}
+            >
+              <span>{d.investor}</span>
               <span>{d.amount} USDT</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
