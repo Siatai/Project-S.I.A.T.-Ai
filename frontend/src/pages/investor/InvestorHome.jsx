@@ -6,6 +6,7 @@ export default function InvestorHome() {
   const [isAssociate, setIsAssociate] = useState(false);
   const [user, setUser] = useState(null);
   const [deposits, setDeposits] = useState([]);
+  const [totalDeposits, setTotalDeposits] = useState(0);
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // 🔹 Fetch user and deposits
@@ -31,6 +32,13 @@ export default function InvestorHome() {
             { headers }
           );
           setDeposits(depRes.data);
+
+          // Calculate total
+          const total = depRes.data.reduce(
+            (sum, d) => sum + Number(d.amount),
+            0
+          );
+          setTotalDeposits(total);
         }
       } catch (err) {
         console.error("Error fetching investor data:", err);
@@ -105,8 +113,26 @@ export default function InvestorHome() {
         }}
       >
         <h3 style={{ marginBottom: "10px" }}>💰 My Deposits</h3>
+
+        {/* Total Row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "8px 0",
+            borderBottom: "2px solid #374151",
+            fontWeight: "bold",
+          }}
+        >
+          <span>Total Deposits</span>
+          <span>{totalDeposits} USDT</span>
+        </div>
+
+        {/* Deposit List */}
         {deposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF" }}>No deposits yet</p>
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
+            No deposits yet
+          </p>
         ) : (
           deposits.map((d, idx) => (
             <div

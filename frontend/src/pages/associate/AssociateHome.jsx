@@ -4,25 +4,33 @@ import axios from "axios";
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
   const [deposits, setDeposits] = useState([]);
+  const [totalDeposits, setTotalDeposits] = useState(0);
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // Fetch user data
+  // Fetch user data + deposits
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API}/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
         // Once user is fetched, fetch deposits
         if (res.data?.email) {
           const depRes = await axios.get(
             `${API}/investments?email=${res.data.email}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers }
           );
           setDeposits(depRes.data);
+
+          // Calculate total
+          const total = depRes.data.reduce(
+            (sum, d) => sum + Number(d.amount),
+            0
+          );
+          setTotalDeposits(total);
         }
       } catch (err) {
         console.error("Error fetching associate data:", err);
@@ -95,8 +103,26 @@ export default function AssociateHome() {
         }}
       >
         <h3 style={{ marginBottom: "10px" }}>💰 My Deposits</h3>
+
+        {/* Total Row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "8px 0",
+            borderBottom: "2px solid #374151",
+            fontWeight: "bold",
+          }}
+        >
+          <span>Total Deposits</span>
+          <span>{totalDeposits} USDT</span>
+        </div>
+
+        {/* Deposit List */}
         {deposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF" }}>No deposits yet</p>
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
+            No deposits yet
+          </p>
         ) : (
           deposits.map((d, idx) => (
             <div
