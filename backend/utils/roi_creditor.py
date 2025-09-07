@@ -1,48 +1,68 @@
 from datetime import datetime
-from sqlalchemy.orm import Session
-
-from models.roi_model import ROIConfig
-from models.withdrawal_model import Investment
 from models.user_model import User
+from models.withdrawal_model import Investment
+from models.referral_model import ReferralEarning
+from models.roi_model import ROIConfig
+from models.commission_model import CommissionConfig
+from utils.user_logic import calculate_investor_roi
 
+def credit_daily_roi(db):
+    now = datetime.utcnow()
 
-def credit_daily_roi(db: Session):
-    """
-    Credit daily ROI to all users' wallet_balance.
-    - ROI % monthly from ROIConfig
-    - Daily split = monthly% / 22
-    - Credits only Mon–Fri
-    """
-
-    today = datetime.utcnow()
-    if today.weekday() >= 5:  # Sat=5, Sun=6
-        return {"message": "Weekend - no ROI credited"}
-
-    roi = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
-    percentage = roi.percentage if roi else 0.0
-    if percentage <= 0:
+    # Get latest ROI config (monthly %)
+    roi_config = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
+    if not roi_config:
         return {"message": "No ROI config set"}
 
-    daily_percentage = percentage / 22  # working days in a month
+    # Convert to daily ROI %
+    daily_roi_percentage = roi_config.percentage / 30
 
-    users = db.query(User).all()
+    # Get latest Commission config (monthly %)
+    commission_config = db.query(CommissionConfig).first()
+    commission_percentage = commission_config.percentage if commission_config else 0.0
+    daily_commission_percentage = commission_percentage / 30  # ✅ convert monthly → daily
+
     credited = []
 
-    for user in users:
-        investments = db.query(Investment).filter_by(user_email=user.email).all()
-        invested_amount = sum(inv.amount for inv in investments)
+    investments = db.query(Investment).all()
+    for inv in investments:
+        user = db.query(User).filter_by(email=inv.user_email).first()
+        if not user:
+            continue
 
-        if invested_amount > 0:
-            daily_earning = invested_amount * (daily_percentage / 100)
-            daily_earning = round(daily_earning, 2)
+        # ✅ Calculate days since deposit
+        days = (now - inv.timestamp).days
+        if days <= 0:
+            continue
 
-            user.wallet_balance += daily_earning
-            credited.append({
-                "email": user.email,
-                "invested": invested_amount,
-                "credited": daily_earning,
-                "new_balance": user.wallet_balance
-            })
+        # ✅ Daily ROI for this investment
+        daily_profit = inv.amount * (daily_roi_percentage / 100)
+
+        # Add profit to investor wallet
+        user.wallet_balance += daily_profit
+
+        credited.append({
+            "email": user.email,
+            "daily_profit": round(daily_profit, 2)
+        })
+
+        # ✅ Commission to referrer (if exists)
+        if user.referred_by:
+            referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
+            if referrer:
+                commission_amount = daily_profit * (daily_commission_percentage / 100)
+                referrer.wallet_balance += commission_amount
+
+                # Record referral earning
+                earning = ReferralEarning(
+                    referrer_email=referrer.email,
+                    referred_email=user.email,
+                    investment_amount=inv.amount,
+                    percentage=commission_percentage,
+                    commission_amount=commission_amount,
+                    timestamp=now
+                )
+                db.add(earning)
 
     db.commit()
-    return {"message": f"Credited ROI to {len(credited)} users", "details": credited}
+    return {"message": "Daily ROI + Commissions credited", "credited": credited}

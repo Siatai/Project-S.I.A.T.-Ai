@@ -32,25 +32,18 @@ def verify_otp(email: str, otp: str) -> bool:
 # ─────────────────────────────
 # 📌 ROI Calculation
 # ─────────────────────────────
-def calculate_investor_roi(db, investment_amount: float, start_date: datetime, end_date: datetime):
-    """
-    Calculate ROI earnings between two dates.
-    - ROI% is per month
-    - Split into weekdays only (Mon–Fri)
-    - Skips Sat/Sun
-    """
+def calculate_investor_roi(db, amount: float, start_date: datetime, now: datetime):
+    from models.roi_model import ROIConfig  # import inside to avoid circular
     roi = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
-    percentage = roi.percentage if roi else 0.0
+    if not roi:
+        return 0.0
 
-    # Daily ROI % = Monthly % / 22 working days
-    daily_percentage = percentage / 22  
+    monthly_percentage = roi.percentage
+    daily_percentage = monthly_percentage / 30  # ✅ convert monthly → daily
 
-    total_earned = 0.0
-    current = start_date
+    days = (now - start_date).days
+    if days < 0:
+        days = 0
 
-    while current <= end_date:
-        if current.weekday() < 5:  # Mon=0 ... Fri=4
-            total_earned += investment_amount * (daily_percentage / 100)
-        current += timedelta(days=1)
-
-    return round(total_earned, 2)
+    earned = amount * (daily_percentage / 100) * days
+    return round(earned, 2)

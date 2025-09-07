@@ -443,29 +443,31 @@ def get_referral_income(email: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Fetch all referral earnings for this associate
+    # Fetch referral earnings (already recorded daily in credit_daily_roi)
     earnings = db.query(ReferralEarning).filter_by(referrer_email=email).all()
 
     total = sum(e.commission_amount for e in earnings)
+
     withdrawn = db.query(Withdrawal).filter_by(email=email).with_entities(
         Withdrawal.final_amount
     ).all()
     withdrawn_sum = sum(w.final_amount for w in withdrawn)
 
     return {
-        "total": round(total, 2),
-        "withdrawn": round(withdrawn_sum, 2),
-        "withdrawable": round(user.wallet_balance, 2),  # ✅ live wallet balance
+        "total": round(total, 2),            # total referral commission earned
+        "withdrawn": round(withdrawn_sum, 2), # withdrawals already made
+        "withdrawable": round(user.wallet_balance, 2), # live wallet balance
         "details": [
             {
-                "name": e.referred_email,
-                "amount": e.investment_amount,
-                "earning": round(e.commission_amount, 2),
+                "investor": e.referred_email,   # who generated this earning
+                "roi_source": round(e.investment_amount, 2),  # original deposit (context)
+                "commission": round(e.commission_amount, 2),  # actual commission earned from ROI
                 "date": e.timestamp.strftime("%Y-%m-%d"),
             }
             for e in earnings
         ],
     }
+
 
 @router.get("/associate/deposits")
 def get_associate_deposits(user=Depends(verify_token), db: Session = Depends(get_db)):
