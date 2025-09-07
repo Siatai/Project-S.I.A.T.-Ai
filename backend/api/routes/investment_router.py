@@ -560,3 +560,12 @@ def get_admin_stats(db: Session = Depends(get_db), user=Depends(verify_token)):
         "total_withdrawals": round(total_withdrawals, 2),
         "total_commissions": round(total_commissions, 2),
     }
+    
+
+@router.post("/admin/force-credit-roi")
+def force_credit_roi(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    # Call the ROI logic but skip the "already credited today" check
+    return credit_daily_roi(db, force=True)
