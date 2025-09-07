@@ -5,7 +5,7 @@ import bg from "../Components/bg.png";
 import avatar from "../Components/avatar.png";
 import sniper from "../Components/sniper.png";
 
-// Glowing Divider with animation
+// Divider with neon glow + shine
 const Divider = () => (
   <div
     style={{
@@ -14,8 +14,8 @@ const Divider = () => (
       maxWidth: "90%",
       borderRadius: "4px",
       background:
-        "linear-gradient(90deg, rgba(0,0,0,0) 0%, #3B82F6 20%, #60A5FA 50%, #3B82F6 80%, rgba(0,0,0,0) 100%)",
-      boxShadow: "0 0 30px 8px rgba(59,130,246,0.9)",
+        "linear-gradient(90deg, rgba(0,0,0,0) 0%, #17E8E5 20%, #17E8E5 50%, #17E8E5 80%, rgba(0,0,0,0) 100%)",
+      boxShadow: "0 0 30px 8px rgba(23,232,229,0.9)",
       position: "relative",
       overflow: "hidden",
     }}
@@ -38,6 +38,7 @@ const Divider = () => (
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
 
+  // Forex stats
   const stats = [
     { stat: "$7T+", desc: "Daily Trading Volume" },
     { stat: "24/5", desc: "Market Open Hours" },
@@ -45,6 +46,7 @@ export default function Landing() {
     { stat: "88%", desc: "Liquidity vs Stocks" },
   ];
 
+  // Coming soon
   const comingSoon = [
     { icon: "📊", desc: "Arbitrage Bot" },
     { icon: "⚡", desc: "MEV Bot" },
@@ -96,14 +98,13 @@ export default function Landing() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderBottom: "1px solid #1E293B",
           fontFamily: "Orbitron, Arial, sans-serif",
-          background: "rgba(11,18,32,0.8)",
-          backdropFilter: "blur(6px)",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.6)",
+          background: "rgba(11,18,32,0.9)",
+          backdropFilter: "blur(8px)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.6)",
         }}
       >
-        <h1 style={{ color: "#3B82F6", fontSize: "20px", fontWeight: "bold" }}>
+        <h1 style={{ color: "#17E8E5", fontSize: "20px", fontWeight: "bold" }}>
           AlgoM³ Ai
         </h1>
         <img
@@ -115,7 +116,7 @@ export default function Landing() {
             height: "40px",
             borderRadius: "50%",
             cursor: "pointer",
-            border: "2px solid #3B82F6",
+            border: "2px solid #17E8E5",
             background: "#fff",
           }}
         />
@@ -141,15 +142,15 @@ export default function Landing() {
             fontSize: "34px",
             fontWeight: "800",
             marginBottom: "20px",
-            textShadow: "0 0 25px #3B82F6, 0 0 60px #1E3A8A",
+            textShadow: "0 0 25px #17E8E5, 0 0 60px #0B1220",
             lineHeight: "1.2",
           }}
         >
           Meet Algo's{" "}
           <span
             style={{
-              color: "#3B82F6",
-              textShadow: "0 0 30px #3B82F6, 0 0 60px #2563EB",
+              color: "#17E8E5",
+              textShadow: "0 0 30px #17E8E5, 0 0 60px #0B1220",
               animation: "pulse 2s infinite",
             }}
           >
@@ -170,7 +171,7 @@ export default function Landing() {
           }}
         >
           AI-powered Forex bot delivering{" "}
-          <span style={{ color: "#3B82F6", fontWeight: "600" }}>8–10% ROI</span>{" "}
+          <span style={{ color: "#17E8E5", fontWeight: "600" }}>8–10% ROI</span>{" "}
           monthly. Transparent, consistent, and futuristic growth.
         </motion.p>
 
@@ -179,8 +180,8 @@ export default function Landing() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setAuthOpen(true)}
           style={{
-            background: "#3B82F6",
-            color: "#fff",
+            background: "#17E8E5",
+            color: "#0B1220",
             border: "none",
             padding: "14px 36px",
             borderRadius: "10px",
@@ -210,7 +211,7 @@ export default function Landing() {
         <h3
           style={{
             fontSize: "24px",
-            color: "#3B82F6",
+            color: "#17E8E5",
             fontWeight: "700",
             marginBottom: "20px",
             textAlign: "center",
@@ -218,12 +219,7 @@ export default function Landing() {
         >
           About Forex
         </h3>
-        <div
-          style={{
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
+        <div style={{ overflow: "hidden" }}>
           <div
             style={{
               display: "flex",
@@ -238,17 +234,17 @@ export default function Landing() {
                   flex: "0 0 250px",
                   margin: "0 12px",
                   background: "rgba(30,41,59,0.7)",
-                  border: "1px solid #1E293B",
                   borderRadius: "12px",
                   padding: "30px 20px",
                   textAlign: "center",
+                  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
                 }}
               >
                 <h4
                   style={{
                     fontSize: "24px",
                     fontWeight: "700",
-                    color: "#3B82F6",
+                    color: "#17E8E5",
                     marginBottom: "10px",
                   }}
                 >
@@ -279,13 +275,13 @@ export default function Landing() {
           style={{
             fontSize: "22px",
             fontWeight: "700",
-            color: "#3B82F6",
+            color: "#17E8E5",
             marginBottom: "20px",
           }}
         >
           Coming Soon
         </h3>
-        <div style={{ overflow: "hidden", position: "relative" }}>
+        <div style={{ overflow: "hidden" }}>
           <div
             style={{
               display: "flex",
@@ -300,10 +296,10 @@ export default function Landing() {
                   flex: "0 0 250px",
                   margin: "0 12px",
                   background: "rgba(30,41,59,0.7)",
-                  border: "1px solid #1E293B",
                   borderRadius: "12px",
                   padding: "30px 20px",
                   textAlign: "center",
+                  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
                 }}
               >
                 <h4 style={{ fontSize: "28px", marginBottom: "10px" }}>
@@ -338,12 +334,12 @@ export default function Landing() {
         <p>Global AI Trading Innovation Hub</p>
       </footer>
 
-      {/* Animations */}
+      {/* Animations + Fixes */}
       <style>{`
         @keyframes pulse {
-          0% { opacity: 1; text-shadow: 0 0 25px #3B82F6, 0 0 60px #1E3A8A; }
-          50% { opacity: 0.7; text-shadow: 0 0 15px #3B82F6; }
-          100% { opacity: 1; text-shadow: 0 0 25px #3B82F6, 0 0 60px #1E3A8A; }
+          0% { opacity: 1; text-shadow: 0 0 25px #17E8E5, 0 0 60px #0B1220; }
+          50% { opacity: 0.7; text-shadow: 0 0 15px #17E8E5; }
+          100% { opacity: 1; text-shadow: 0 0 25px #17E8E5, 0 0 60px #0B1220; }
         }
         @keyframes shine {
           0% { left: -50%; }
@@ -352,6 +348,16 @@ export default function Landing() {
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-33.33%); }
+        }
+        html, body {
+          margin: 0;
+          padding: 0;
+          background-color: #0B1220;
+          height: 100%;
+          overflow-x: hidden;
+        }
+        #root {
+          height: 100%;
         }
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }

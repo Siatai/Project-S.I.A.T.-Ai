@@ -11,7 +11,6 @@ export default function Deposit() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // 🔹 Fetch bound wallet on load
   useEffect(() => {
     const fetchWallet = async () => {
       try {
@@ -26,7 +25,6 @@ export default function Deposit() {
     if (token) fetchWallet();
   }, [token]);
 
-  // 🔹 Save wallet
   const saveWallet = async () => {
     try {
       await axios.post(
@@ -44,10 +42,8 @@ export default function Deposit() {
     }
   };
 
-  // TRC20 deposit address
   const TRC20_ADDRESS = "TF14BvXgdkyz6Bv8ApoQMr8acDYyaHmRgz";
 
-  // Deposit methods
   const methods = [
     { id: "trc20", name: "Tether (USDT TRC20)", active: true, recommended: true },
     { id: "erc20", name: "Tether (USDT ERC20)", active: false },
@@ -57,15 +53,25 @@ export default function Deposit() {
   ];
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
-      <h2 style={{ marginBottom: "20px" }}>Deposit</h2>
+    <div style={{ color: "#E5E7EB", padding: "20px" }}>
+      <h2
+        style={{
+          marginBottom: "10px",
+          fontFamily: "Orbitron, sans-serif",
+          color: "#17E8E5",
+        }}
+      >
+        Deposit
+      </h2>
+      <div style={glowLine} />
 
-      {/* Deposit Methods Grid */}
+      {/* Methods Grid */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
           gap: "20px",
+          marginTop: "20px",
         }}
       >
         {methods.map((m) => (
@@ -73,64 +79,68 @@ export default function Deposit() {
             key={m.id}
             onClick={() => {
               if (m.active) {
-                if (!wallet) {
-                  setShowWalletPopup(true); // 🚨 force wallet bind first
-                } else {
-                  setSelected(m.id);
-                }
+                if (!wallet) setShowWalletPopup(true);
+                else setSelected(m.id);
               }
             }}
             style={{
               position: "relative",
-              background: "#1F2937",
-              padding: "20px",
-              borderRadius: "8px",
+              background: "rgba(17,24,39,0.7)",
+              backdropFilter: "blur(8px)",
+              padding: "22px",
+              borderRadius: "12px",
               cursor: m.active ? "pointer" : "not-allowed",
-              opacity: m.active ? 1 : 0.6,
+              opacity: m.active ? 1 : 0.5,
               border:
-                selected === m.id ? "2px solid #3B82F6" : "2px solid transparent",
+                selected === m.id
+                  ? "2px solid #17E8E5"
+                  : "1px solid rgba(255,255,255,0.1)",
+              transition: "all 0.3s ease",
+              boxShadow:
+                selected === m.id
+                  ? "0 0 20px rgba(23,232,229,0.6)"
+                  : "0 0 8px rgba(23,232,229,0.2)",
             }}
           >
-            <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>{m.name}</h3>
-            <p style={{ fontSize: "14px", color: "#9CA3AF" }}>
-              {m.active
-                ? "Processing time: Instant – 15 minutes"
-                : "Processing time: Coming soon"}
+            <h3 style={{ fontSize: "16px", marginBottom: "10px", fontWeight: "600" }}>
+              {m.name}
+            </h3>
+            <p style={{ fontSize: "13px", color: "#9CA3AF" }}>
+              {m.active ? "Processing: Instant – 15 minutes" : "Coming soon"}
             </p>
 
-            {/* Recommended badge */}
             {m.recommended && (
               <span
                 style={{
                   position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  background: "#10B981",
-                  color: "#fff",
-                  fontSize: "12px",
-                  padding: "2px 8px",
+                  top: "12px",
+                  right: "12px",
+                  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
+                  color: "#0B1220",
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  padding: "3px 10px",
                   borderRadius: "12px",
+                  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
                 }}
               >
                 LIVE
               </span>
             )}
 
-            {/* Coming Soon watermark */}
             {!m.active && (
               <div
                 style={{
                   position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%) ",
-                  background: "rgba(0,0,0,0.7)",
-                  color: "#FFFFFF",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  padding: "5px 15px",
-                  borderRadius: "4px",
-                  pointerEvents: "none",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(0,0,0,0.65)",
+                  color: "#E5E7EB",
+                  fontSize: "15px",
+                  fontWeight: "600",
+                  borderRadius: "12px",
                 }}
               >
                 Coming Soon
@@ -140,48 +150,40 @@ export default function Deposit() {
         ))}
       </div>
 
-      {/* Popup for TRC20 */}
+      {/* TRC20 Deposit Modal */}
       {selected === "trc20" && (
-        <div
-          style={{
-            marginTop: "30px",
-            padding: "20px",
-            background: "#111827",
-            borderRadius: "8px",
-            textAlign: "center",
-          }}
-        >
-          <h3 style={{ marginBottom: "15px" }}>Deposit via TRC20 (USDT)</h3>
-          <QRCodeCanvas value={TRC20_ADDRESS} size={180} />
-          <p style={{ marginTop: "15px", fontSize: "14px" }}>
-            Send USDT to the address below:
-          </p>
-          <p
-            style={{
-              marginTop: "10px",
-              padding: "10px",
-              background: "#1F2937",
-              borderRadius: "6px",
-              fontFamily: "monospace",
-              wordBreak: "break-all",
-            }}
-          >
-            {TRC20_ADDRESS}
-          </p>
-          <button
-            onClick={() => navigator.clipboard.writeText(TRC20_ADDRESS)}
-            style={{
-              marginTop: "15px",
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "6px",
-              background: "#3B82F6",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            Copy Address
-          </button>
+        <div style={popupOverlay} onClick={() => setSelected(null)}>
+          <div style={popupBox} onClick={(e) => e.stopPropagation()}>
+            <button style={closeBtn} onClick={() => setSelected(null)}>
+              ✕
+            </button>
+            <h3 style={{ marginBottom: "18px", fontWeight: "600", color: "#17E8E5" }}>
+              Deposit via TRC20 (USDT)
+            </h3>
+            <QRCodeCanvas value={TRC20_ADDRESS} size={180} />
+            <p style={{ marginTop: "15px", fontSize: "14px", color: "#9CA3AF" }}>
+              Send USDT to the address below:
+            </p>
+            <p
+              style={{
+                marginTop: "12px",
+                padding: "12px",
+                background: "rgba(31,41,55,0.8)",
+                borderRadius: "8px",
+                fontFamily: "monospace",
+                wordBreak: "break-all",
+                fontSize: "14px",
+              }}
+            >
+              {TRC20_ADDRESS}
+            </p>
+            <button
+              onClick={() => navigator.clipboard.writeText(TRC20_ADDRESS)}
+              style={btnTeal}
+            >
+              Copy Address
+            </button>
+          </div>
         </div>
       )}
 
@@ -189,8 +191,13 @@ export default function Deposit() {
       {showWalletPopup && (
         <div style={popupOverlay} onClick={() => setShowWalletPopup(false)}>
           <div style={popupBox} onClick={(e) => e.stopPropagation()}>
-            <h3>🔗 Bind Your TRC20 Wallet</h3>
-            <p style={{ fontSize: "14px", marginBottom: "10px" }}>
+            <button style={closeBtn} onClick={() => setShowWalletPopup(false)}>
+              ✕
+            </button>
+            <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>
+              Bind Your TRC20 Wallet
+            </h3>
+            <p style={{ fontSize: "13px", marginBottom: "12px", color: "#9CA3AF" }}>
               You must bind your withdrawal wallet before depositing.
             </p>
             <input
@@ -198,14 +205,9 @@ export default function Deposit() {
               placeholder="Enter TRC20 Wallet Address"
               value={newWallet}
               onChange={(e) => setNewWallet(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "6px",
-                marginBottom: "10px",
-              }}
+              style={inputStyle}
             />
-            <button onClick={saveWallet} style={btnGreen}>
+            <button onClick={saveWallet} style={btnTeal}>
               Save Wallet
             </button>
           </div>
@@ -215,13 +217,33 @@ export default function Deposit() {
   );
 }
 
-const btnGreen = {
-  padding: "10px 20px",
+/* === Shared Styles === */
+const btnTeal = {
+  marginTop: "15px",
+  padding: "12px 24px",
   border: "none",
-  borderRadius: "6px",
-  background: "#22C55E",
-  color: "#fff",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
+  color: "#0B1220",
+  fontWeight: "700",
   cursor: "pointer",
+  transition: "all 0.3s ease",
+  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
+  width: "100%",
+  maxWidth: "420px",
+};
+
+const inputStyle = {
+  width: "100%",
+  maxWidth: "420px",
+  padding: "12px",
+  borderRadius: "8px",
+  marginBottom: "12px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  fontSize: "14px",
+  boxSizing: "border-box",
 };
 
 const popupOverlay = {
@@ -234,12 +256,34 @@ const popupOverlay = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  zIndex: 1000,
 };
 
 const popupBox = {
-  background: "#1F2937",
-  padding: "20px",
-  borderRadius: "10px",
-  maxWidth: "400px",
-  width: "100%",
+  background: "rgba(17,24,39,0.95)",
+  padding: "25px",
+  borderRadius: "12px",
+  maxWidth: "420px",
+  width: "90%",
+  boxShadow: "0 0 25px rgba(23,232,229,0.35)",
+  textAlign: "center",
+  position: "relative",
+};
+
+const closeBtn = {
+  position: "absolute",
+  top: "10px",
+  right: "12px",
+  background: "transparent",
+  border: "none",
+  fontSize: "20px",
+  color: "#E5E7EB",
+  cursor: "pointer",
+};
+
+const glowLine = {
+  height: "2px",
+  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
+  boxShadow: "0 0 10px #17E8E5",
+  marginBottom: "20px",
 };

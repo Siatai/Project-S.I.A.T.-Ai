@@ -13,7 +13,7 @@ export default function Withdrawal() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // 🔹 Reusable fetch summary function
+  // 🔹 Fetch wallet summary
   const fetchSummary = useCallback(async () => {
     try {
       setLoading(true);
@@ -22,11 +22,26 @@ export default function Withdrawal() {
       });
 
       const data = res.data;
-      const withdrawn = data.withdrawals.reduce(
+
+      const approved = data.withdrawals.filter((w) => w.status === "approved");
+      const pending = data.withdrawals.filter((w) => w.status === "pending");
+
+      const withdrawn = approved.reduce(
         (sum, w) => sum + (w.final_amount || 0),
         0
       );
-      const total = withdrawn + (data.wallet_balance || 0);
+      const pendingAmt = pending.reduce(
+        (sum, w) => sum + (w.requested_amount || 0),
+        0
+      );
+      const total = withdrawn + pendingAmt + (data.wallet_balance || 0);
+
+      // ✅ Deductions = requested - final (only approved)
+      const deductions = approved.reduce(
+        (sum, w) =>
+          sum + ((w.requested_amount || 0) - (w.final_amount || 0)),
+        0
+      );
 
       setSummary({
         wallet: data.wallet,
@@ -34,7 +49,9 @@ export default function Withdrawal() {
         withdrawals: data.withdrawals || [],
         total,
         withdrawn,
+        pending: pendingAmt,
         withdrawable: data.wallet_balance || 0,
+        deductions,
       });
     } catch (err) {
       console.error("Error fetching wallet summary:", err);
@@ -44,7 +61,6 @@ export default function Withdrawal() {
     }
   }, [API, token]);
 
-  // 🔹 Initial fetch
   useEffect(() => {
     if (token) fetchSummary();
   }, [token, fetchSummary]);
@@ -52,7 +68,7 @@ export default function Withdrawal() {
   // 🔹 Request OTP
   const requestOtp = async () => {
     if (!summary?.wallet) {
-      setShowWalletPopup(true); // 🚨 show popup if no wallet bound
+      setShowWalletPopup(true);
       return;
     }
     try {
@@ -112,53 +128,88 @@ export default function Withdrawal() {
   if (!summary) return <p style={{ color: "#E5E7EB" }}>No wallet data available.</p>;
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
-      <h2 style={{ marginBottom: "20px" }}>Withdrawal</h2>
+    <div style={{ color: "#E5E7EB", padding: "20px" }}>
+      <h2
+        style={{
+          marginBottom: "10px",
+          fontFamily: "Orbitron, sans-serif",
+          color: "#17E8E5",
+        }}
+      >
+        Withdrawal
+      </h2>
+      <div style={glowLine} />
 
       {/* Wallet Summary */}
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "25px",
+          marginTop: "20px",
+          flexWrap: "wrap",
+        }}
+      >
         <div style={cardStyle}>
-          <h3>Total Earnings</h3>
+          <h3 style={cardTitle}>Total Earnings</h3>
           <p style={valueStyle}>${summary.total.toFixed(2)}</p>
         </div>
         <div style={cardStyle}>
-          <h3>Withdrawn</h3>
+          <h3 style={cardTitle}>Withdrawn</h3>
           <p style={valueStyle}>${summary.withdrawn.toFixed(2)}</p>
         </div>
         <div style={cardStyle}>
-          <h3>Withdrawable</h3>
-          <p style={{ ...valueStyle, color: "#22C55E" }}>
+          <h3 style={cardTitle}>Pending</h3>
+          <p style={{ ...valueStyle, color: "#FACC15" }}>
+            ${summary.pending.toFixed(2)}
+          </p>
+        </div>
+        <div style={cardStyle}>
+          <h3 style={cardTitle}>Withdrawable</h3>
+          <p style={{ ...valueStyle, color: "#17E8E5" }}>
             ${summary.withdrawable.toFixed(2)}
+          </p>
+        </div>
+        <div style={cardStyle}>
+          <h3 style={cardTitle}>Total Deductions</h3>
+          <p style={{ ...valueStyle, color: "#EF4444" }}>
+            -${summary.deductions.toFixed(2)}
           </p>
         </div>
       </div>
 
+      <div style={glowLine} />
+
       {/* Withdraw Earnings */}
       {summary.withdrawable > 0 && !otpSent && (
-        <button onClick={requestOtp} style={btnBlue}>
+        <button onClick={requestOtp} style={btnTeal}>
           Request Withdrawal
         </button>
       )}
 
       {/* OTP Confirmation */}
       {otpSent && (
-        <div style={{ marginBottom: "20px" }}>
+        <div
+          style={{
+            marginBottom: "20px",
+            maxWidth: "420px",
+            background: "rgba(17,24,39,0.7)",
+            padding: "18px",
+            borderRadius: "12px",
+            marginTop: "20px",
+          }}
+        >
           <input
             type="text"
             placeholder="Enter OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "6px",
-              marginBottom: "10px",
-            }}
+            style={inputStyle}
           />
           <button
             onClick={confirmWithdrawal}
             disabled={withdrawing || !otp}
-            style={btnGreen}
+            style={btnTeal}
           >
             {withdrawing ? "Submitting..." : "Confirm Withdrawal"}
           </button>
@@ -169,8 +220,11 @@ export default function Withdrawal() {
       {showWalletPopup && (
         <div style={popupOverlay} onClick={() => setShowWalletPopup(false)}>
           <div style={popupBox} onClick={(e) => e.stopPropagation()}>
-            <h3>🔗 Bind Your TRC20 Wallet</h3>
-            <p style={{ fontSize: "14px", marginBottom: "10px" }}>
+            <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>
+              Bind Your TRC20 Wallet
+            </h3>
+            <div style={glowLine} />
+            <p style={{ fontSize: "14px", marginBottom: "12px", color: "#94A3B8" }}>
               You must bind a withdrawal wallet before requesting withdrawal.
             </p>
             <input
@@ -178,14 +232,9 @@ export default function Withdrawal() {
               placeholder="Enter TRC20 Wallet Address"
               value={newWallet}
               onChange={(e) => setNewWallet(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "6px",
-                marginBottom: "10px",
-              }}
+              style={inputStyle}
             />
-            <button onClick={saveWallet} style={btnGreen}>
+            <button onClick={saveWallet} style={btnTeal}>
               Save Wallet
             </button>
           </div>
@@ -195,35 +244,55 @@ export default function Withdrawal() {
   );
 }
 
+/* === Styles === */
 const cardStyle = {
   flex: "1",
-  padding: "15px",
-  background: "#1F2937",
-  borderRadius: "8px",
+  padding: "18px",
+  borderRadius: "12px",
+  background: "rgba(17,24,39,0.8)",
+  backdropFilter: "blur(8px)",
+  boxShadow: "0 0 20px rgba(23,232,229,0.15)",
+  minWidth: "200px",
+};
+
+const cardTitle = {
+  fontSize: "14px",
+  color: "#94A3B8",
+  marginBottom: "8px",
+  fontWeight: "500",
 };
 
 const valueStyle = {
   fontSize: "20px",
+  fontWeight: "700",
+  color: "#E5E7EB",
+};
+
+const btnTeal = {
   marginTop: "10px",
+  padding: "12px 20px",
+  border: "none",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
+  color: "#0B1220",
+  fontWeight: "700",
+  cursor: "pointer",
+  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+  transition: "all 0.3s ease",
+  width: "100%",
+  maxWidth: "420px",
 };
 
-const btnBlue = {
-  marginBottom: "20px",
-  padding: "10px 20px",
-  border: "none",
-  borderRadius: "6px",
-  background: "#3B82F6",
-  color: "#fff",
-  cursor: "pointer",
-};
-
-const btnGreen = {
-  padding: "10px 20px",
-  border: "none",
-  borderRadius: "6px",
-  background: "#22C55E",
-  color: "#fff",
-  cursor: "pointer",
+const inputStyle = {
+  width: "100%",
+  maxWidth: "420px",
+  padding: "12px",
+  borderRadius: "8px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  marginBottom: "12px",
+  boxSizing: "border-box",
 };
 
 const popupOverlay = {
@@ -236,12 +305,23 @@ const popupOverlay = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  zIndex: 1000,
 };
 
 const popupBox = {
-  background: "#1F2937",
-  padding: "20px",
-  borderRadius: "10px",
-  maxWidth: "400px",
+  background: "rgba(17,24,39,0.95)",
+  padding: "25px",
+  borderRadius: "12px",
+  maxWidth: "420px",
   width: "100%",
+  boxShadow: "0 0 20px rgba(23,232,229,0.25)",
+  boxSizing: "border-box",
+  textAlign: "center",
+};
+
+const glowLine = {
+  height: "2px",
+  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
+  boxShadow: "0 0 10px #17E8E5",
+  margin: "8px 0 20px 0",
 };

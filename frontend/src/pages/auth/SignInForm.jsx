@@ -10,7 +10,6 @@ export default function SignInForm() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // Step 1: Request OTP
   const sendOtp = async () => {
     if (!email.trim()) {
       alert("⚠️ Please enter your email address.");
@@ -26,20 +25,21 @@ export default function SignInForm() {
     }
   };
 
-  // Step 2: Verify OTP
   const verifyOtp = async () => {
     try {
       const res = await axios.post(`${API}/verify-otp`, { email, otp });
       const { token, user } = res.data;
 
-      // Save token & role
       localStorage.setItem("token", token);
-      const role = user.is_admin ? "admin" : user.is_associate ? "associate" : "investor";
+      const role = user.is_admin
+        ? "admin"
+        : user.is_associate
+        ? "associate"
+        : "investor";
       localStorage.setItem("role", role);
 
       alert("✅ Login successful!");
 
-      // Redirect based on role
       if (role === "admin") navigate("/admin");
       else if (role === "associate") navigate("/associate");
       else navigate("/investor");
@@ -50,9 +50,7 @@ export default function SignInForm() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "50px auto", color: "#E5E7EB" }}>
-      <h2 style={{ marginBottom: 20 }}>Sign In</h2>
-
+    <div>
       {!otpSent ? (
         <>
           <input
@@ -60,20 +58,9 @@ export default function SignInForm() {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{ width: "100%", padding: 10, borderRadius: 6, marginBottom: 15 }}
+            style={inputStyle}
           />
-          <button
-            onClick={sendOtp}
-            style={{
-              width: "100%",
-              padding: 10,
-              border: "none",
-              borderRadius: 6,
-              background: "#3B82F6",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={sendOtp} style={buttonStyleTeal}>
             Send OTP
           </button>
         </>
@@ -84,20 +71,9 @@ export default function SignInForm() {
             placeholder="Enter OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            style={{ width: "100%", padding: 10, borderRadius: 6, marginBottom: 15 }}
+            style={inputStyle}
           />
-          <button
-            onClick={verifyOtp}
-            style={{
-              width: "100%",
-              padding: 10,
-              border: "none",
-              borderRadius: 6,
-              background: "#22C55E",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={verifyOtp} style={buttonStyleTeal}>
             Verify OTP
           </button>
         </>
@@ -105,3 +81,28 @@ export default function SignInForm() {
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px 14px",
+  marginBottom: "18px",
+  borderRadius: "10px",
+  border: "1px solid #1E293B",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  fontSize: "14px",
+  boxSizing: "border-box",
+};
+
+const buttonStyleTeal = {
+  width: "100%",
+  padding: "12px",
+  border: "none",
+  borderRadius: "10px",
+  background: "#17E8E5",
+  color: "#0B1220",
+  fontSize: "15px",
+  fontWeight: "700",
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+};

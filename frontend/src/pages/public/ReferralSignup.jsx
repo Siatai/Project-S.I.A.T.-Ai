@@ -60,7 +60,7 @@ export default function ReferralSignup() {
 
       alert("✅ Signup successful!");
 
-      // Redirect based on role
+      // Redirect
       if (role === "admin") navigate("/admin");
       else if (role === "associate") navigate("/associate");
       else navigate("/investor");
@@ -75,101 +75,171 @@ export default function ReferralSignup() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#0B1220",
+        flexDirection: "column",
+        background: "linear-gradient(135deg,#0B1220,#0F2F2D,#000)",
         color: "#E5E7EB",
-        padding: "20px",
       }}
     >
-      <div style={{ width: "100%", maxWidth: "400px" }}>
-        <h2 style={{ marginBottom: 20, textAlign: "center" }}>Referral Signup</h2>
+      {/* 🔹 Header */}
+      <header
+        style={{
+          height: "60px",
+          background: "rgba(18,26,43,0.9)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 20px",
+          borderBottom: "1px solid rgba(23,232,229,0.3)",
+          boxShadow: "0 0 12px rgba(23,232,229,0.2)",
+        }}
+      >
+        <h1
+          style={{
+            fontFamily: "Orbitron, sans-serif",
+            fontWeight: "700",
+            color: "#17E8E5",
+            fontSize: "22px",
+          }}
+        >
+          AlgoM³
+        </h1>
+        <span style={{ color: "#94A3B8", fontSize: "14px" }}>
+          Referral Signup
+        </span>
+      </header>
 
-        {!otpSent ? (
-          <>
-            <input
-              type="text"
-              placeholder="Full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 6,
-                marginBottom: 10,
-              }}
-            />
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 6,
-                marginBottom: 10,
-              }}
-            />
-            <input
-              type="text"
-              value={referralCode}
-              disabled
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 6,
-                marginBottom: 15,
-                background: "#1F2937",
-                color: "#9CA3AF",
-              }}
-            />
-            <button
-              onClick={sendOtp}
-              style={{
-                width: "100%",
-                padding: 10,
-                border: "none",
-                borderRadius: 6,
-                background: "#3B82F6",
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              Send OTP
-            </button>
-          </>
-        ) : (
-          <>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 6,
-                marginBottom: 15,
-              }}
-            />
-            <button
-              onClick={verifyOtp}
-              style={{
-                width: "100%",
-                padding: 10,
-                border: "none",
-                borderRadius: 6,
-                background: "#22C55E",
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              Verify OTP
-            </button>
-          </>
-        )}
-      </div>
+      {/* 🔹 Main Content */}
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "420px",
+            background: "rgba(17,24,39,0.85)",
+            padding: "30px",
+            borderRadius: "12px",
+            boxShadow: "0 0 20px rgba(23,232,229,0.25)",
+          }}
+        >
+          <h2
+            style={{
+              marginBottom: "20px",
+              textAlign: "center",
+              fontFamily: "Orbitron, sans-serif",
+              color: "#17E8E5",
+            }}
+          >
+            Signup
+          </h2>
+
+          {!otpSent ? (
+            <>
+              <input
+                type="text"
+                placeholder="Full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={inputStyle}
+              />
+              <input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={inputStyle}
+              />
+              <input
+                type="text"
+                value={referralCode}
+                disabled
+                style={{
+                  ...inputStyle,
+                  background: "rgba(31,41,55,0.8)",
+                  color: "#9CA3AF",
+                  cursor: "not-allowed",
+                }}
+              />
+              <button onClick={sendOtp} style={btnTeal}>
+                Send OTP
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                style={inputStyle}
+              />
+              <button onClick={verifyOtp} style={btnGreen}>
+                Verify OTP
+              </button>
+            </>
+          )}
+        </div>
+      </main>
+
+      {/* 🔹 Footer */}
+      <footer
+        style={{
+          padding: "12px",
+          textAlign: "center",
+          fontSize: "13px",
+          color: "#9CA3AF",
+          borderTop: "1px solid rgba(23,232,229,0.2)",
+          background: "rgba(18,26,43,0.8)",
+        }}
+      >
+        © {new Date().getFullYear()} AlgoM³ • All Rights Reserved
+      </footer>
     </div>
   );
 }
+
+/* === Styles === */
+const inputStyle = {
+  width: "100%",
+  padding: "12px",
+  borderRadius: "8px",
+  marginBottom: "12px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  fontSize: "14px",
+  boxSizing: "border-box",
+};
+
+const btnTeal = {
+  width: "100%",
+  padding: "12px",
+  border: "none",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
+  color: "#0B1220",
+  fontWeight: "700",
+  cursor: "pointer",
+  marginTop: "10px",
+  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
+};
+
+const btnGreen = {
+  width: "100%",
+  padding: "12px",
+  border: "none",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg,#22C55E,#16A34A)",
+  color: "#fff",
+  fontWeight: "700",
+  cursor: "pointer",
+  marginTop: "10px",
+  boxShadow: "0 0 12px rgba(34,197,94,0.4)",
+};

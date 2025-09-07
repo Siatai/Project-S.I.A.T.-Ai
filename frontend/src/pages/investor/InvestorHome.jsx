@@ -71,42 +71,52 @@ export default function InvestorHome() {
 
   return (
     <div style={{ color: "#E5E7EB", padding: "20px" }}>
-      <h2>Welcome Investor</h2>
-      <p style={{ marginTop: 10 }}>
+      <h2
+        style={{
+          fontFamily: "Orbitron, sans-serif",
+          fontSize: "22px",
+          color: "#17E8E5",
+        }}
+      >
+        Welcome, Investor
+      </h2>
+      <div style={glowLine} />
+      <p style={{ marginTop: 10, color: "#9CA3AF" }}>
         You can deposit funds, withdraw profits, and track your ROI here.
       </p>
 
       {/* ✅ My Deposits */}
-      <div
-        style={{
-          marginTop: 30,
-          padding: "15px",
-          borderRadius: "8px",
-          background: "#111827",
-          maxWidth: "600px",
-        }}
-      >
-        <h3 style={{ marginBottom: "10px" }}>💰 My Deposits</h3>
+      <div style={cardStyle}>
+        <h3
+          style={{
+            marginBottom: "10px",
+            fontSize: "18px",
+            fontWeight: "600",
+            color: "#17E8E5",
+          }}
+        >
+          💰 My Deposits
+        </h3>
+        <div style={glowLine} />
 
         {/* Total Row */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            padding: "8px 0",
-            borderBottom: "2px solid #374151",
-            fontWeight: "bold",
+            padding: "10px 0",
+            fontWeight: "600",
+            fontSize: "15px",
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
           }}
         >
           <span>Total Deposits</span>
-          <span>{totalDeposits} USDT</span>
+          <span style={{ color: "#17E8E5" }}>{totalDeposits} USDT</span>
         </div>
 
         {/* Deposit List */}
         {deposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
-            No deposits yet
-          </p>
+          <p style={{ color: "#9CA3AF", marginTop: "12px" }}>No deposits yet</p>
         ) : (
           deposits.map((d, idx) => (
             <div
@@ -114,8 +124,8 @@ export default function InvestorHome() {
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                borderBottom: "1px solid #374151",
-                padding: "6px 0",
+                borderBottom: "1px solid rgba(255,255,255,0.05)",
+                padding: "8px 0",
                 fontSize: "14px",
               }}
             >
@@ -126,29 +136,18 @@ export default function InvestorHome() {
         )}
       </div>
 
-      {/* ✅ Associate Status / Button moved to bottom */}
+      {/* ✅ Associate Status / Button */}
       <div style={{ marginTop: 40, textAlign: "center" }}>
         {isAssociate ? (
-          <p style={{ color: "#4ADE80" }}>
+          <p style={{ color: "#4ADE80", fontWeight: "600" }}>
             🎉 Welcome, <strong>Associate</strong>! You now have referral access.
           </p>
         ) : !applied ? (
-          <button
-            onClick={applyForAssociate}
-            style={{
-              padding: "8px 16px",
-              border: "1px solid #3B82F6",
-              borderRadius: 6,
-              background: "transparent",
-              color: "#3B82F6",
-              cursor: "pointer",
-              fontSize: "14px",
-            }}
-          >
+          <button onClick={applyForAssociate} style={btnTeal}>
             Apply to become Associate
           </button>
         ) : (
-          <p style={{ color: "#FACC15" }}>
+          <p style={{ color: "#FACC15", fontWeight: "600" }}>
             ⏳ Pending approval from Admin...
           </p>
         )}
@@ -156,3 +155,33 @@ export default function InvestorHome() {
     </div>
   );
 }
+
+/* === Styles === */
+const cardStyle = {
+  marginTop: 30,
+  padding: "20px",
+  borderRadius: "12px",
+  background: "rgba(17,24,39,0.8)",
+  backdropFilter: "blur(10px)",
+  maxWidth: "600px",
+  boxShadow: "0 0 20px rgba(23,232,229,0.2)",
+};
+
+const glowLine = {
+  height: "2px",
+  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
+  boxShadow: "0 0 10px #17E8E5",
+  margin: "8px 0 18px 0",
+};
+
+const btnTeal = {
+  padding: "10px 20px",
+  borderRadius: "8px",
+  border: "none",
+  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
+  color: "#0B1220",
+  fontWeight: "700",
+  cursor: "pointer",
+  boxShadow: "0 0 15px rgba(23,232,229,0.4)",
+  transition: "all 0.3s ease",
+};

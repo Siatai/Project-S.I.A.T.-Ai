@@ -10,49 +10,30 @@ export default function AssociateHome() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // Fetch user + deposits + team deposits
   useEffect(() => {
-    const fetchUserAndDeposits = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        // Fetch logged-in user
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        // Own deposits
         if (res.data?.email) {
-          const depRes = await axios.get(
-            `${API}/investments?email=${res.data.email}`,
-            { headers }
-          );
+          const depRes = await axios.get(`${API}/investments?email=${res.data.email}`, { headers });
           setDeposits(depRes.data);
-
-          const total = depRes.data.reduce(
-            (sum, d) => sum + Number(d.amount),
-            0
-          );
-          setTotalDeposits(total);
+          setTotalDeposits(depRes.data.reduce((sum, d) => sum + Number(d.amount), 0));
         }
 
-        // Team deposits (referrals)
-        const teamRes = await axios.get(`${API}/associate/deposits`, {
-          headers,
-        });
+        const teamRes = await axios.get(`${API}/associate/deposits`, { headers });
         setTeamDeposits(teamRes.data);
-
-        const teamTotal = teamRes.data.reduce(
-          (sum, d) => sum + Number(d.amount),
-          0
-        );
-        setTotalTeamDeposits(teamTotal);
+        setTotalTeamDeposits(teamRes.data.reduce((sum, d) => sum + Number(d.amount), 0));
       } catch (err) {
-        console.error("Error fetching associate data:", err);
+        console.error("Error fetching data:", err);
       }
     };
 
-    fetchUserAndDeposits();
+    fetchData();
   }, []);
 
   const copyReferral = () => {
@@ -69,87 +50,43 @@ export default function AssociateHome() {
 
   return (
     <div style={{ color: "#E5E7EB", padding: "20px" }}>
-      <h2>Welcome Associate 🎉</h2>
-      <p style={{ marginTop: 10 }}>
-        Share your referral link below — new users will land directly on the
-        signup page with your referral code prefilled.
+      <h2 style={{ marginBottom: "15px", color: "#17E8E5" }}>
+        Welcome, {user.name || "Associate"}
+      </h2>
+      <p style={{ marginBottom: "25px", color: "#94A3B8" }}>
+        Share your unique referral link to grow your network. All deposits made via your link will be tracked here.
       </p>
 
       {/* Referral Link */}
-      <div
-        style={{
-          marginTop: 20,
-          padding: "15px",
-          borderRadius: "8px",
-          background: "#1E293B",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          maxWidth: "600px",
-        }}
-      >
-        <span style={{ fontSize: "14px", wordBreak: "break-all" }}>
-          {signupUrl}
-        </span>
-        <button
-          onClick={copyReferral}
-          style={{
-            padding: "6px 12px",
-            border: "none",
-            borderRadius: "6px",
-            background: "#3B82F6",
-            color: "#fff",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          Copy Link
-        </button>
+      <div style={cardStyle}>
+        <h3 style={sectionTitle}>Referral Link</h3>
+        <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+          <input
+            type="text"
+            value={signupUrl}
+            readOnly
+            style={inputStyle}
+          />
+          <button onClick={copyReferral} style={btnTeal}>
+            Copy
+          </button>
+        </div>
       </div>
 
-      {/* Own Deposits */}
-      <div
-        style={{
-          marginTop: 30,
-          padding: "15px",
-          borderRadius: "8px",
-          background: "#111827",
-          maxWidth: "600px",
-        }}
-      >
-        <h3 style={{ marginBottom: "10px" }}>💰 My Deposits</h3>
+      <div style={glowLine}></div>
 
-        {/* Total Row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 0",
-            borderBottom: "2px solid #374151",
-            fontWeight: "bold",
-          }}
-        >
+      {/* Own Deposits */}
+      <div style={cardStyle}>
+        <h3 style={sectionTitle}>My Deposits</h3>
+        <div style={rowHeader}>
           <span>Total Deposits</span>
           <span>{totalDeposits} USDT</span>
         </div>
-
-        {/* Deposit List */}
         {deposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
-            No deposits yet
-          </p>
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No deposits yet</p>
         ) : (
           deposits.map((d, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                borderBottom: "1px solid #374151",
-                padding: "6px 0",
-                fontSize: "14px",
-              }}
-            >
+            <div key={idx} style={rowStyle}>
               <span>{d.amount} USDT</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
@@ -157,49 +94,20 @@ export default function AssociateHome() {
         )}
       </div>
 
-      {/* Team Deposits */}
-      <div
-        style={{
-          marginTop: 30,
-          padding: "15px",
-          borderRadius: "8px",
-          background: "#1E293B",
-          maxWidth: "800px",
-        }}
-      >
-        <h3 style={{ marginBottom: "10px" }}>👥 Team Deposits</h3>
+      <div style={glowLine}></div>
 
-        {/* Total Row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 0",
-            borderBottom: "2px solid #374151",
-            fontWeight: "bold",
-          }}
-        >
+      {/* Team Deposits */}
+      <div style={cardStyle}>
+        <h3 style={sectionTitle}>Team Deposits</h3>
+        <div style={rowHeader}>
           <span>Total Team Deposits</span>
           <span>{totalTeamDeposits} USDT</span>
         </div>
-
-        {/* Team Deposit List */}
         {teamDeposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
-            No team deposits yet
-          </p>
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No team deposits yet</p>
         ) : (
           teamDeposits.map((d, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "2fr 1fr 1fr",
-                borderBottom: "1px solid #374151",
-                padding: "6px 0",
-                fontSize: "14px",
-              }}
-            >
+            <div key={idx} style={rowStyle}>
               <span>{d.name}</span>
               <span>{d.amount} USDT</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
@@ -210,3 +118,63 @@ export default function AssociateHome() {
     </div>
   );
 }
+
+/* === Styles === */
+const cardStyle = {
+  background: "rgba(17,24,39,0.85)",
+  padding: "20px",
+  borderRadius: "12px",
+  marginBottom: "25px",
+  boxShadow: "0 0 15px rgba(23,232,229,0.15)",
+};
+
+const sectionTitle = {
+  fontSize: "16px",
+  fontWeight: "600",
+  color: "#17E8E5",
+  marginBottom: "12px",
+};
+
+const inputStyle = {
+  flex: 1,
+  padding: "10px",
+  borderRadius: "8px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  fontSize: "14px",
+  marginRight: "10px",
+};
+
+const btnTeal = {
+  padding: "10px 16px",
+  border: "none",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg,#17E8E5,#14B8A6)",
+  color: "#0B1220",
+  fontWeight: "700",
+  cursor: "pointer",
+  boxShadow: "0 0 10px rgba(23,232,229,0.3)",
+};
+
+const glowLine = {
+  height: "2px",
+  background: "linear-gradient(90deg,transparent,#17E8E5,transparent)",
+  margin: "30px 0",
+};
+
+const rowHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "8px 0",
+  borderBottom: "2px solid rgba(255,255,255,0.1)",
+  fontWeight: "600",
+};
+
+const rowStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "6px 0",
+  fontSize: "14px",
+  borderBottom: "1px solid rgba(255,255,255,0.05)",
+};

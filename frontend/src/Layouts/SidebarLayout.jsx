@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// role can be: "investor", "associate", "admin"
 export default function SidebarLayout({
-  role = "investor",
-  user = { email: "user@email.com", wallet_balance: 10000, name: "User" },
+  role = "associate",
+  user = { name: "User", wallet_balance: 1000 },
   children,
 }) {
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState("home");
   const navigate = useNavigate();
 
   // Sidebar items by role
@@ -21,11 +20,11 @@ export default function SidebarLayout({
       { key: "analytics", label: "Analytics", path: "/investor/analytics" },
     ],
     associate: [
-      { key: "account", label: "My Account", path: "/associate/account" },
+      { key: "home", label: "Home", path: "/associate" },
       { key: "deposit", label: "Deposit", path: "/associate/deposit" },
       { key: "withdrawal", label: "Withdrawal", path: "/associate/withdrawal" },
-      { key: "history", label: "Transaction History", path: "/associate/history" },
-      { key: "wallet", label: "Crypto Wallet", path: "/associate/wallet" },
+      { key: "wallet", label: "Wallet", path: "/associate/wallet" },
+      { key: "transactions", label: "Transactions", path: "/associate/history" },
       { key: "commissions", label: "Referrals & Deposits", path: "/associate/deposits" },
       { key: "analytics", label: "Analytics", path: "/associate/analytics" },
     ],
@@ -34,21 +33,19 @@ export default function SidebarLayout({
       { key: "users", label: "Users", path: "/admin/users" },
       { key: "roi-config", label: "ROI Config", path: "/admin/roi-config" },
       { key: "commission-config", label: "Commission Config", path: "/admin/commission-config" },
-      { key: "roi-credit", label: "ROI & Commission Credit", path: "/admin/roi-credit" }, // ✅ new
-      { key: "financial-summary", label: "Financial Summary", path: "/admin/financial-summary" }, // ✅ new
+      { key: "roi-credit", label: "ROI & Commission Credit", path: "/admin/roi-credit" },
+      { key: "financial-summary", label: "Financial Summary", path: "/admin/financial-summary" },
       { key: "approvals", label: "Withdrawal Approvals", path: "/admin/approvals" },
       { key: "transactions", label: "Transactions", path: "/admin/transactions" },
       { key: "analytics", label: "Analytics", path: "/admin/analytics" },
     ],
   };
 
-  // 🔹 Handle navigation
   const handleNav = (item) => {
     setActive(item.key);
     navigate(item.path);
   };
 
-  // 🔹 Handle logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -56,31 +53,30 @@ export default function SidebarLayout({
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", backgroundColor: "#0B1220", color: "#E5E7EB" }}>
+    <div style={{ display: "flex", height: "100vh", background: "#0B1220", color: "#E5E7EB" }}>
       {/* Sidebar */}
       <div
         style={{
-          width: "240px",
-          backgroundColor: "#121A2B",
-          padding: "20px 10px",
+          width: "260px",
+          background: "#121A2B",
+          padding: "20px 15px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
         }}
       >
         <div>
-          <h2
-            style={{
-              color: "#3B82F6",
-              fontSize: "20px",
-              textAlign: "center",
-              marginBottom: "30px",
-              textTransform: "uppercase",
-            }}
-          >
-            {role} Panel
-          </h2>
+          {/* User Info */}
+          <div style={{ marginBottom: "30px", textAlign: "left" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "5px" }}>
+              {user.name || "User"}
+            </h2>
+            <p style={{ fontSize: "14px", color: "#17E8E5", fontWeight: "600" }}>
+              Balance: ${user.wallet_balance?.toLocaleString() || 0}
+            </p>
+          </div>
 
+          {/* Menu Items */}
           {sidebarItems[role].map((item) => (
             <div
               key={item.key}
@@ -90,8 +86,8 @@ export default function SidebarLayout({
                 margin: "6px 0",
                 borderRadius: "8px",
                 cursor: "pointer",
-                backgroundColor: active === item.key ? "#1E293B" : "transparent",
-                color: active === item.key ? "#3B82F6" : "#E5E7EB",
+                backgroundColor: active === item.key ? "rgba(23,232,229,0.1)" : "transparent",
+                color: active === item.key ? "#17E8E5" : "#E5E7EB",
                 fontWeight: active === item.key ? "600" : "400",
                 transition: "all 0.2s ease-in-out",
               }}
@@ -101,6 +97,7 @@ export default function SidebarLayout({
           ))}
         </div>
 
+        {/* Logout */}
         <div
           onClick={handleLogout}
           style={{
@@ -120,11 +117,11 @@ export default function SidebarLayout({
 
       {/* Main Content */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* Top Bar */}
+        {/* Top Header with Branding */}
         <div
           style={{
             height: "60px",
-            backgroundColor: "#121A2B",
+            background: "#121A2B",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -132,27 +129,19 @@ export default function SidebarLayout({
             borderBottom: "1px solid #1E293B",
           }}
         >
-          <div style={{ fontSize: "16px" }}>
-            Balance: ${user.wallet_balance?.toLocaleString() || 0}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span>{user.email}</span>
-            <div
-              style={{
-                width: "35px",
-                height: "35px",
-                borderRadius: "50%",
-                backgroundColor: "#3B82F6",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-                fontWeight: "bold",
-              }}
-            >
-              {user.name?.charAt(0).toUpperCase() || "U"}
-            </div>
-          </div>
+          <h1
+            style={{
+              fontFamily: "Orbitron, sans-serif",
+              fontWeight: "700",
+              color: "#17E8E5",
+              fontSize: "20px",
+            }}
+          >
+            AlgoM³
+          </h1>
+          <span style={{ fontSize: "14px", color: "#94A3B8", fontWeight: "600" }}>
+            {role.toUpperCase()} PANEL
+          </span>
         </div>
 
         {/* Dynamic page content */}
