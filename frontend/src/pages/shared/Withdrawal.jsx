@@ -11,7 +11,7 @@ export default function Withdrawal() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // Fetch wallet summary (ROI + commissions)
+  // Fetch wallet summary
   useEffect(() => {
     const fetchSummary = async () => {
       try {
@@ -19,7 +19,21 @@ export default function Withdrawal() {
         const res = await axios.get(`${API}/wallet/summary`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSummary(res.data);
+
+        const data = res.data;
+
+        // 🔹 Calculate totals
+        const withdrawn = data.withdrawals.reduce((sum, w) => sum + (w.final_amount || 0), 0);
+        const total = withdrawn + (data.wallet_balance || 0);
+
+        setSummary({
+          wallet: data.wallet,
+          wallet_balance: data.wallet_balance || 0,
+          withdrawals: data.withdrawals || [],
+          total,
+          withdrawn,
+          withdrawable: data.wallet_balance || 0,
+        });
       } catch (err) {
         console.error("Error fetching wallet summary:", err);
         alert("Failed to load wallet summary");
@@ -64,7 +78,19 @@ export default function Withdrawal() {
       const updated = await axios.get(`${API}/wallet/summary`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSummary(updated.data);
+
+      const data = updated.data;
+      const withdrawn = data.withdrawals.reduce((sum, w) => sum + (w.final_amount || 0), 0);
+      const total = withdrawn + (data.wallet_balance || 0);
+
+      setSummary({
+        wallet: data.wallet,
+        wallet_balance: data.wallet_balance || 0,
+        withdrawals: data.withdrawals || [],
+        total,
+        withdrawn,
+        withdrawable: data.wallet_balance || 0,
+      });
     } catch (err) {
       console.error("Error withdrawing:", err);
       alert(err?.response?.data?.detail || "Withdrawal failed");
@@ -82,36 +108,25 @@ export default function Withdrawal() {
 
       {/* Wallet Summary */}
       <div style={{ display: "flex", gap: "20px", marginBottom: "20px", flexWrap: "wrap" }}>
-        <div style={{ flex: "1", padding: "15px", background: "#1F2937", borderRadius: "8px" }}>
+        <div style={cardStyle}>
           <h3>Total Earnings</h3>
-          <p style={{ fontSize: "20px", marginTop: "10px" }}>${summary.total}</p>
+          <p style={valueStyle}>${summary.total.toFixed(2)}</p>
         </div>
-        <div style={{ flex: "1", padding: "15px", background: "#1F2937", borderRadius: "8px" }}>
+        <div style={cardStyle}>
           <h3>Withdrawn</h3>
-          <p style={{ fontSize: "20px", marginTop: "10px" }}>${summary.withdrawn}</p>
+          <p style={valueStyle}>${summary.withdrawn.toFixed(2)}</p>
         </div>
-        <div style={{ flex: "1", padding: "15px", background: "#1F2937", borderRadius: "8px" }}>
+        <div style={cardStyle}>
           <h3>Withdrawable</h3>
-          <p style={{ fontSize: "20px", marginTop: "10px", color: "#22C55E" }}>
-            ${summary.withdrawable}
+          <p style={{ ...valueStyle, color: "#22C55E" }}>
+            ${summary.withdrawable.toFixed(2)}
           </p>
         </div>
       </div>
 
       {/* Withdraw Earnings */}
       {summary.withdrawable > 0 && !otpSent && (
-        <button
-          onClick={requestOtp}
-          style={{
-            marginBottom: "20px",
-            padding: "10px 20px",
-            border: "none",
-            borderRadius: "6px",
-            background: "#3B82F6",
-            color: "#fff",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={requestOtp} style={btnBlue}>
           Request Withdrawal
         </button>
       )}
@@ -134,14 +149,7 @@ export default function Withdrawal() {
           <button
             onClick={confirmWithdrawal}
             disabled={withdrawing || !otp}
-            style={{
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "6px",
-              background: "#22C55E",
-              color: "#fff",
-              cursor: "pointer",
-            }}
+            style={btnGreen}
           >
             {withdrawing ? "Submitting..." : "Confirm Withdrawal"}
           </button>
@@ -150,3 +158,34 @@ export default function Withdrawal() {
     </div>
   );
 }
+
+const cardStyle = {
+  flex: "1",
+  padding: "15px",
+  background: "#1F2937",
+  borderRadius: "8px",
+};
+
+const valueStyle = {
+  fontSize: "20px",
+  marginTop: "10px",
+};
+
+const btnBlue = {
+  marginBottom: "20px",
+  padding: "10px 20px",
+  border: "none",
+  borderRadius: "6px",
+  background: "#3B82F6",
+  color: "#fff",
+  cursor: "pointer",
+};
+
+const btnGreen = {
+  padding: "10px 20px",
+  border: "none",
+  borderRadius: "6px",
+  background: "#22C55E",
+  color: "#fff",
+  cursor: "pointer",
+};
