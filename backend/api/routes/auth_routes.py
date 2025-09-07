@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from random import randint
-
+from sqlalchemy import func
 from typing import Dict
 from db import get_db, SessionLocal
 from models.user_model import User
@@ -18,6 +18,7 @@ from models.user_logic import (
 from utils.token_utils import generate_token
 from utils.email_sender import send_email_otp
 from utils.auth_middleware import verify_token
+from models.referral_model import ReferralEarning
 
 router = APIRouter()
 
@@ -258,3 +259,14 @@ def get_my_referrals(data: ReferralsRequest, db: Session = Depends(get_db)):
         }
         for u in referred_users
     ]
+
+@router.get("/admin/last-roi-credit")
+def get_last_roi_credit(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    last_credit = db.query(func.max(ReferralEarning.timestamp)).scalar()
+    if not last_credit:
+        return {"last_credit": None, "message": "ROI has never been credited yet"}
+    
+    return {"last_credit": last_credit}

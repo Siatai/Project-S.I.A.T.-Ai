@@ -25,6 +25,7 @@ import ROIConfig from "../pages/admin/ROIConfig";
 import CommissionConfig from "../pages/admin/CommissionConfig";
 import WithdrawApprovals from "../pages/admin/WithdrawApprovals";
 import Transactions from "../pages/admin/Transactions";
+import AdminROICredit from "./pages/admin/AdminROICredit";
 
 // --- Role Guards ---
 function RequireAssociate({ children }) {
@@ -93,6 +94,7 @@ export default function AppRoutes() {
           <Route path="commission" element={<CommissionConfig />} />
           <Route path="approvals" element={<WithdrawApprovals />} />
           <Route path="transactions" element={<Transactions />} />
+          <Route path="/admin/roi-credit" element={<AdminROICredit />} />
         </Route>
 
         {/* 🚨 Catch-All Redirect */}
