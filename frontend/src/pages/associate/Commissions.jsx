@@ -28,6 +28,7 @@ export default function Commissions() {
         setLoading(true);
         const res = await axios.get(`${API}/get-referral-income`, {
           params: { email },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setSummary(res.data);
       } catch (err) {
@@ -36,8 +37,9 @@ export default function Commissions() {
         setLoading(false);
       }
     };
+
     if (email) fetchSummary();
-  }, [email]); // ✅ no warning now
+  }, [email, token]);
 
   // Request OTP
   const requestOtp = async () => {
@@ -67,13 +69,13 @@ export default function Commissions() {
       alert(res.data.message || "Withdrawal request submitted");
       setOtp("");
       setOtpSent(false);
-      // Refresh summary after withdrawal
-      setLoading(true);
+
+      // Refresh summary
       const updated = await axios.get(`${API}/get-referral-income`, {
         params: { email },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setSummary(updated.data);
-      setLoading(false);
     } catch (err) {
       console.error("Error withdrawing:", err);
       alert(err?.response?.data?.detail || "Withdrawal failed");
@@ -89,7 +91,7 @@ export default function Commissions() {
     <div style={{ color: "#E5E7EB" }}>
       <h2 style={{ marginBottom: "20px" }}>My Commissions</h2>
 
-      {/* Summary */}
+      {/* Summary Cards */}
       <div style={{ display: "flex", gap: "20px", marginBottom: "20px", flexWrap: "wrap" }}>
         <div style={{ flex: "1", padding: "15px", background: "#1F2937", borderRadius: "8px" }}>
           <h3>Total Earnings</h3>
@@ -157,7 +159,7 @@ export default function Commissions() {
         </div>
       )}
 
-      {/* Detailed Breakdown */}
+      {/* Referral Details Table */}
       <h3>Referral Details</h3>
       {summary.details.length === 0 ? (
         <p>No referrals yet.</p>
@@ -174,7 +176,7 @@ export default function Commissions() {
           <tbody>
             {summary.details.map((d, i) => (
               <tr key={i} style={{ borderBottom: "1px solid #374151" }}>
-                <td style={{ padding: "10px" }}>{d.name}</td>
+                <td style={{ padding: "10px" }}>{d.name || d.email}</td>
                 <td style={{ padding: "10px" }}>${d.amount}</td>
                 <td style={{ padding: "10px" }}>{d.date}</td>
                 <td style={{ padding: "10px", color: "#22C55E" }}>${d.earning}</td>
