@@ -1,13 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import axios from "axios";
 
 export default function Deposit() {
   const [selected, setSelected] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [showWalletPopup, setShowWalletPopup] = useState(false);
+  const [newWallet, setNewWallet] = useState("");
+
+  const API = "https://project-s-i-a-t-ai.onrender.com";
+  const token = localStorage.getItem("token");
+
+  // 🔹 Fetch bound wallet on load
+  useEffect(() => {
+    const fetchWallet = async () => {
+      try {
+        const res = await axios.get(`${API}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWallet(res.data.wallet);
+      } catch (err) {
+        console.error("Error fetching wallet:", err);
+      }
+    };
+    if (token) fetchWallet();
+  }, [token]);
+
+  // 🔹 Save wallet
+  const saveWallet = async () => {
+    try {
+      await axios.post(
+        `${API}/wallet/bind`,
+        { wallet: newWallet },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("✅ Wallet bound successfully!");
+      setWallet(newWallet);
+      setShowWalletPopup(false);
+      setNewWallet("");
+    } catch (err) {
+      console.error("Error saving wallet:", err);
+      alert(err?.response?.data?.detail || "Failed to bind wallet");
+    }
+  };
 
   // TRC20 deposit address
   const TRC20_ADDRESS = "TF14BvXgdkyz6Bv8ApoQMr8acDYyaHmRgz";
 
-  // TRC20 comes first
+  // Deposit methods
   const methods = [
     { id: "trc20", name: "Tether (USDT TRC20)", active: true, recommended: true },
     { id: "erc20", name: "Tether (USDT ERC20)", active: false },
@@ -31,7 +71,15 @@ export default function Deposit() {
         {methods.map((m) => (
           <div
             key={m.id}
-            onClick={() => m.active && setSelected(m.id)}
+            onClick={() => {
+              if (m.active) {
+                if (!wallet) {
+                  setShowWalletPopup(true); // 🚨 force wallet bind first
+                } else {
+                  setSelected(m.id);
+                }
+              }
+            }}
             style={{
               position: "relative",
               background: "#1F2937",
@@ -136,6 +184,62 @@ export default function Deposit() {
           </button>
         </div>
       )}
+
+      {/* Wallet Binding Popup */}
+      {showWalletPopup && (
+        <div style={popupOverlay} onClick={() => setShowWalletPopup(false)}>
+          <div style={popupBox} onClick={(e) => e.stopPropagation()}>
+            <h3>🔗 Bind Your TRC20 Wallet</h3>
+            <p style={{ fontSize: "14px", marginBottom: "10px" }}>
+              You must bind your withdrawal wallet before depositing.
+            </p>
+            <input
+              type="text"
+              placeholder="Enter TRC20 Wallet Address"
+              value={newWallet}
+              onChange={(e) => setNewWallet(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "6px",
+                marginBottom: "10px",
+              }}
+            />
+            <button onClick={saveWallet} style={btnGreen}>
+              Save Wallet
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const btnGreen = {
+  padding: "10px 20px",
+  border: "none",
+  borderRadius: "6px",
+  background: "#22C55E",
+  color: "#fff",
+  cursor: "pointer",
+};
+
+const popupOverlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: "rgba(0,0,0,0.6)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const popupBox = {
+  background: "#1F2937",
+  padding: "20px",
+  borderRadius: "10px",
+  maxWidth: "400px",
+  width: "100%",
+};

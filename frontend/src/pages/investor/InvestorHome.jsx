@@ -76,32 +76,6 @@ export default function InvestorHome() {
         You can deposit funds, withdraw profits, and track your ROI here.
       </p>
 
-      {/* ✅ Associate Status */}
-      {isAssociate ? (
-        <p style={{ marginTop: 20, color: "#4ADE80" }}>
-          🎉 Welcome, <strong>Associate</strong>! You now have referral access.
-        </p>
-      ) : !applied ? (
-        <button
-          onClick={applyForAssociate}
-          style={{
-            marginTop: 20,
-            padding: "10px 20px",
-            border: "none",
-            borderRadius: 6,
-            background: "#3B82F6",
-            color: "#fff",
-            cursor: "pointer",
-          }}
-        >
-          Apply to become Associate
-        </button>
-      ) : (
-        <p style={{ marginTop: 20, color: "#FACC15" }}>
-          ⏳ Pending approval from Admin...
-        </p>
-      )}
-
       {/* ✅ My Deposits */}
       <div
         style={{
@@ -149,6 +123,34 @@ export default function InvestorHome() {
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
           ))
+        )}
+      </div>
+
+      {/* ✅ Associate Status / Button moved to bottom */}
+      <div style={{ marginTop: 40, textAlign: "center" }}>
+        {isAssociate ? (
+          <p style={{ color: "#4ADE80" }}>
+            🎉 Welcome, <strong>Associate</strong>! You now have referral access.
+          </p>
+        ) : !applied ? (
+          <button
+            onClick={applyForAssociate}
+            style={{
+              padding: "8px 16px",
+              border: "1px solid #3B82F6",
+              borderRadius: 6,
+              background: "transparent",
+              color: "#3B82F6",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            Apply to become Associate
+          </button>
+        ) : (
+          <p style={{ color: "#FACC15" }}>
+            ⏳ Pending approval from Admin...
+          </p>
         )}
       </div>
     </div>
