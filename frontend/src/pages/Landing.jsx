@@ -2,8 +2,39 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import AuthModal from "./auth/AuthModal";
 import bg from "../Components/bg.png";
-import avatar from "../Components/avatar.png"; // use your avatar image
+import avatar from "../Components/avatar.png";
 import sniper from "../Components/sniper.png";
+
+// Glowing Divider with animation
+const Divider = () => (
+  <div
+    style={{
+      height: "4px",
+      margin: "50px auto",
+      maxWidth: "90%",
+      borderRadius: "4px",
+      background:
+        "linear-gradient(90deg, rgba(0,0,0,0) 0%, #3B82F6 20%, #60A5FA 50%, #3B82F6 80%, rgba(0,0,0,0) 100%)",
+      boxShadow: "0 0 30px 8px rgba(59,130,246,0.9)",
+      position: "relative",
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: "-50%",
+        width: "50%",
+        height: "100%",
+        background:
+          "linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)",
+        animation: "shine 3s linear infinite",
+      }}
+    />
+  </div>
+);
+
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
 
@@ -14,13 +45,22 @@ export default function Landing() {
     { stat: "88%", desc: "Liquidity vs Stocks" },
   ];
 
- const comingSoon = [
-  { icon: "📊", desc: "Arbitrage Bot" },
-  { icon: "⚡", desc: "MEV Bot" },
-  { icon: <img src={sniper} alt="Sniper Bot" style={{ width: "40px", margin: "0 auto" }} />, desc: "Sniper Bot" },
-  { icon: "💹", desc: "Crypto Trading Bot" },
-  { icon: "📈", desc: "Multi-Asset Smart Portfolio" },
-];
+  const comingSoon = [
+    { icon: "📊", desc: "Arbitrage Bot" },
+    { icon: "⚡", desc: "MEV Bot" },
+    {
+      icon: (
+        <img
+          src={sniper}
+          alt="Sniper Bot"
+          style={{ width: "40px", margin: "0 auto" }}
+        />
+      ),
+      desc: "Sniper Bot",
+    },
+    { icon: "💹", desc: "Crypto Trading Bot" },
+    { icon: "📈", desc: "Multi-Asset Smart Portfolio" },
+  ];
 
   return (
     <div
@@ -46,17 +86,21 @@ export default function Landing() {
         }}
       />
 
-      {/* Header */}
+      {/* Sticky Header */}
       <header
         style={{
-          position: "relative",
-          zIndex: 2,
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
           padding: "15px 20px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           borderBottom: "1px solid #1E293B",
           fontFamily: "Orbitron, Arial, sans-serif",
+          background: "rgba(11,18,32,0.8)",
+          backdropFilter: "blur(6px)",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.6)",
         }}
       >
         <h1 style={{ color: "#3B82F6", fontSize: "20px", fontWeight: "bold" }}>
@@ -97,7 +141,7 @@ export default function Landing() {
             fontSize: "34px",
             fontWeight: "800",
             marginBottom: "20px",
-            textShadow: "0 0 20px #3B82F6, 0 0 40px #1E3A8A",
+            textShadow: "0 0 25px #3B82F6, 0 0 60px #1E3A8A",
             lineHeight: "1.2",
           }}
         >
@@ -105,7 +149,7 @@ export default function Landing() {
           <span
             style={{
               color: "#3B82F6",
-              textShadow: "0 0 25px #3B82F6, 0 0 50px #2563EB",
+              textShadow: "0 0 30px #3B82F6, 0 0 60px #2563EB",
               animation: "pulse 2s infinite",
             }}
           >
@@ -123,7 +167,6 @@ export default function Landing() {
             color: "#94A3B8",
             lineHeight: "1.6",
             marginBottom: "40px",
-            fontFamily: "Inter, Arial, sans-serif",
           }}
         >
           AI-powered Forex bot delivering{" "}
@@ -152,7 +195,9 @@ export default function Landing() {
         </motion.button>
       </main>
 
-      {/* About Forex Auto-Carousel */}
+      <Divider />
+
+      {/* About Forex - Continuous Carousel */}
       <section
         style={{
           position: "relative",
@@ -169,30 +214,34 @@ export default function Landing() {
             fontWeight: "700",
             marginBottom: "20px",
             textAlign: "center",
-            fontFamily: "Rajdhani, Arial, sans-serif",
           }}
         >
           About Forex
         </h3>
-        <div style={{ overflow: "hidden", position: "relative" }}>
+        <div
+          style={{
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
           <div
             style={{
               display: "flex",
-              animation: "slide 16s linear infinite",
+              width: "max-content",
+              animation: "marquee 25s linear infinite",
             }}
           >
-            {[...stats, ...stats].map((item, i) => (
+            {[...stats, ...stats, ...stats].map((item, i) => (
               <div
                 key={i}
                 style={{
                   flex: "0 0 250px",
-                  margin: "0 10px",
-                  background: "rgba(30,41,59,0.6)",
+                  margin: "0 12px",
+                  background: "rgba(30,41,59,0.7)",
                   border: "1px solid #1E293B",
                   borderRadius: "12px",
                   padding: "30px 20px",
                   textAlign: "center",
-                  fontFamily: "Rajdhani, Arial, sans-serif",
                 }}
               >
                 <h4
@@ -214,7 +263,9 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Coming Soon Auto-Carousel */}
+      <Divider />
+
+      {/* Coming Soon - Continuous Carousel */}
       <section
         style={{
           position: "relative",
@@ -230,7 +281,6 @@ export default function Landing() {
             fontWeight: "700",
             color: "#3B82F6",
             marginBottom: "20px",
-            fontFamily: "Rajdhani, Arial, sans-serif",
           }}
         >
           Coming Soon
@@ -239,37 +289,27 @@ export default function Landing() {
           <div
             style={{
               display: "flex",
-              animation: "slide 14s linear infinite",
+              width: "max-content",
+              animation: "marquee 20s linear infinite",
             }}
           >
-            {[...comingSoon, ...comingSoon].map((item, i) => (
+            {[...comingSoon, ...comingSoon, ...comingSoon].map((item, i) => (
               <div
                 key={i}
                 style={{
                   flex: "0 0 250px",
-                  margin: "0 10px",
-                  background: "rgba(30,41,59,0.6)",
+                  margin: "0 12px",
+                  background: "rgba(30,41,59,0.7)",
                   border: "1px solid #1E293B",
                   borderRadius: "12px",
                   padding: "30px 20px",
                   textAlign: "center",
                 }}
               >
-                <h4
-                  style={{
-                    fontSize: "28px",
-                    marginBottom: "10px",
-                  }}
-                >
+                <h4 style={{ fontSize: "28px", marginBottom: "10px" }}>
                   {item.icon}
                 </h4>
-                <p
-                  style={{
-                    fontSize: "16px",
-                    color: "#94A3B8",
-                    fontFamily: "Inter, Arial, sans-serif",
-                  }}
-                >
+                <p style={{ fontSize: "16px", color: "#94A3B8" }}>
                   {item.desc}
                 </p>
               </div>
@@ -277,6 +317,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <Divider />
 
       {/* Footer */}
       <footer
@@ -288,7 +330,6 @@ export default function Landing() {
           borderTop: "1px solid #1E293B",
           color: "#64748B",
           fontSize: "14px",
-          fontFamily: "Inter, Arial, sans-serif",
         }}
       >
         <p style={{ marginBottom: "5px" }}>
@@ -300,13 +341,17 @@ export default function Landing() {
       {/* Animations */}
       <style>{`
         @keyframes pulse {
-          0% { opacity: 1; text-shadow: 0 0 20px #3B82F6, 0 0 40px #1E3A8A; }
-          50% { opacity: 0.7; text-shadow: 0 0 10px #3B82F6; }
-          100% { opacity: 1; text-shadow: 0 0 20px #3B82F6, 0 0 40px #1E3A8A; }
+          0% { opacity: 1; text-shadow: 0 0 25px #3B82F6, 0 0 60px #1E3A8A; }
+          50% { opacity: 0.7; text-shadow: 0 0 15px #3B82F6; }
+          100% { opacity: 1; text-shadow: 0 0 25px #3B82F6, 0 0 60px #1E3A8A; }
         }
-        @keyframes slide {
+        @keyframes shine {
+          0% { left: -50%; }
+          100% { left: 120%; }
+        }
+        @keyframes marquee {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          100% { transform: translateX(-33.33%); }
         }
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
