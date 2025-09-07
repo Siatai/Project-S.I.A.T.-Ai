@@ -4,31 +4,40 @@ import axios from "axios";
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
   const [isAssociate, setIsAssociate] = useState(false);
+  const [user, setUser] = useState(null);
+  const [deposits, setDeposits] = useState([]);
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // 🔹 Check user status on mount
+  // 🔹 Fetch user and deposits
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndDeposits = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await axios.get(`${API}/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers = { Authorization: `Bearer ${token}` };
 
-        if (res.data.is_associate) {
-          setIsAssociate(true);
-        }
-        if (res.data.pending_associate) {
-          setApplied(true);
+        // Get user info
+        const res = await axios.get(`${API}/me`, { headers });
+        setUser(res.data);
+
+        if (res.data.is_associate) setIsAssociate(true);
+        if (res.data.pending_associate) setApplied(true);
+
+        // Get deposits
+        if (res.data.email) {
+          const depRes = await axios.get(
+            `${API}/investments?email=${res.data.email}`,
+            { headers }
+          );
+          setDeposits(depRes.data);
         }
       } catch (err) {
-        console.error("Error fetching user status:", err);
+        console.error("Error fetching investor data:", err);
       }
     };
 
-    fetchUser();
+    fetchUserAndDeposits();
   }, []);
 
   // 🔹 Apply for associate
@@ -50,8 +59,10 @@ export default function InvestorHome() {
     }
   };
 
+  if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
+
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={{ color: "#E5E7EB", padding: "20px" }}>
       <h2>Welcome Investor</h2>
       <p style={{ marginTop: 10 }}>
         You can deposit funds, withdraw profits, and track your ROI here.
@@ -82,6 +93,38 @@ export default function InvestorHome() {
           ⏳ Pending approval from Admin...
         </p>
       )}
+
+      {/* ✅ My Deposits */}
+      <div
+        style={{
+          marginTop: 30,
+          padding: "15px",
+          borderRadius: "8px",
+          background: "#111827",
+          maxWidth: "600px",
+        }}
+      >
+        <h3 style={{ marginBottom: "10px" }}>💰 My Deposits</h3>
+        {deposits.length === 0 ? (
+          <p style={{ color: "#9CA3AF" }}>No deposits yet</p>
+        ) : (
+          deposits.map((d, idx) => (
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                borderBottom: "1px solid #374151",
+                padding: "6px 0",
+                fontSize: "14px",
+              }}
+            >
+              <span>{d.amount} USDT</span>
+              <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

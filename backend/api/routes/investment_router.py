@@ -148,7 +148,21 @@ def check_deposit(email: str, db: Session = Depends(get_db)):
 
 @router.get("/investments")
 def get_investments(email: str, db: Session = Depends(get_db)):
-    return db.query(Investment).filter_by(user_email=email).order_by(Investment.timestamp.desc()).all()
+    investments = (
+        db.query(Investment)
+        .filter_by(user_email=email)
+        .order_by(Investment.timestamp.desc())
+        .all()
+    )
+
+    return [
+        {
+            "amount": inv.amount,
+            "timestamp": inv.timestamp,
+            "tx_hash": inv.tx_hash
+        }
+        for inv in investments
+    ]
 
 
 @router.get("/admin/investments")
