@@ -51,7 +51,7 @@ export default function DashboardLayout() {
     fetchUser();
   }, [navigate]);
 
-  // 🔹 Handle role-based redirects only when user changes
+  // 🔹 Handle role-based redirects
   useEffect(() => {
     if (!user) return;
 
@@ -111,18 +111,28 @@ export default function DashboardLayout() {
       { key: "transactions", label: "Transactions", path: "/associate/history" },
       {
         key: "commissions",
-        label: "Referrals & Commissions",
+        label: "Referrals & Deposits",
         path: "/associate/commissions",
       },
     ],
     admin: [
       { key: "dashboard", label: "Dashboard", path: "/admin" },
       { key: "users", label: "Users", path: "/admin/users" },
-      { key: "roi", label: "ROI Config", path: "/admin/roi" },
+      { key: "roi-config", label: "ROI Config", path: "/admin/roi-config" },
       {
-        key: "commission",
+        key: "commission-config",
         label: "Commission Config",
-        path: "/admin/commission",
+        path: "/admin/commission-config",
+      },
+      {
+        key: "roi-credit",
+        label: "ROI & Commission Credit",
+        path: "/admin/roi-credit",
+      },
+      {
+        key: "financial-summary",
+        label: "Financial Summary",
+        path: "/admin/financial-summary",
       },
       {
         key: "approvals",
