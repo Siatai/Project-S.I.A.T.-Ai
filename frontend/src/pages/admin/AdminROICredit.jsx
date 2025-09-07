@@ -3,12 +3,13 @@ import axios from "axios";
 
 export default function AdminROICredit() {
   const [loading, setLoading] = useState(false);
+  const [forceLoading, setForceLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [lastCredit, setLastCredit] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // 🔹 Fetch last credit date on mount
+  // 🔹 Fetch last credit date on mount + after each run
   useEffect(() => {
     const fetchLastCredit = async () => {
       try {
@@ -23,8 +24,9 @@ export default function AdminROICredit() {
     };
 
     fetchLastCredit();
-  }, [result]); // refresh after crediting
+  }, [result]);
 
+  // 🔹 Normal credit (once/day)
   const handleCreditROI = async () => {
     try {
       setLoading(true);
@@ -42,12 +44,30 @@ export default function AdminROICredit() {
     }
   };
 
+  // 🔹 Force credit (multi-run / test)
+  const handleForceCreditROI = async () => {
+    try {
+      setForceLoading(true);
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const res = await axios.post(`${API}/admin/force-credit-roi`, {}, { headers });
+      setResult(res.data);
+      alert(res.data.message);
+    } catch (err) {
+      console.error("Error force crediting ROI:", err);
+      alert(err?.response?.data?.detail || "❌ Failed to force credit ROI");
+    } finally {
+      setForceLoading(false);
+    }
+  };
+
   return (
     <div style={{ padding: "20px", color: "#E5E7EB" }}>
       <h2>📌 Credit ROI & Commission</h2>
       <p style={{ marginTop: 10 }}>
-        Use this tool to manually credit daily ROI and commissions.  
-        This should normally run automatically, but you can trigger it here if needed.
+        Normally ROI & commissions are credited automatically once per day.  
+        Use the buttons below to trigger manually.
       </p>
 
       {/* Show last credit date */}
@@ -56,21 +76,38 @@ export default function AdminROICredit() {
         {lastCredit ? new Date(lastCredit).toLocaleString() : "Never"}
       </div>
 
-      {/* Action Button */}
-      <button
-        onClick={handleCreditROI}
-        disabled={loading}
-        style={{
-          padding: "10px 20px",
-          border: "none",
-          borderRadius: "6px",
-          background: loading ? "#9CA3AF" : "#3B82F6",
-          color: "#fff",
-          cursor: loading ? "not-allowed" : "pointer",
-        }}
-      >
-        {loading ? "Processing..." : "Credit ROI & Commission"}
-      </button>
+      {/* Action Buttons */}
+      <div style={{ display: "flex", gap: "10px" }}>
+        <button
+          onClick={handleCreditROI}
+          disabled={loading}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "6px",
+            background: loading ? "#9CA3AF" : "#3B82F6",
+            color: "#fff",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          {loading ? "Processing..." : "Credit ROI (Safe)"}
+        </button>
+
+        <button
+          onClick={handleForceCreditROI}
+          disabled={forceLoading}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "6px",
+            background: forceLoading ? "#9CA3AF" : "#F59E0B",
+            color: "#fff",
+            cursor: forceLoading ? "not-allowed" : "pointer",
+          }}
+        >
+          {forceLoading ? "Processing..." : "Force Credit ROI (Test)"}
+        </button>
+      </div>
 
       {/* Results */}
       {result && (
@@ -94,6 +131,7 @@ export default function AdminROICredit() {
                     <th style={{ padding: "6px" }}>Email</th>
                     <th style={{ padding: "6px" }}>Investment</th>
                     <th style={{ padding: "6px" }}>Daily Profit</th>
+                    <th style={{ padding: "6px" }}>Mode</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -102,12 +140,15 @@ export default function AdminROICredit() {
                       <td style={{ padding: "6px" }}>{c.email}</td>
                       <td style={{ padding: "6px" }}>{c.investment} USDT</td>
                       <td style={{ padding: "6px" }}>{c.daily_profit} USDT</td>
+                      <td style={{ padding: "6px" }}>
+                        {c.force_mode ? "Force" : "Safe"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p style={{ color: "#9CA3AF" }}>No users credited today.</p>
+              <p style={{ color: "#9CA3AF" }}>No users credited.</p>
             )}
           </div>
         </div>
