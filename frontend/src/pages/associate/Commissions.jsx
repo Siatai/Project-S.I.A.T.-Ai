@@ -107,12 +107,12 @@ export default function Commissions() {
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "500px" }}>
           <thead>
             <tr style={{ background: "rgba(31,41,55,0.9)" }}>
-              {["Date", "Total Earnings", "Action"].map((h, i) => (
+              {["Date", "Total Earnings"].map((h, i) => (
                 <th
                   key={i}
                   style={{
                     padding: "12px",
-                    textAlign: i === 2 ? "center" : "left",
+                    textAlign: "left",
                     fontSize: "14px",
                     color: "#9CA3AF",
                     fontWeight: "600",
@@ -127,15 +127,37 @@ export default function Commissions() {
             {Object.entries(groupedByDate).map(([date, records], i) => {
               const totalForDay = records.reduce((sum, r) => sum + r.commission, 0);
               return (
-                <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                <tr
+                  key={i}
+                  style={{
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  }}
+                >
                   <td style={tdStyle}>{date}</td>
-                  <td style={{ ...tdStyle, color: "#17E8E5", fontWeight: "600" }}>
+                  <td
+                    style={{
+                      ...tdStyle,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      color: "#17E8E5",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {/* Small clickable icon */}
+                    <span
+                      onClick={() => setSelectedDate({ date, records })}
+                      style={{
+                        cursor: "pointer",
+                        fontSize: "16px",
+                        color: "#38BDF8",
+                        textShadow: "0 0 8px rgba(23,232,229,0.6)",
+                      }}
+                      title="View Details"
+                    >
+                      🔍
+                    </span>
                     ${totalForDay.toFixed(2)}
-                  </td>
-                  <td style={{ padding: "10px", textAlign: "center" }}>
-                    <button onClick={() => setSelectedDate({ date, records })} style={btnTealSm}>
-                      Details
-                    </button>
                   </td>
                 </tr>
               );
@@ -143,6 +165,15 @@ export default function Commissions() {
           </tbody>
         </table>
       </div>
+
+      {/* Glow Line */}
+      <div
+        style={{
+          height: "2px",
+          background: "linear-gradient(90deg,transparent,#17E8E5,transparent)",
+          margin: "25px 0",
+        }}
+      ></div>
 
       {/* Popup for details */}
       {selectedDate && (
@@ -197,16 +228,6 @@ const tdStyle = {
   fontSize: "14px",
   color: "#E5E7EB",
   fontFamily: "Inter, sans-serif",
-};
-
-const btnTealSm = {
-  padding: "6px 14px",
-  border: "none",
-  borderRadius: "6px",
-  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
-  color: "#0B1220",
-  fontWeight: "600",
-  cursor: "pointer",
 };
 
 const btnRed = {

@@ -61,15 +61,8 @@ export default function AssociateHome() {
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Referral Link</h3>
         <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
-          <input
-            type="text"
-            value={signupUrl}
-            readOnly
-            style={inputStyle}
-          />
-          <button onClick={copyReferral} style={btnTeal}>
-            Copy
-          </button>
+          <input type="text" value={signupUrl} readOnly style={inputStyle} />
+          <button onClick={copyReferral} style={btnTeal}>Copy</button>
         </div>
       </div>
 
@@ -80,7 +73,9 @@ export default function AssociateHome() {
         <h3 style={sectionTitle}>My Deposits</h3>
         <div style={rowHeader}>
           <span>Total Deposits</span>
-          <span>{totalDeposits} USDT</span>
+          <span style={{ color: "#17E8E5", fontWeight: "700" }}>
+            {totalDeposits} USDT
+          </span>
         </div>
         {deposits.length === 0 ? (
           <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No deposits yet</p>
@@ -99,17 +94,31 @@ export default function AssociateHome() {
       {/* Team Deposits */}
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Team Deposits</h3>
+
+        {/* Total */}
         <div style={rowHeader}>
           <span>Total Team Deposits</span>
-          <span>{totalTeamDeposits} USDT</span>
+          <span style={{ color: "#22C55E", fontWeight: "700", fontSize: "15px" }}>
+            {totalTeamDeposits} USDT
+          </span>
         </div>
+
+        {/* Table Headings */}
+        {teamDeposits.length > 0 && (
+          <div style={tableHeader}>
+            <span>Name</span>
+            <span>USDT</span>
+            <span>Date</span>
+          </div>
+        )}
+
         {teamDeposits.length === 0 ? (
           <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No team deposits yet</p>
         ) : (
           teamDeposits.map((d, idx) => (
-            <div key={idx} style={rowStyle}>
+            <div key={idx} style={tableRow}>
               <span>{d.name}</span>
-              <span>{d.amount} USDT</span>
+              <span>{d.amount}</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
           ))
@@ -174,6 +183,28 @@ const rowHeader = {
 const rowStyle = {
   display: "flex",
   justifyContent: "space-between",
+  padding: "6px 0",
+  fontSize: "14px",
+  borderBottom: "1px solid rgba(255,255,255,0.05)",
+};
+
+/* Table-like styles for Team Deposits */
+const tableHeader = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  textAlign: "center",
+  fontWeight: "600",
+  fontSize: "14px",
+  color: "#9CA3AF",
+  padding: "8px 0",
+  borderBottom: "2px solid rgba(255,255,255,0.1)",
+  marginTop: "10px",
+};
+
+const tableRow = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  textAlign: "center",
   padding: "6px 0",
   fontSize: "14px",
   borderBottom: "1px solid rgba(255,255,255,0.05)",
