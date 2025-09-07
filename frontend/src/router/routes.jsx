@@ -25,7 +25,8 @@ import ROIConfig from "../pages/admin/ROIConfig";
 import CommissionConfig from "../pages/admin/CommissionConfig";
 import WithdrawApprovals from "../pages/admin/WithdrawApprovals";
 import Transactions from "../pages/admin/Transactions";
-import AdminROICredit from "./pages/admin/AdminROICredit";
+import AdminROICredit from "../pages/admin/AdminROICredit";
+import AdminFinancialSummary from "../pages/admin/AdminFinancialSummary"; // ✅ new
 
 // --- Role Guards ---
 function RequireAssociate({ children }) {
@@ -90,11 +91,12 @@ export default function AppRoutes() {
         >
           <Route index element={<Navigate to="users" replace />} />
           <Route path="users" element={<Users />} />
-          <Route path="roi" element={<ROIConfig />} />
-          <Route path="commission" element={<CommissionConfig />} />
+          <Route path="roi-config" element={<ROIConfig />} />
+          <Route path="commission-config" element={<CommissionConfig />} />
+          <Route path="roi-credit" element={<AdminROICredit />} /> {/* ✅ fixed */}
+          <Route path="financial-summary" element={<AdminFinancialSummary />} /> {/* ✅ new */}
           <Route path="approvals" element={<WithdrawApprovals />} />
           <Route path="transactions" element={<Transactions />} />
-          <Route path="/admin/roi-credit" element={<AdminROICredit />} />
         </Route>
 
         {/* 🚨 Catch-All Redirect */}

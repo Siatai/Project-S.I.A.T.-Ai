@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from random import randint
-
+from sqlalchemy import func
 from db import get_db
 from models.user_model import User
 from models.withdrawal_model import Investment, Withdrawal
@@ -502,3 +502,56 @@ def get_associate_deposits(user=Depends(verify_token), db: Session = Depends(get
         })
 
     return result
+
+
+@router.get("/admin/financial-summary")
+def get_financial_summary(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    # Total Deposits
+    total_deposits = db.query(func.sum(Investment.amount)).scalar() or 0
+
+    # Total Commission Paid
+    total_commissions = db.query(func.sum(ReferralEarning.commission_amount)).scalar() or 0
+
+    # Total ROI Distributed = sum of all wallet balances + withdrawals already made - commissions
+    total_withdrawals = db.query(func.sum(Withdrawal.final_amount)).scalar() or 0
+    total_wallet_balances = db.query(func.sum(User.wallet_balance)).scalar() or 0
+    total_roi = total_wallet_balances + total_withdrawals - total_commissions
+
+    # User payout list
+    users = db.query(User).all()
+    user_payouts = [
+        {
+            "name": u.name,
+            "email": u.email,
+            "wallet": u.wallet,
+            "wallet_balance": round(u.wallet_balance, 2)
+        }
+        for u in users
+    ]
+
+    return {
+        "total_deposits": round(total_deposits, 2),
+        "total_commissions": round(total_commissions, 2),
+        "total_roi_distributed": round(total_roi, 2),
+        "user_payouts": user_payouts
+    }
+    
+@router.get("/admin/stats")
+def get_admin_stats(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    total_users = db.query(func.count(User.id)).scalar() or 0
+    total_deposits = db.query(func.sum(Investment.amount)).scalar() or 0
+    total_withdrawals = db.query(func.sum(Withdrawal.final_amount)).scalar() or 0
+    total_commissions = db.query(func.sum(ReferralEarning.commission_amount)).scalar() or 0
+
+    return {
+        "total_users": total_users,
+        "total_deposits": round(total_deposits, 2),
+        "total_withdrawals": round(total_withdrawals, 2),
+        "total_commissions": round(total_commissions, 2),
+    }

@@ -23,12 +23,66 @@ export default function AdminHome() {
   if (!stats) return <p style={{ color: "#E5E7EB" }}>Loading admin dashboard...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
-      <h2>Admin Dashboard</h2>
-      <div style={{ marginTop: 20 }}>
-        <p>Total Users: {stats.total_users}</p>
-        <p>Total Deposits: ${stats.total_deposits}</p>
-        <p>Total Withdrawals: ${stats.total_withdrawals}</p>
+    <div style={{ color: "#E5E7EB", padding: "20px" }}>
+      <h2>📊 Admin Dashboard</h2>
+
+      <div
+        style={{
+          marginTop: 20,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "15px",
+        }}
+      >
+        <div
+          style={{
+            padding: "15px",
+            borderRadius: "8px",
+            background: "#1E293B",
+          }}
+        >
+          <h3>Total Users</h3>
+          <p style={{ fontSize: "20px", fontWeight: "bold" }}>{stats.total_users}</p>
+        </div>
+
+        <div
+          style={{
+            padding: "15px",
+            borderRadius: "8px",
+            background: "#1E293B",
+          }}
+        >
+          <h3>Total Deposits</h3>
+          <p style={{ fontSize: "20px", fontWeight: "bold" }}>
+            {stats.total_deposits} USDT
+          </p>
+        </div>
+
+        <div
+          style={{
+            padding: "15px",
+            borderRadius: "8px",
+            background: "#1E293B",
+          }}
+        >
+          <h3>Total Withdrawals</h3>
+          <p style={{ fontSize: "20px", fontWeight: "bold" }}>
+            {stats.total_withdrawals} USDT
+          </p>
+        </div>
+
+        <div
+          style={{
+            padding: "15px",
+            borderRadius: "8px",
+            background: "#1E293B",
+          }}
+        >
+          <h3>Total Commissions</h3>
+          <p style={{ fontSize: "20px", fontWeight: "bold" }}>
+            {stats.total_commissions} USDT
+          </p>
+        </div>
       </div>
     </div>
   );
