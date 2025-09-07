@@ -10,13 +10,14 @@ export default function AssociateHome() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // Fetch user data + deposits
+  // Fetch user + deposits + team deposits
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndDeposits = async () => {
       try {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
+        // Fetch logged-in user
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
@@ -35,7 +36,7 @@ export default function AssociateHome() {
           setTotalDeposits(total);
         }
 
-        // Team deposits
+        // Team deposits (referrals)
         const teamRes = await axios.get(`${API}/associate/deposits`, {
           headers,
         });
@@ -51,7 +52,7 @@ export default function AssociateHome() {
       }
     };
 
-    fetchUser();
+    fetchUserAndDeposits();
   }, []);
 
   const copyReferral = () => {
@@ -199,7 +200,7 @@ export default function AssociateHome() {
                 fontSize: "14px",
               }}
             >
-              <span>{d.investor}</span>
+              <span>{d.name}</span>
               <span>{d.amount} USDT</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
