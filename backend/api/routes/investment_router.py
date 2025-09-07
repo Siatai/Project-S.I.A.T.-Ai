@@ -515,9 +515,13 @@ def get_financial_summary(db: Session = Depends(get_db), user=Depends(verify_tok
     # Total Commission Paid
     total_commissions = db.query(func.sum(ReferralEarning.commission_amount)).scalar() or 0
 
-    # Total ROI Distributed = sum of all wallet balances + withdrawals already made - commissions
+    # Total Withdrawals
     total_withdrawals = db.query(func.sum(Withdrawal.final_amount)).scalar() or 0
+
+    # Total Wallet Balances (handle NULLs safely)
     total_wallet_balances = db.query(func.sum(User.wallet_balance)).scalar() or 0
+
+    # ROI Distributed = balances + withdrawals - commissions
     total_roi = total_wallet_balances + total_withdrawals - total_commissions
 
     # User payout list
@@ -527,7 +531,7 @@ def get_financial_summary(db: Session = Depends(get_db), user=Depends(verify_tok
             "name": u.name,
             "email": u.email,
             "wallet": u.wallet,
-            "wallet_balance": round(u.wallet_balance, 2)
+            "wallet_balance": round(u.wallet_balance or 0.0, 2)  # ✅ fix
         }
         for u in users
     ]
@@ -538,6 +542,7 @@ def get_financial_summary(db: Session = Depends(get_db), user=Depends(verify_tok
         "total_roi_distributed": round(total_roi, 2),
         "user_payouts": user_payouts
     }
+
     
 @router.get("/admin/stats")
 def get_admin_stats(db: Session = Depends(get_db), user=Depends(verify_token)):
