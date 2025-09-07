@@ -201,6 +201,18 @@ export default function ReferralSignup() {
       >
         © {new Date().getFullYear()} AlgoM³ • All Rights Reserved
       </footer>
+
+      {/* 🔹 Global Fix for Bleed */}
+      <style>{`
+        html, body, #root {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          width: 100%;
+          background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
+          overflow-x: hidden;
+        }
+      `}</style>
     </div>
   );
 }
