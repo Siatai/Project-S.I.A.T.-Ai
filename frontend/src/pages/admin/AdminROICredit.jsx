@@ -4,6 +4,7 @@ import axios from "axios";
 export default function AdminROICredit() {
   const [loading, setLoading] = useState(false);
   const [forceLoading, setForceLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [lastCredit, setLastCredit] = useState(null);
 
@@ -62,12 +63,29 @@ export default function AdminROICredit() {
     }
   };
 
+  // 🔹 Reset ROI dates (testing only)
+  const handleResetROIDates = async () => {
+    try {
+      setResetLoading(true);
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.post(`${API}/admin/reset-roi-dates`, {}, { headers });
+      alert("✅ ROI dates reset. You can re-run ROI crediting from scratch.");
+    } catch (err) {
+      console.error("Error resetting ROI dates:", err);
+      alert(err?.response?.data?.detail || "❌ Failed to reset ROI dates");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div style={{ padding: "20px", color: "#E5E7EB" }}>
       <h2>📌 Credit ROI & Commission</h2>
       <p style={{ marginTop: 10 }}>
         Normally ROI & commissions are credited automatically once per day.  
-        Use the buttons below to trigger manually.
+        Use the buttons below to trigger manually for testing.
       </p>
 
       {/* Show last credit date */}
@@ -77,7 +95,7 @@ export default function AdminROICredit() {
       </div>
 
       {/* Action Buttons */}
-      <div style={{ display: "flex", gap: "10px" }}>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         <button
           onClick={handleCreditROI}
           disabled={loading}
@@ -107,6 +125,21 @@ export default function AdminROICredit() {
         >
           {forceLoading ? "Processing..." : "Force Credit ROI (Test)"}
         </button>
+
+        <button
+          onClick={handleResetROIDates}
+          disabled={resetLoading}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "6px",
+            background: resetLoading ? "#9CA3AF" : "#EF4444",
+            color: "#fff",
+            cursor: resetLoading ? "not-allowed" : "pointer",
+          }}
+        >
+          {resetLoading ? "Resetting..." : "Reset ROI Dates"}
+        </button>
       </div>
 
       {/* Results */}
@@ -117,11 +150,13 @@ export default function AdminROICredit() {
             padding: "15px",
             borderRadius: "8px",
             background: "#111827",
-            maxWidth: "700px",
+            maxWidth: "800px",
           }}
         >
           <h3 style={{ marginBottom: 10 }}>{result.message}</h3>
-          <p><strong>Total Users Credited:</strong> {result.count}</p>
+          <p>
+            <strong>Total Users Credited:</strong> {result.count}
+          </p>
 
           <div style={{ marginTop: 10 }}>
             {result.credited && result.credited.length > 0 ? (
@@ -130,7 +165,8 @@ export default function AdminROICredit() {
                   <tr style={{ textAlign: "left", borderBottom: "1px solid #374151" }}>
                     <th style={{ padding: "6px" }}>Email</th>
                     <th style={{ padding: "6px" }}>Investment</th>
-                    <th style={{ padding: "6px" }}>Daily Profit</th>
+                    <th style={{ padding: "6px" }}>Days Credited</th>
+                    <th style={{ padding: "6px" }}>Total Profit</th>
                     <th style={{ padding: "6px" }}>Mode</th>
                   </tr>
                 </thead>
@@ -139,7 +175,8 @@ export default function AdminROICredit() {
                     <tr key={idx} style={{ borderBottom: "1px solid #374151" }}>
                       <td style={{ padding: "6px" }}>{c.email}</td>
                       <td style={{ padding: "6px" }}>{c.investment} USDT</td>
-                      <td style={{ padding: "6px" }}>{c.daily_profit} USDT</td>
+                      <td style={{ padding: "6px" }}>{c.days}</td>
+                      <td style={{ padding: "6px" }}>{c.credited_profit} USDT</td>
                       <td style={{ padding: "6px" }}>
                         {c.force_mode ? "Force" : "Safe"}
                       </td>

@@ -37,13 +37,15 @@ def force_credit_daily_roi(db: Session):
 # 📌 Core logic (used by both safe + force)
 # ────────────────────────────────
 def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False):
+    today = date.today()
+
     # ROI CONFIG
     roi_config = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
     if not roi_config:
         return {"message": "No ROI config set"}
 
     monthly_roi_percentage = roi_config.percentage
-    daily_roi_percentage = monthly_roi_percentage / 30  # ✅ daily ROI %
+    daily_roi_percentage = monthly_roi_percentage / 30  # % per day
 
     # COMMISSION CONFIG
     commission_config = db.query(CommissionConfig).first()
@@ -52,34 +54,40 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
     credited = []
     referral_earnings = []
 
-    # Process all active investments
     investments = db.query(Investment).all()
     for inv in investments:
         user = db.query(User).filter_by(email=inv.user_email).first()
         if not user:
             continue
 
-        # Skip if deposit is today
-        days = (now - inv.timestamp).days
-        if days <= 0:
-            continue
+        # Determine last credited date
+        last_date = inv.last_roi_date or inv.timestamp.date()
+        days_to_credit = (today - last_date).days
 
-        # ✅ Daily ROI
+        if days_to_credit <= 0:
+            continue  # nothing new to credit
+
+        # ✅ Calculate total ROI since last credit
         daily_profit = inv.amount * (daily_roi_percentage / 100)
-        user.wallet_balance = (user.wallet_balance or 0.0) + daily_profit
+        total_profit = daily_profit * days_to_credit
+        user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
+
+        # Update last credited date
+        inv.last_roi_date = today
 
         credited.append({
             "email": user.email,
             "investment": inv.amount,
-            "daily_profit": round(daily_profit, 2),
+            "days": days_to_credit,
+            "credited_profit": round(total_profit, 2),
             "force_mode": force
         })
 
-        # ✅ Commission (referrer earns % of investor’s ROI)
+        # ✅ Commission (referrer earns % of investor’s ROI profit)
         if user.referred_by:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
             if referrer:
-                commission_amount = daily_profit * (commission_percentage / 100)  # ✅ FIXED
+                commission_amount = total_profit * (commission_percentage / 100)
                 referrer.wallet_balance = (referrer.wallet_balance or 0.0) + commission_amount
 
                 referral_earnings.append(
@@ -93,11 +101,9 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
                     )
                 )
 
-    # Bulk insert all referral earnings
     if referral_earnings:
         db.add_all(referral_earnings)
 
-    # Commit everything in one go
     db.commit()
 
     return {
@@ -106,3 +112,4 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
         "count": len(credited),
         "force_mode": force,
     }
+

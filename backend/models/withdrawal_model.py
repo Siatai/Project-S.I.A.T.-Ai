@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, UniqueConstraint, Date
 from datetime import datetime
 from db import Base
 
@@ -11,6 +11,7 @@ class Investment(Base):
     amount = Column(Float, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
     tx_hash = Column(String, unique=True, index=True)  # unique blockchain tx hash
+    last_roi_date = Column(Date, nullable=True)
 
     __table_args__ = (
         UniqueConstraint("tx_hash", name="uq_tx_hash"),

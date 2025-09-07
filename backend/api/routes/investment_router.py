@@ -569,3 +569,15 @@ def run_daily_roi(db: Session = Depends(get_db), user=Depends(verify_token)):
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin only")
     return credit_daily_roi(db)
+
+@router.post("/admin/reset-roi-dates")
+def reset_roi_dates(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    investments = db.query(Investment).all()
+    for inv in investments:
+        inv.last_roi_date = None  # reset to uncredited
+
+    db.commit()
+    return {"message": "✅ All ROI dates reset successfully. You can re-run ROI crediting now."}
