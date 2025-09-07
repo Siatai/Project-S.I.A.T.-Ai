@@ -5,7 +5,6 @@ from models.withdrawal_model import Investment, Withdrawal
 from models.referral_model import ReferralEarning
 from models.roi_model import ROIConfig
 from models.commission_model import CommissionConfig
-
 # ────────────────────────────────
 # 📌 Safe ROI Credit (once per day)
 # ────────────────────────────────
@@ -22,7 +21,7 @@ def credit_daily_roi(db: Session):
     if already_done:
         return {"message": "ROI already credited today, try again tomorrow"}
 
-    return _process_roi_and_commissions(db, now)
+    return _process_roi_and_commissions(db, now, force=False)
 
 
 # ────────────────────────────────
@@ -34,10 +33,9 @@ def force_credit_daily_roi(db: Session):
 
 
 # ────────────────────────────────
-# 📌 Core logic (used by both functions)
+# 📌 Core logic (used by both)
 # ────────────────────────────────
 def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False):
-    # ROI CONFIG (monthly → daily)
     roi_config = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
     if not roi_config:
         return {"message": "No ROI config set"}
@@ -45,27 +43,23 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
     monthly_roi_percentage = roi_config.percentage
     daily_roi_percentage = monthly_roi_percentage / 30
 
-    # COMMISSION CONFIG (monthly → daily)
     commission_config = db.query(CommissionConfig).first()
     commission_percentage = commission_config.percentage if commission_config else 0.0
     daily_commission_percentage = commission_percentage / 30
 
     credited = []
-    referral_earnings = []  # bulk insert list
+    referral_earnings = []
 
-    # Process all investments
     investments = db.query(Investment).all()
     for inv in investments:
         user = db.query(User).filter_by(email=inv.user_email).first()
         if not user:
             continue
 
-        # Skip if deposit is today (0 days old)
         days = (now - inv.timestamp).days
         if days <= 0:
             continue
 
-        # ✅ Daily ROI for this investment
         daily_profit = inv.amount * (daily_roi_percentage / 100)
         user.wallet_balance = (user.wallet_balance or 0.0) + daily_profit
 
@@ -76,7 +70,6 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
             "force_mode": force
         })
 
-        # ✅ Commission for Referrer
         if user.referred_by:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
             if referrer:
@@ -94,16 +87,14 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
                     )
                 )
 
-    # Bulk insert referral earnings
     if referral_earnings:
         db.add_all(referral_earnings)
 
-    # Commit once for all
     db.commit()
 
     return {
         "message": "✅ ROI + Commissions credited successfully",
         "credited": credited,
         "count": len(credited),
-        "force_mode": force
+        "force_mode": force,
     }

@@ -14,7 +14,7 @@ from models.commission_model import CommissionConfig
 from utils.auth_middleware import verify_token
 from utils.email_sender import send_email_otp
 from utils.user_logic import store_otp, verify_otp, calculate_investor_roi
-from utils.roi_creditor import credit_daily_roi
+from utils.roi_creditor import credit_daily_roi, force_credit_daily_roi
 
 router = APIRouter()
 
@@ -209,11 +209,7 @@ def set_roi_config(data: ROIConfigPayload, db: Session = Depends(get_db), user=D
     return {"message": "ROI updated", "percentage": roi.percentage}
 
 
-@router.post("/admin/credit-daily-roi")
-def run_daily_roi(db: Session = Depends(get_db), user=Depends(verify_token)):
-    if not user.get("is_admin"):
-        raise HTTPException(status_code=403, detail="Admin only")
-    return credit_daily_roi(db)
+
 
 
 # ────────────────────────────────
@@ -563,9 +559,13 @@ def get_admin_stats(db: Session = Depends(get_db), user=Depends(verify_token)):
     
 
 @router.post("/admin/force-credit-roi")
-def force_credit_roi(db: Session = Depends(get_db), user=Depends(verify_token)):
+def run_force_daily_roi(db: Session = Depends(get_db), user=Depends(verify_token)):
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin only")
+    return force_credit_daily_roi(db)
 
-    # Call the ROI logic but skip the "already credited today" check
-    return credit_daily_roi(db, force=True)
+@router.post("/admin/credit-daily-roi")
+def run_daily_roi(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+    return credit_daily_roi(db)
