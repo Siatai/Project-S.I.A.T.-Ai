@@ -20,14 +20,23 @@ export default function AssociateHome() {
         setUser(res.data);
 
         if (res.data?.email) {
-          const depRes = await axios.get(`${API}/investments?email=${res.data.email}`, { headers });
+          const depRes = await axios.get(
+            `${API}/investments?email=${res.data.email}`,
+            { headers }
+          );
           setDeposits(depRes.data);
-          setTotalDeposits(depRes.data.reduce((sum, d) => sum + Number(d.amount), 0));
+          setTotalDeposits(
+            depRes.data.reduce((sum, d) => sum + Number(d.amount), 0)
+          );
         }
 
-        const teamRes = await axios.get(`${API}/associate/deposits`, { headers });
+        const teamRes = await axios.get(`${API}/associate/deposits`, {
+          headers,
+        });
         setTeamDeposits(teamRes.data);
-        setTotalTeamDeposits(teamRes.data.reduce((sum, d) => sum + Number(d.amount), 0));
+        setTotalTeamDeposits(
+          teamRes.data.reduce((sum, d) => sum + Number(d.amount), 0)
+        );
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -54,15 +63,20 @@ export default function AssociateHome() {
         Welcome, {user.name || "Associate"}
       </h2>
       <p style={{ marginBottom: "25px", color: "#94A3B8" }}>
-        Share your unique referral link to grow your network. All deposits made via your link will be tracked here.
+        Share your unique referral link to grow your network. All deposits made
+        via your link will be tracked here.
       </p>
 
       {/* Referral Link */}
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Referral Link</h3>
-        <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+        <div
+          style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
+        >
           <input type="text" value={signupUrl} readOnly style={inputStyle} />
-          <button onClick={copyReferral} style={btnTeal}>Copy</button>
+          <button onClick={copyReferral} style={btnTeal}>
+            Copy
+          </button>
         </div>
       </div>
 
@@ -73,7 +87,13 @@ export default function AssociateHome() {
         <h3 style={sectionTitle}>My Deposits</h3>
         <div style={rowHeader}>
           <span>Total Deposits</span>
-          <span style={{ color: "#17E8E5", fontWeight: "700" }}>
+          <span
+            style={{
+              color: "#22C55E",
+              fontWeight: "800",
+              fontSize: "16px",
+            }}
+          >
             {totalDeposits} USDT
           </span>
         </div>
@@ -98,7 +118,13 @@ export default function AssociateHome() {
         {/* Total */}
         <div style={rowHeader}>
           <span>Total Team Deposits</span>
-          <span style={{ color: "#22C55E", fontWeight: "700", fontSize: "15px" }}>
+          <span
+            style={{
+              color: "#22C55E",
+              fontWeight: "800",
+              fontSize: "16px",
+            }}
+          >
             {totalTeamDeposits} USDT
           </span>
         </div>
@@ -113,7 +139,9 @@ export default function AssociateHome() {
         )}
 
         {teamDeposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No team deposits yet</p>
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
+            No team deposits yet
+          </p>
         ) : (
           teamDeposits.map((d, idx) => (
             <div key={idx} style={glowRowGrid}>
@@ -189,14 +217,14 @@ const glowRow = {
   fontSize: "14px",
   borderRadius: "8px",
   background: "rgba(15,23,42,0.9)",
-  borderLeft: "4px solid #",
-  boxShadow: "0 0 10px rgba(23,232,229,0.25)",
+  borderLeft: "4px solid #22C55E",
+  boxShadow: "0 0 10px rgba(34,197,94,0.25)",
 };
 
-/* 🔹 Glow Grid Row for Team Deposits */
+/* 🔹 Fixed Table Header for Team Deposits */
 const tableHeader = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 22C55E1fr",
+  gridTemplateColumns: "1fr 1fr 1fr", // ✅ Fixed 3 columns
   textAlign: "center",
   fontWeight: "600",
   fontSize: "14px",
@@ -206,6 +234,7 @@ const tableHeader = {
   marginTop: "10px",
 };
 
+/* 🔹 Glow Grid Row for Team Deposits */
 const glowRowGrid = {
   display: "grid",
   gridTemplateColumns: "1fr 1fr 1fr",
