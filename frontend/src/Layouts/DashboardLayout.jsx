@@ -12,12 +12,14 @@ export default function DashboardLayout() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
+  // 🔹 Detect mobile resize
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // 🔹 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -25,6 +27,7 @@ export default function DashboardLayout() {
     navigate("/");
   };
 
+  // 🔹 Fetch user + wallet balance
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -68,10 +71,7 @@ export default function DashboardLayout() {
     fetchUser();
   }, [navigate]);
 
-  if (loading) {
-    return <div className="loading-screen">Loading dashboard...</div>;
-  }
-
+  if (loading) return <div className="loading-screen">Loading dashboard...</div>;
   if (!user) return null;
 
   let role = "Investor";
@@ -111,7 +111,7 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       {(sidebarOpen || !isMobile) && (
         <aside className="dashboard-sidebar">
-          {/* 🔹 Close button visible only on mobile */}
+          {/* Close button only on mobile */}
           {isMobile && (
             <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>
               ✖
@@ -165,61 +165,141 @@ export default function DashboardLayout() {
 
       {/* Styles */}
       <style>{`
-        /* --- inside <style> --- */
-.dashboard-root {
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  font-family: Inter, Arial, sans-serif;
-  color: #E5E7EB;
-  background: #0B1220;
-}
+        .dashboard-root {
+          display: flex;
+          height: 100vh;
+          width: 100%;
+          overflow: hidden;
+          font-family: Inter, Arial, sans-serif;
+          color: #E5E7EB;
+          background: #0B1220; /* solid background */
+        }
 
-/* Sidebar stays fixed height */
-.dashboard-sidebar {
-  width: 250px;
-  background: rgba(17, 24, 39, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 25px 15px;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid rgba(23,232,166,0.2);
-  box-shadow: 0 0 20px rgba(23,232,229,0.15);
-  position: relative;
-  overflow: hidden; /* lock sidebar scroll */
-}
+        .dashboard-sidebar {
+          width: 250px;
+          background: rgba(17, 24, 39, 0.95);
+          backdrop-filter: blur(10px);
+          padding: 25px 15px;
+          display: flex;
+          flex-direction: column;
+          border-right: 1px solid rgba(23,232,166,0.2);
+          box-shadow: 0 0 20px rgba(23,232,229,0.15);
+          position: relative;
+          overflow: hidden; /* lock sidebar scroll */
+          flex-shrink: 0;
+        }
 
-/* Main layout = header fixed + scrollable body */
-.dashboard-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
+        .close-sidebar {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: transparent;
+          border: none;
+          font-size: 22px;
+          color: #17E8E5;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        }
+        .close-sidebar:hover {
+          transform: scale(1.2);
+        }
 
-.dashboard-header {
-  flex-shrink: 0;
-  height: 60px;
-  background: rgba(18,26,43,0.95);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  border-bottom: 1px solid rgba(23,232,166,0.2);
-}
+        .user-name {
+          font-size: 18px;
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 6px;
+        }
+        .user-balance {
+          font-size: 14px;
+          color: #17E8E5;
+          text-align: center;
+          margin-bottom: 20px;
+          font-weight: 600;
+        }
 
-/* 🔹 Only this part scrolls */
-.dashboard-content {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* smooth iOS scrolling */
-  background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
-  padding: 20px;
-}
+        .sidebar-link {
+          display: block;
+          padding: 12px 15px;
+          border-radius: 10px;
+          text-decoration: none;
+          color: #E5E7EB;
+          transition: all 0.3s ease;
+        }
+        .sidebar-link.active {
+          background: linear-gradient(135deg,#17E8E5,#14B8A6);
+          color: #0B1220;
+          font-weight: 600;
+          box-shadow: 0 0 12px rgba(23,232,166,0.5);
+        }
 
+        .logout-btn {
+          padding: 12px 15px;
+          margin: 20px 0 40px;
+          border-radius: 10px;
+          cursor: pointer;
+          background: rgba(255,255,255,0.08);
+          text-align: center;
+          font-weight: 600;
+        }
+
+        .dashboard-main {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .dashboard-header {
+          height: 60px;
+          background: rgba(18,26,43,0.95);
+          backdrop-filter: blur(6px);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 20px;
+          border-bottom: 1px solid rgba(23,232,166,0.2);
+          flex-shrink: 0;
+        }
+
+        .brand {
+          font-family: Orbitron, sans-serif;
+          font-weight: 700;
+          color: #17E8E5;
+          font-size: 20px;
+        }
+        .panel {
+          font-size: 14px;
+          color: #94A3B8;
+          font-weight: 600;
+        }
+        .menu-btn {
+          background: transparent;
+          border: none;
+          color: #17E8E5;
+          font-size: 22px;
+          cursor: pointer;
+        }
+
+        /* 🔹 Right side scrolls fully */
+        .dashboard-content {
+          flex: 1;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
+          padding: 20px;
+          padding-bottom: 100px; /* ✅ ensures bottom buttons not cut off */
+        }
+
+        html, body, #root {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          width: 100%;
+          overflow: hidden;
+          background: #000;
+        }
       `}</style>
     </div>
   );
