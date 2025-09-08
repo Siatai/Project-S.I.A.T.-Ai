@@ -63,16 +63,42 @@ class CommissionPayload(BaseModel):
 # 📌 WALLET MODULE
 # ────────────────────────────────
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+from db import get_db
+from models.user_model import User
+from utils.auth_middleware import verify_token
+
+router = APIRouter()
+
+
 @router.post("/save-wallet")
-def save_wallet(data: WalletPayload, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(email=data.email).first()
+def save_wallet(payload: WalletPayload, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    if user.wallet:
-        raise HTTPException(status_code=400, detail="Wallet already bound")
-    user.wallet = data.wallet
-    db.commit()
-    return {"message": "Wallet saved", "wallet": user.wallet}
+
+    # ✅ check if wallet is already bound to another user
+    existing = db.query(User).filter(User.wallet == payload.wallet).first()
+    if existing and existing.id != user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="⚠️ This wallet is already bound to another account."
+        )
+
+    try:
+        user.wallet = payload.wallet
+        db.commit()
+        db.refresh(user)
+        return {"message": "✅ Wallet saved successfully"}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="⚠️ This wallet is already bound to another account."
+        )
+
 
 
 @router.get("/user-info")

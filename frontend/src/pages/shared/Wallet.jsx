@@ -5,6 +5,7 @@ export default function Wallet() {
   const [wallet, setWallet] = useState("");
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [popupMessage, setPopupMessage] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
@@ -33,6 +34,7 @@ export default function Wallet() {
         }
       } catch (err) {
         console.error("Error fetching wallet:", err);
+        setPopupMessage({ type: "error", text: "❌ Failed to fetch wallet info." });
       } finally {
         setLoading(false);
       }
@@ -43,7 +45,7 @@ export default function Wallet() {
   // ✅ Save wallet
   const saveWallet = async () => {
     if (!wallet.trim()) {
-      alert("Please enter a valid TRC20 address.");
+      setPopupMessage({ type: "error", text: "⚠️ Please enter a valid TRC20 address." });
       return;
     }
     try {
@@ -52,11 +54,24 @@ export default function Wallet() {
         { email, wallet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("✅ Wallet saved successfully!");
       setSaved(true);
+      setPopupMessage({ type: "success", text: "✅ Wallet saved successfully!" });
     } catch (err) {
       console.error("Error saving wallet:", err);
-      alert(err?.response?.data?.detail || "Failed to save wallet");
+      if (
+        err?.response?.data?.detail &&
+        err.response.data.detail.toLowerCase().includes("duplicate")
+      ) {
+        setPopupMessage({
+          type: "error",
+          text: "⚠️ This wallet is already bound to another account.",
+        });
+      } else {
+        setPopupMessage({
+          type: "error",
+          text: err?.response?.data?.detail || "❌ Failed to save wallet.",
+        });
+      }
     }
   };
 
@@ -75,6 +90,29 @@ export default function Wallet() {
       </h2>
       <div style={glowLine} />
 
+      {/* ✅ Inline popup message */}
+      {popupMessage && (
+        <div
+          style={{
+            marginBottom: "15px",
+            padding: "12px",
+            borderRadius: "8px",
+            background:
+              popupMessage.type === "error"
+                ? "rgba(239,68,68,0.2)"
+                : "rgba(16,185,129,0.2)",
+            border: `1px solid ${
+              popupMessage.type === "error" ? "#EF4444" : "#10B981"
+            }`,
+            color: popupMessage.type === "error" ? "#F87171" : "#34D399",
+            fontWeight: "600",
+            textAlign: "center",
+          }}
+        >
+          {popupMessage.text}
+        </div>
+      )}
+
       {saved ? (
         <div style={cardStyle}>
           <p style={{ marginBottom: "10px", fontWeight: "600" }}>
@@ -82,9 +120,13 @@ export default function Wallet() {
           </p>
           <p style={walletBox}>{wallet}</p>
           <div style={glowLine} />
-          <p style={{ fontSize: "13px", color: "#F87171", marginTop: "12px" }}>
-            ⚠️ You cannot change this wallet once saved.
-          </p>
+
+          {/* 🔹 Strong warning */}
+          <div style={warningBox}>
+            <p>⚠️ Only <b>one wallet</b> can be bound per account.</p>
+            <p>⚠️ A wallet address cannot be used for <b>multiple accounts</b>.</p>
+            <p>⚠️ Once saved, this wallet <b>cannot be changed</b>.</p>
+          </div>
         </div>
       ) : (
         <div style={cardStyle}>
@@ -98,6 +140,13 @@ export default function Wallet() {
           <button onClick={saveWallet} style={btnTeal}>
             Save Wallet
           </button>
+
+          {/* 🔹 Warning before saving */}
+          <div style={{ ...warningBox, marginTop: "15px" }}>
+            <p>⚠️ You can bind only one wallet to your account.</p>
+            <p>⚠️ Duplicate wallets across accounts will not be saved.</p>
+            <p>⚠️ Once saved, wallet cannot be changed.</p>
+          </div>
         </div>
       )}
     </div>
@@ -156,4 +205,15 @@ const glowLine = {
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 20px 0",
+};
+
+const warningBox = {
+  background: "rgba(239,68,68,0.1)",
+  border: "1px solid rgba(239,68,68,0.4)",
+  borderRadius: "8px",
+  padding: "12px",
+  fontSize: "13px",
+  color: "#F87171",
+  textAlign: "left",
+  lineHeight: "1.5",
 };

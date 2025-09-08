@@ -7,10 +7,13 @@ export default function Deposit() {
   const [wallet, setWallet] = useState(null);
   const [showWalletPopup, setShowWalletPopup] = useState(false);
   const [newWallet, setNewWallet] = useState("");
+  const [email, setEmail] = useState("");
+  const [popupMessage, setPopupMessage] = useState(null); // ✅ success/error messages
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
+  // 🔹 Fetch user email + wallet
   useEffect(() => {
     const fetchWallet = async () => {
       try {
@@ -18,6 +21,7 @@ export default function Deposit() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setWallet(res.data.wallet);
+        setEmail(res.data.email);
       } catch (err) {
         console.error("Error fetching wallet:", err);
       }
@@ -25,20 +29,32 @@ export default function Deposit() {
     if (token) fetchWallet();
   }, [token]);
 
+  // 🔹 Save wallet (with email)
   const saveWallet = async () => {
+    if (!newWallet.trim()) {
+      setPopupMessage({ type: "error", text: "⚠️ Please enter a valid TRC20 wallet address." });
+      return;
+    }
     try {
       await axios.post(
-        `${API}/wallet/bind`,
-        { wallet: newWallet },
+        `${API}/save-wallet`,
+        { email, wallet: newWallet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("✅ Wallet bound successfully!");
       setWallet(newWallet);
       setShowWalletPopup(false);
       setNewWallet("");
+      setPopupMessage({ type: "success", text: "✅ Wallet bound successfully!" });
     } catch (err) {
       console.error("Error saving wallet:", err);
-      alert(err?.response?.data?.detail || "Failed to bind wallet");
+      if (
+        err?.response?.data?.detail &&
+        err.response.data.detail.toLowerCase().includes("duplicate")
+      ) {
+        setPopupMessage({ type: "error", text: "⚠️ This wallet is already bound to another account." });
+      } else {
+        setPopupMessage({ type: "error", text: err?.response?.data?.detail || "❌ Failed to bind wallet" });
+      }
     }
   };
 
@@ -54,16 +70,29 @@ export default function Deposit() {
 
   return (
     <div style={{ color: "#E5E7EB", padding: "20px" }}>
-      <h2
-        style={{
-          marginBottom: "10px",
-          fontFamily: "Orbitron, sans-serif",
-          color: "#17E8E5",
-        }}
-      >
+      <h2 style={{ marginBottom: "10px", fontFamily: "Orbitron, sans-serif", color: "#17E8E5" }}>
         Deposit
       </h2>
       <div style={glowLine} />
+
+      {/* ✅ Popup message */}
+      {popupMessage && (
+        <div
+          style={{
+            marginBottom: "15px",
+            padding: "12px",
+            borderRadius: "8px",
+            background:
+              popupMessage.type === "error" ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)",
+            border: `1px solid ${popupMessage.type === "error" ? "#EF4444" : "#10B981"}`,
+            color: popupMessage.type === "error" ? "#F87171" : "#34D399",
+            fontWeight: "600",
+            textAlign: "center",
+          }}
+        >
+          {popupMessage.text}
+        </div>
+      )}
 
       {/* Methods Grid */}
       <div
@@ -92,9 +121,7 @@ export default function Deposit() {
               cursor: m.active ? "pointer" : "not-allowed",
               opacity: m.active ? 1 : 0.5,
               border:
-                selected === m.id
-                  ? "2px solid #17E8E5"
-                  : "1px solid rgba(255,255,255,0.1)",
+                selected === m.id ? "2px solid #17E8E5" : "1px solid rgba(255,255,255,0.1)",
               transition: "all 0.3s ease",
               boxShadow:
                 selected === m.id
@@ -154,9 +181,7 @@ export default function Deposit() {
       {selected === "trc20" && (
         <div style={popupOverlay} onClick={() => setSelected(null)}>
           <div style={popupBox} onClick={(e) => e.stopPropagation()}>
-            <button style={closeBtn} onClick={() => setSelected(null)}>
-              ✕
-            </button>
+            <button style={closeBtn} onClick={() => setSelected(null)}>✕</button>
             <h3 style={{ marginBottom: "18px", fontWeight: "600", color: "#17E8E5" }}>
               Deposit via TRC20 (USDT)
             </h3>
@@ -191,14 +216,13 @@ export default function Deposit() {
       {showWalletPopup && (
         <div style={popupOverlay} onClick={() => setShowWalletPopup(false)}>
           <div style={popupBox} onClick={(e) => e.stopPropagation()}>
-            <button style={closeBtn} onClick={() => setShowWalletPopup(false)}>
-              ✕
-            </button>
-            <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>
-              Bind Your TRC20 Wallet
-            </h3>
-            <p style={{ fontSize: "13px", marginBottom: "12px", color: "#9CA3AF" }}>
+            <button style={closeBtn} onClick={() => setShowWalletPopup(false)}>✕</button>
+            <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>Bind Your TRC20 Wallet</h3>
+            <p style={{ fontSize: "13px", marginBottom: "8px", color: "#9CA3AF" }}>
               You must bind your withdrawal wallet before depositing.
+            </p>
+            <p style={{ fontSize: "12px", color: "#F87171", marginBottom: "12px", fontStyle: "italic" }}>
+              ⚠️ Duplicate wallets will not be saved — each wallet can only be linked to one account.
             </p>
             <input
               type="text"
@@ -207,9 +231,7 @@ export default function Deposit() {
               onChange={(e) => setNewWallet(e.target.value)}
               style={inputStyle}
             />
-            <button onClick={saveWallet} style={btnTeal}>
-              Save Wallet
-            </button>
+            <button onClick={saveWallet} style={btnTeal}>Save Wallet</button>
           </div>
         </div>
       )}
@@ -218,72 +240,9 @@ export default function Deposit() {
 }
 
 /* === Shared Styles === */
-const btnTeal = {
-  marginTop: "15px",
-  padding: "12px 24px",
-  border: "none",
-  borderRadius: "8px",
-  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
-  color: "#0B1220",
-  fontWeight: "700",
-  cursor: "pointer",
-  transition: "all 0.3s ease",
-  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
-  width: "100%",
-  maxWidth: "420px",
-};
-
-const inputStyle = {
-  width: "100%",
-  maxWidth: "420px",
-  padding: "12px",
-  borderRadius: "8px",
-  marginBottom: "12px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.05)",
-  color: "#E5E7EB",
-  fontSize: "14px",
-  boxSizing: "border-box",
-};
-
-const popupOverlay = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  background: "rgba(0,0,0,0.6)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const popupBox = {
-  background: "rgba(17,24,39,0.95)",
-  padding: "25px",
-  borderRadius: "12px",
-  maxWidth: "420px",
-  width: "90%",
-  boxShadow: "0 0 25px rgba(23,232,229,0.35)",
-  textAlign: "center",
-  position: "relative",
-};
-
-const closeBtn = {
-  position: "absolute",
-  top: "10px",
-  right: "12px",
-  background: "transparent",
-  border: "none",
-  fontSize: "20px",
-  color: "#E5E7EB",
-  cursor: "pointer",
-};
-
-const glowLine = {
-  height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 10px #17E8E5",
-  marginBottom: "20px",
-};
+const btnTeal = { marginTop: "15px", padding: "12px 24px", border: "none", borderRadius: "8px", background: "linear-gradient(135deg,#17E8E5,#14B8E5)", color: "#0B1220", fontWeight: "700", cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 0 12px rgba(23,232,229,0.4)", width: "100%", maxWidth: "420px" };
+const inputStyle = { width: "100%", maxWidth: "420px", padding: "12px", borderRadius: "8px", marginBottom: "12px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#E5E7EB", fontSize: "14px", boxSizing: "border-box" };
+const popupOverlay = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 };
+const popupBox = { background: "rgba(17,24,39,0.95)", padding: "25px", borderRadius: "12px", maxWidth: "420px", width: "90%", boxShadow: "0 0 25px rgba(23,232,229,0.35)", textAlign: "center", position: "relative" };
+const closeBtn = { position: "absolute", top: "10px", right: "12px", background: "transparent", border: "none", fontSize: "20px", color: "#E5E7EB", cursor: "pointer" };
+const glowLine = { height: "2px", background: "linear-gradient(90deg, transparent, #17E8E5, transparent)", boxShadow: "0 0 10px #17E8E5", marginBottom: "20px" };
