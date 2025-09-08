@@ -81,7 +81,7 @@ export default function AssociateHome() {
           <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No deposits yet</p>
         ) : (
           deposits.map((d, idx) => (
-            <div key={idx} style={rowStyle}>
+            <div key={idx} style={glowRow}>
               <span>{d.amount} USDT</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
@@ -116,7 +116,7 @@ export default function AssociateHome() {
           <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No team deposits yet</p>
         ) : (
           teamDeposits.map((d, idx) => (
-            <div key={idx} style={tableRow}>
+            <div key={idx} style={glowRowGrid}>
               <span>{d.name}</span>
               <span>{d.amount}</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
@@ -180,18 +180,23 @@ const rowHeader = {
   fontWeight: "600",
 };
 
-const rowStyle = {
+/* 🔹 Glow Row for My Deposits */
+const glowRow = {
   display: "flex",
   justifyContent: "space-between",
-  padding: "6px 0",
+  padding: "10px",
+  marginTop: "8px",
   fontSize: "14px",
-  borderBottom: "1px solid rgba(255,255,255,0.05)",
+  borderRadius: "8px",
+  background: "rgba(15,23,42,0.9)",
+  borderLeft: "4px solid #",
+  boxShadow: "0 0 10px rgba(23,232,229,0.25)",
 };
 
-/* Table-like styles for Team Deposits */
+/* 🔹 Glow Grid Row for Team Deposits */
 const tableHeader = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
+  gridTemplateColumns: "1fr 1fr 22C55E1fr",
   textAlign: "center",
   fontWeight: "600",
   fontSize: "14px",
@@ -201,11 +206,15 @@ const tableHeader = {
   marginTop: "10px",
 };
 
-const tableRow = {
+const glowRowGrid = {
   display: "grid",
   gridTemplateColumns: "1fr 1fr 1fr",
   textAlign: "center",
-  padding: "6px 0",
+  padding: "10px",
+  marginTop: "8px",
   fontSize: "14px",
-  borderBottom: "1px solid rgba(255,255,255,0.05)",
+  borderRadius: "8px",
+  background: "rgba(15,23,42,0.9)",
+  borderLeft: "4px solid #17E8E5",
+  boxShadow: "0 0 10px rgba(34,197,94,0.25)",
 };

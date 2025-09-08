@@ -242,7 +242,7 @@ export default function TransactionHistory() {
                           ? "#FACC15"
                           : t.status === "approved" || t.status === "confirmed"
                           ? "#17E8E5"
-                          : "#EF4444",
+                          : "#4fef44ff",
                       fontWeight: "600",
                     }}
                   >

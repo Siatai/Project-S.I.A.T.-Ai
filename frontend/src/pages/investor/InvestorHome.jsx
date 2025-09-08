@@ -95,23 +95,14 @@ export default function InvestorHome() {
             color: "#17E8E5",
           }}
         >
-          💰 My Deposits
+          My Deposits
         </h3>
         <div style={glowLine} />
 
-        {/* Total Row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "10px 0",
-            fontWeight: "600",
-            fontSize: "15px",
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-          }}
-        >
+        {/* Total Row (Bigger + Bold + Strong Glow) */}
+        <div style={glowRowTotal}>
           <span>Total Deposits</span>
-          <span style={{ color: "#17E8E5" }}>{totalDeposits} USDT</span>
+          <span>{totalDeposits} USDT</span>
         </div>
 
         {/* Deposit List */}
@@ -119,16 +110,7 @@ export default function InvestorHome() {
           <p style={{ color: "#9CA3AF", marginTop: "12px" }}>No deposits yet</p>
         ) : (
           deposits.map((d, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                borderBottom: "1px solid rgba(255,255,255,0.05)",
-                padding: "8px 0",
-                fontSize: "14px",
-              }}
-            >
+            <div key={idx} style={glowRowGreen}>
               <span>{d.amount} USDT</span>
               <span>{new Date(d.timestamp).toLocaleDateString()}</span>
             </div>
@@ -140,7 +122,7 @@ export default function InvestorHome() {
       <div style={{ marginTop: 40, textAlign: "center" }}>
         {isAssociate ? (
           <p style={{ color: "#4ADE80", fontWeight: "600" }}>
-            🎉 Welcome, <strong>Associate</strong>! You now have referral access.
+            Welcome, <strong>Associate</strong>! You now have referral access.
           </p>
         ) : !applied ? (
           <button onClick={applyForAssociate} style={btnTeal}>
@@ -172,6 +154,29 @@ const glowLine = {
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 18px 0",
+};
+
+/* 🔹 Glowing green row for deposits */
+const glowRowGreen = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "8px 10px",
+  marginTop: "6px",
+  fontSize: "14px",
+  borderRadius: "6px",
+  background: "rgba(15,23,42,0.85)",
+  borderLeft: "3px solid #22C55E",
+  boxShadow: "0 0 6px rgba(34,197,94,0.25)",
+};
+
+/* 🔹 Special styling for Total row */
+const glowRowTotal = {
+  ...glowRowGreen,
+  fontSize: "16px",
+  fontWeight: "700",
+  borderLeft: "4px solid #22C55E",
+  boxShadow: "0 0 12px rgba(34,197,94,0.4)",
+  marginBottom: "8px",
 };
 
 const btnTeal = {

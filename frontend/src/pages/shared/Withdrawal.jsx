@@ -172,7 +172,7 @@ export default function Withdrawal() {
         </div>
         <div style={cardStyle}>
           <h3 style={cardTitle}>Total Deductions</h3>
-          <p style={{ ...valueStyle, color: "#EF4444" }}>
+          <p style={{ ...valueStyle, color: "#44ef77ff" }}>
             -${summary.deductions.toFixed(2)}
           </p>
         </div>
