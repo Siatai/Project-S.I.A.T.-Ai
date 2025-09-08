@@ -4,6 +4,7 @@ import AuthModal from "./auth/AuthModal";
 import bg from "../Components/bg.png";
 import avatar from "../Components/avatar.png";
 import sniper from "../Components/sniper.png";
+import logo from "../Components/logo.png"; // ✅ your square logo
 
 // Divider with neon glow + shine
 const Divider = () => (
@@ -104,9 +105,35 @@ export default function Landing() {
           boxShadow: "0 2px 12px rgba(0,0,0,0.6)",
         }}
       >
-        <h1 style={{ color: "#17E8E5", fontSize: "20px", fontWeight: "bold" }}>
-          AlgoM³ Ai
-        </h1>
+        {/* ✅ Logo + Text */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <img
+            src={logo}
+            alt="AlgoM³ Logo"
+            style={{
+              height: "45px",
+              width: "45px",
+              borderRadius: "8px",
+              border: "2px solid #17E8E5",
+              background: "#0B1220",
+              padding: "4px",
+              boxShadow: "0 0 12px rgba(23,232,229,0.6)",
+            }}
+          />
+          <h1
+            style={{
+              color: "#17E8E5",
+              fontSize: "25px",
+              fontWeight: "bold",
+              justifyContent: "center",
+              margin: 0,
+              textShadow: "0 0 12px #17E8E5, 0 0 24px #0B1220",
+            }}
+          >
+            AlgoM³ Ai
+          </h1>
+        </div>
+
         <img
           src={avatar}
           alt="profile"
@@ -198,7 +225,7 @@ export default function Landing() {
 
       <Divider />
 
-      {/* About Forex - Continuous Carousel */}
+      {/* About Forex */}
       <section
         style={{
           position: "relative",
@@ -261,7 +288,7 @@ export default function Landing() {
 
       <Divider />
 
-      {/* Coming Soon - Continuous Carousel */}
+      {/* Coming Soon */}
       <section
         style={{
           position: "relative",

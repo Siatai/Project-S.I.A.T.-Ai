@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import logo from "../Components/logo.png"; // ✅ your logo
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -111,7 +112,6 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       {(sidebarOpen || !isMobile) && (
         <aside className="dashboard-sidebar">
-          {/* Close button only on mobile */}
           {isMobile && (
             <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>
               ✖
@@ -123,6 +123,9 @@ export default function DashboardLayout() {
             <p className="user-balance">
               Balance: ${user.withdrawable_balance?.toLocaleString() || "0"}
             </p>
+
+            {/* ✅ Glowy divider line */}
+            <div className="glow-divider"></div>
 
             {sidebarItems[role.toLowerCase()].map((item) => {
               const active = location.pathname === item.path;
@@ -149,13 +152,48 @@ export default function DashboardLayout() {
       {/* Main Section */}
       <div className="dashboard-main">
         <header className="dashboard-header">
-          <h1 className="brand">AlgoM³</h1>
-          <span className="panel">{role} Panel</span>
-          {isMobile && (
-            <button className="menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-              ☰
-            </button>
-          )}
+          {/* Left: Logo */}
+          <div className="header-left">
+            <img
+              src={logo}
+              alt="AlgoM³ Logo"
+              style={{
+                height: "36px",
+                width: "36px",
+                borderRadius: "8px",
+                border: "2px solid #17E8E5",
+                background: "#0B1220",
+                padding: "3px",
+                boxShadow: "0 0 8px rgba(23,232,229,0.6)",
+              }}
+            />
+          </div>
+
+          {/* Center: Branding */}
+          <div className="header-center">
+            <h1
+              className="brand"
+              style={{
+                margin: 0,
+                fontSize: "22px",
+                fontWeight: "bold",
+                color: "#17E8E5",
+                textShadow: "0 0 10px #17E8E5, 0 0 20px #0B1220",
+              }}
+            >
+              AlgoM³ Ai
+            </h1>
+          </div>
+
+          {/* Right: Panel + Menu */}
+          <div className="header-right">
+            <span className="panel">{role} Panel</span>
+            {isMobile && (
+              <button className="menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                ☰
+              </button>
+            )}
+          </div>
         </header>
 
         <main className="dashboard-content">
@@ -172,7 +210,7 @@ export default function DashboardLayout() {
           overflow: hidden;
           font-family: Inter, Arial, sans-serif;
           color: #E5E7EB;
-          background: #0B1220; /* solid background */
+          background: #0B1220;
         }
 
         .dashboard-sidebar {
@@ -185,7 +223,7 @@ export default function DashboardLayout() {
           border-right: 1px solid rgba(23,232,166,0.2);
           box-shadow: 0 0 20px rgba(23,232,229,0.15);
           position: relative;
-          overflow: hidden; /* lock sidebar scroll */
+          overflow: hidden;
           flex-shrink: 0;
         }
 
@@ -214,8 +252,17 @@ export default function DashboardLayout() {
           font-size: 14px;
           color: #17E8E5;
           text-align: center;
-          margin-bottom: 20px;
+          margin-bottom: 15px;
           font-weight: 600;
+        }
+
+        /* ✅ Glowy divider line */
+        .glow-divider {
+          height: 2px;
+          border-radius: 2px;
+          margin: 15px 0;
+          background: linear-gradient(90deg, transparent, #17E8E5, transparent);
+          box-shadow: 0 0 12px #17E8E5;
         }
 
         .sidebar-link {
@@ -258,21 +305,33 @@ export default function DashboardLayout() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 20px;
+          padding: 0 15px;
           border-bottom: 1px solid rgba(23,232,166,0.2);
           flex-shrink: 0;
         }
 
+        .header-left {
+          flex: 0 0 auto;
+        }
+        .header-center {
+          flex: 1;
+          text-align: center;
+        }
+        .header-right {
+          flex: 0 0 auto;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
         .brand {
           font-family: Orbitron, sans-serif;
-          font-weight: 700;
-          color: #17E8E5;
-          font-size: 20px;
         }
         .panel {
           font-size: 14px;
           color: #94A3B8;
           font-weight: 600;
+          white-space: nowrap;
         }
         .menu-btn {
           background: transparent;
@@ -282,14 +341,13 @@ export default function DashboardLayout() {
           cursor: pointer;
         }
 
-        /* 🔹 Right side scrolls fully */
         .dashboard-content {
           flex: 1;
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
           background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
           padding: 20px;
-          padding-bottom: 100px; /* ✅ ensures bottom buttons not cut off */
+          padding-bottom: 100px;
         }
 
         html, body, #root {
