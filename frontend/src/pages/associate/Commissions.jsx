@@ -104,7 +104,7 @@ export default function Commissions() {
           boxShadow: "0 0 12px rgba(23,232,229,0.15)",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "500px" }}>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 12px" }}>
           <thead>
             <tr style={{ background: "rgba(31,41,55,0.9)" }}>
               {["Date", "Total Earnings"].map((h, i) => (
@@ -130,10 +130,12 @@ export default function Commissions() {
                 <tr
                   key={i}
                   style={{
-                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    background: "rgba(15,23,42,0.9)",
+                    boxShadow: "0 0 10px rgba(23,232,229,0.3)",
+                    borderRadius: "8px",
                   }}
                 >
-                  <td style={tdStyle}>{date}</td>
+                  <td style={{ ...tdStyle, borderLeft: "4px solid #17E8E5" }}>{date}</td>
                   <td
                     style={{
                       ...tdStyle,
@@ -144,7 +146,6 @@ export default function Commissions() {
                       fontWeight: "600",
                     }}
                   >
-                    {/* Small clickable icon */}
                     <span
                       onClick={() => setSelectedDate({ date, records })}
                       style={{
@@ -224,7 +225,7 @@ export default function Commissions() {
 
 /* === Styles === */
 const tdStyle = {
-  padding: "10px",
+  padding: "12px",
   fontSize: "14px",
   color: "#E5E7EB",
   fontFamily: "Inter, sans-serif",
