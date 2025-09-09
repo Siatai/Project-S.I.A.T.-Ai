@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import TermsModal from "../../Components/TermsModal"; // ✅ popup
 
-export default function SignUpForm() {
+export default function ReferralSignup() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -13,9 +14,44 @@ export default function SignUpForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const referrer = params.get("ref") || ""; // ✅ prefilled from referral link
+  const referrer = params.get("ref") || "";
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
+
+  // ✅ Axios instance with token handling
+  const api = axios.create({ baseURL: API });
+
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
+
+  api.interceptors.response.use(
+    (res) => res,
+    (err) => {
+      if (err?.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/signup");
+      }
+      return Promise.reject(err);
+    }
+  );
+
+  // ✅ Fetch user (to confirm token works)
+  const fetchUser = useCallback(async () => {
+    try {
+      await api.get("/me");
+    } catch (err) {
+      console.error("Fetch user failed:", err?.response?.data || err.message);
+    }
+  }, [api]);
+
+  // Auto fetch if token exists
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) fetchUser();
+  }, [fetchUser]);
 
   // Step 1: Send OTP
   const sendOtp = async () => {
@@ -56,6 +92,7 @@ export default function SignUpForm() {
       localStorage.setItem("role", role);
 
       alert("✅ Signup successful!");
+      fetchUser();
 
       if (role === "admin") navigate("/admin");
       else if (role === "associate") navigate("/associate");
@@ -70,59 +107,61 @@ export default function SignUpForm() {
     <div
       style={{
         minHeight: "100vh",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         padding: "30px 20px",
-        background: "linear-gradient(135deg,#0B1220,#0F2F2D,#000)",
-        color: "#E5E7EB",
+        boxSizing: "border-box",
       }}
     >
-      {/* 🔹 Header with logo + title */}
-      <header
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "30px",
-        }}
-      >
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <img
-            src="/logo.png"
-            alt="AlgoMcube Logo"
-            style={{
-              height: "60px",
-              cursor: "pointer",
-              filter: "drop-shadow(0 0 8px rgba(23,232,229,0.6))",
-            }}
-          />
-        </Link>
-        <h1
+      {/* 🔹 Centered Logo */}
+      <Link to="/" style={{ textDecoration: "none", marginBottom: "20px" }}>
+        <img
+          src="/logo.png"
+          alt="AlgoMcube Logo"
+          className="logo-img"
           style={{
-            fontFamily: "Orbitron, sans-serif",
-            fontSize: "22px",
-            fontWeight: "700",
-            color: "#17E8E5",
+            height: "70px",
+            cursor: "pointer",
+            filter: "drop-shadow(0 0 8px rgba(23,232,229,0.6))",
           }}
-        >
-          Referral Signup
-        </h1>
-      </header>
+        />
+      </Link>
 
-      {/* 🔹 Signup Card */}
+      {/* 🔹 Card */}
       <div
         style={{
           width: "100%",
           maxWidth: "420px",
-          background: "rgba(17,24,39,0.85)",
+          background: "rgba(17,24,39,0.95)",
           padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 0 20px rgba(23,232,229,0.25)",
+          borderRadius: "16px",
+          boxShadow: "0 6px 24px rgba(0,0,0,0.6)",
         }}
       >
+        {/* ✅ Subtle neon welcome heading */}
+        <h1
+          style={{
+            textAlign: "center",
+            fontFamily: "Orbitron, sans-serif",
+            fontSize: "28px",
+            fontWeight: "700",
+            marginBottom: "12px",
+          }}
+        >
+          <span style={{ color: "#ffffff" }}>Welcome to </span>
+          <span
+            style={{
+              color: "#17E8E5",
+              textShadow:
+                "0 0 4px #17E8E5, 0 0 8px rgba(23,232,229,0.6), 0 0 12px rgba(23,232,229,0.4)",
+            }}
+          >
+            AlgoM³
+          </span>
+        </h1>
+
         <h2
           style={{
             marginBottom: "20px",
@@ -150,7 +189,6 @@ export default function SignUpForm() {
               onChange={(e) => setEmail(e.target.value)}
               style={inputStyle}
             />
-            {/* ✅ Referral code prefilled + disabled */}
             <input
               type="text"
               value={referrer}
@@ -163,7 +201,6 @@ export default function SignUpForm() {
               }}
             />
 
-            {/* ✅ Agreement checkbox */}
             <div style={checkboxContainer}>
               <input
                 type="checkbox"
@@ -214,43 +251,30 @@ export default function SignUpForm() {
         )}
       </div>
 
-      {/* ✅ Modal (T&C) */}
-      {showTerms && (
-        <div style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ marginTop: 0, color: "#17E8E5" }}>
-              Terms & Conditions
-            </h2>
-            <div style={modalContent}>
-              {/* 👇 You can paste your T&C text here (kept shorter for readability) */}
-              <p>
-                These Terms and Conditions (“Terms”) govern the use of AlgoMcube’s
-                services. By creating an account, making a deposit, or engaging
-                in trading, you agree to these Terms.
-              </p>
-              <hr />
-              <h3>1. Account Rules</h3>
-              <p>• One account per person.</p>
-              <p>• First deposit wallet is permanently linked.</p>
-              <hr />
-              <h3>2. Deposits & Withdrawals</h3>
-              <p>• Minimum Deposit: $100</p>
-              <p>• Minimum Withdrawal: $20</p>
-              <p>• Withdrawals only on Saturdays & Sundays.</p>
-              <hr />
-              <h3>3. Risk Disclaimer</h3>
-              <p>
-                Forex trading is highly volatile and risky. AlgoMcube does not
-                guarantee profits. You may lose all or part of your investment.
-              </p>
-            </div>
+      {/* ✅ Reusable popup */}
+      <TermsModal open={showTerms} onClose={() => setShowTerms(false)} />
 
-            <button style={buttonStyleTeal} onClick={() => setShowTerms(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ✅ Background + responsive logo */}
+      <style>{`
+        html, body, #root {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          width: 100%;
+          background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
+          overflow-x: hidden;
+        }
+
+        .logo-img {
+          transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+          .logo-img {
+            height: 120px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -285,35 +309,4 @@ const checkboxContainer = {
   display: "flex",
   alignItems: "center",
   marginBottom: "18px",
-};
-
-const modalOverlay = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: "rgba(0,0,0,0.7)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 1000,
-};
-
-const modalBox = {
-  background: "#1E293B",
-  padding: "20px",
-  borderRadius: "12px",
-  maxWidth: "650px",
-  width: "90%",
-  color: "#E5E7EB",
-  boxShadow: "0 0 20px rgba(23,232,229,0.4)",
-};
-
-const modalContent = {
-  maxHeight: "400px",
-  overflowY: "auto",
-  marginBottom: "15px",
-  fontSize: "14px",
-  lineHeight: "1.6",
 };

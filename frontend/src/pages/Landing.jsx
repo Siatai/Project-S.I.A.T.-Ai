@@ -3,8 +3,12 @@ import { motion } from "framer-motion";
 import AuthModal from "./auth/AuthModal";
 import bg from "../Components/bg.png";
 import avatar from "../Components/avatar.png";
-import sniper from "../Components/sniper.png";
-import logo from "../Components/logo.png"; // ✅ your square logo
+import logo from "../Components/logo.png";
+
+// ✅ externalized sections
+import FlowSection from "../Components/FlowSection";
+import ForexStats from "../Components/ForexStats";
+import ComingSoon from "../Components/ComingSoon";
 
 // Divider with neon glow + shine
 const Divider = () => (
@@ -39,32 +43,6 @@ const Divider = () => (
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
 
-  // Forex stats
-  const stats = [
-    { stat: "$7T+", desc: "Daily Trading Volume" },
-    { stat: "24/5", desc: "Market Open Hours" },
-    { stat: "190+", desc: "Countries Trading" },
-    { stat: "88%", desc: "Liquidity vs Stocks" },
-  ];
-
-  // Coming soon
-  const comingSoon = [
-    { icon: "📊", desc: "Arbitrage Bot" },
-    { icon: "⚡", desc: "MEV Bot" },
-    {
-      icon: (
-        <img
-          src={sniper}
-          alt="Sniper Bot"
-          style={{ width: "40px", margin: "0 auto" }}
-        />
-      ),
-      desc: "Sniper Bot",
-    },
-    { icon: "💹", desc: "Crypto Trading Bot" },
-    { icon: "📈", desc: "Multi-Asset Smart Portfolio" },
-  ];
-
   return (
     <div
       style={{
@@ -89,7 +67,7 @@ export default function Landing() {
         }}
       />
 
-      {/* Sticky Header */}
+      {/* ✅ Sticky Header */}
       <header
         style={{
           position: "sticky",
@@ -105,7 +83,6 @@ export default function Landing() {
           boxShadow: "0 2px 12px rgba(0,0,0,0.6)",
         }}
       >
-        {/* ✅ Logo + Text */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <img
             src={logo}
@@ -125,7 +102,6 @@ export default function Landing() {
               color: "#17E8E5",
               fontSize: "25px",
               fontWeight: "bold",
-              justifyContent: "center",
               margin: 0,
               textShadow: "0 0 12px #17E8E5, 0 0 24px #0B1220",
             }}
@@ -149,7 +125,7 @@ export default function Landing() {
         />
       </header>
 
-      {/* Hero */}
+      {/* ✅ Hero Section */}
       <main
         style={{
           position: "relative",
@@ -221,126 +197,33 @@ export default function Landing() {
         >
           Get Started
         </motion.button>
+
+        {/* ✅ New Slogan */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 1 }}
+          style={{
+            fontSize: "18px",
+            marginTop: "25px",
+            color: "#17E8E5",
+            fontWeight: "600",
+            textShadow: "0 0 12px #17E8E5, 0 0 24px #0B1220",
+            fontFamily: "Rajdhani, Arial, sans-serif",
+          }}
+        >
+          AI creates the edge. ML makes it smarter. AlgoM³ turns it into profit.
+        </motion.p>
       </main>
 
       <Divider />
 
-      {/* About Forex */}
-      <section
-        style={{
-          position: "relative",
-          zIndex: 2,
-          padding: "60px 20px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h3
-          style={{
-            fontSize: "24px",
-            color: "#17E8E5",
-            fontWeight: "700",
-            marginBottom: "20px",
-            textAlign: "center",
-          }}
-        >
-          About Forex
-        </h3>
-        <div style={{ overflow: "hidden" }}>
-          <div
-            style={{
-              display: "flex",
-              width: "max-content",
-              animation: "marquee 25s linear infinite",
-            }}
-          >
-            {[...stats, ...stats, ...stats].map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: "0 0 250px",
-                  margin: "0 12px",
-                  background: "rgba(30,41,59,0.7)",
-                  borderRadius: "12px",
-                  padding: "30px 20px",
-                  textAlign: "center",
-                  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: "24px",
-                    fontWeight: "700",
-                    color: "#17E8E5",
-                    marginBottom: "10px",
-                  }}
-                >
-                  {item.stat}
-                </h4>
-                <p style={{ fontSize: "14px", color: "#94A3B8" }}>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* ✅ Externalized Sections */}
+      <FlowSection />
       <Divider />
-
-      {/* Coming Soon */}
-      <section
-        style={{
-          position: "relative",
-          zIndex: 2,
-          padding: "60px 20px",
-          textAlign: "center",
-          background: "rgba(15,23,42,0.7)",
-        }}
-      >
-        <h3
-          style={{
-            fontSize: "22px",
-            fontWeight: "700",
-            color: "#17E8E5",
-            marginBottom: "20px",
-          }}
-        >
-          Coming Soon
-        </h3>
-        <div style={{ overflow: "hidden" }}>
-          <div
-            style={{
-              display: "flex",
-              width: "max-content",
-              animation: "marquee 20s linear infinite",
-            }}
-          >
-            {[...comingSoon, ...comingSoon, ...comingSoon].map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: "0 0 250px",
-                  margin: "0 12px",
-                  background: "rgba(30,41,59,0.7)",
-                  borderRadius: "12px",
-                  padding: "30px 20px",
-                  textAlign: "center",
-                  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
-                }}
-              >
-                <h4 style={{ fontSize: "28px", marginBottom: "10px" }}>
-                  {item.icon}
-                </h4>
-                <p style={{ fontSize: "16px", color: "#94A3B8" }}>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      <ForexStats />
+      <Divider />
+      <ComingSoon />
       <Divider />
 
       {/* Footer */}
@@ -356,11 +239,10 @@ export default function Landing() {
         }}
       >
         <p style={{ marginBottom: "5px" }}>
-          © {new Date().getFullYear()} AlgoMcube Fintech Pvt. Ltd.
+          © {new Date().getFullYear()} AlgoMcube Fintech
         </p>
         <p>Global AI Trading Innovation Hub</p>
         <p style={{ marginTop: "8px" }}>
-          {" "}
           <a
             href="mailto:support@algomcube.com"
             style={{
@@ -374,7 +256,7 @@ export default function Landing() {
         </p>
       </footer>
 
-      {/* Animations + Fixes */}
+      {/* Animations */}
       <style>{`
         @keyframes pulse {
           0% { opacity: 1; text-shadow: 0 0 25px #17E8E5, 0 0 60px #0B1220; }
@@ -396,9 +278,7 @@ export default function Landing() {
           height: 100%;
           overflow-x: hidden;
         }
-        #root {
-          height: 100%;
-        }
+        #root { height: 100%; }
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
