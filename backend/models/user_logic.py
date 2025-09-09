@@ -33,7 +33,7 @@ def create_or_update_user(email, name, referrer=None, wallet=None):
             referral_code=referral_code,
             is_associate=False,
             pending_associate=False,
-            is_admin=(email == "admin@irondoge.io")
+            is_admin=(email == "admin@algomcube.com")
         )
         db.add(user)
     else:

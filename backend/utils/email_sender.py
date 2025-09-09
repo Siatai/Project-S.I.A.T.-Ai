@@ -12,7 +12,7 @@ SMTP_PASS = os.getenv("SMTP_PASS")
 
 
 def send_email_otp(to_email: str, otp: str):
-    subject = "Your OTP for IronDoge Signup"
+    subject = "Your OTP for AlgoMcube Signup"
     body = f"""
     Hello,
 
@@ -20,7 +20,7 @@ def send_email_otp(to_email: str, otp: str):
     This OTP will expire in 10 minutes.
 
     Thanks,
-    IronDoge Team
+    Team Mcube
     """
 
     msg = MIMEText(body)

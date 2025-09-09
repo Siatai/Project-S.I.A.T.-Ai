@@ -26,4 +26,4 @@ app.include_router(investment_router, prefix="/api")
 # Health check root
 @app.get("/")
 def root():
-    return {"message": "IronDoge API is running"}
+    return {"message": "AlgoM3 API is running"}
