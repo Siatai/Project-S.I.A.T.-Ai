@@ -53,7 +53,7 @@ app = FastAPI(lifespan=lifespan)
 # ✅ Add CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # adjust in production
+    allow_origins=["https://www.algomcube.com", "https://algomcube.com", "http://localhost:3000"],  # adjust in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
