@@ -140,83 +140,82 @@ export default function SignUpForm() {
             <h2 style={{ marginTop: 0, color: "#17E8E5" }}>Terms & Conditions</h2>
             <div style={modalContent}>
               <p>
-                These Terms and Conditions (“Terms”) govern your use of the services provided by
-                <strong> AlgoMcube Fintech (“AlgoMcube”)</strong>.  
-                AlgoMcube acts solely as a <strong>facilitator of trade</strong>, connecting
-                users to professional trading strategies. AlgoMcube is <u>not</u> a broker,
-                financial advisor, or trading platform.
+                These Terms and Conditions (“Terms”) govern the use of AlgoMcube’s services.  
+                AlgoMcube acts solely as a <strong>facilitator of trade</strong> and is not a broker, exchange, or financial advisor.  
+                By creating an account, making a deposit, or engaging in trading activities, you confirm that you have read and agree to these Terms.
               </p>
 
               <hr />
-
-              <h3>1. Risk Disclaimer</h3>
-              <p>
-                Forex trading is highly volatile and inherently risky. There is no guarantee of
-                profits, and past performance does not indicate future results. By using our
-                services, you acknowledge and accept full responsibility for financial gains or
-                losses incurred. Invest only what you can afford to lose.
-              </p>
+              <h3>1. Account Registration and Verification</h3>
+              <p><strong>Single Account Rule:</strong> One account per person. Multiple accounts may be suspended.</p>
+              <p><strong>Wallet Binding:</strong> First deposit wallet is permanently linked. All withdrawals go to the same wallet.</p>
+              <p><strong>KYC Verification:</strong> Additional documents may be required for compliance.</p>
 
               <hr />
-
-              <h3>2. Return on Investment (RoI)</h3>
-              <ul>
-                <li>Expected monthly ROI ranges between <strong>8–10%</strong>, but may vary.</li>
-                <li>AlgoMcube does not guarantee fixed returns. Performance can fluctuate.</li>
-              </ul>
+              <h3>2. Minimum Deposit and Withdrawal</h3>
+              <p>Minimum Deposit: <strong>$100</strong></p>
+              <p>Minimum Withdrawal: <strong>$20</strong></p>
 
               <hr />
-
-              <h3>3. Deposits and Wallet Binding</h3>
-              <ul>
-                <li>Each user is allowed only one account.</li>
-                <li>Deposits must come from the wallet you bind to your account.</li>
-                <li>All withdrawals will be credited back to the same wallet address.</li>
-                <li>Changing wallets requires explicit AlgoMcube approval.</li>
-              </ul>
+              <h3>3. Deposits and Fund Management</h3>
+              <p>Deposits must be from your registered wallet. Third-party deposits may be rejected with fees.</p>
+              <p>Deposits are allocated towards live forex trading with AlgoMcube’s systems and partners.</p>
 
               <hr />
-
               <h3>4. Withdrawal Policy</h3>
               <ul>
-                <li>Withdrawals are processed only on non-trading days (Saturday & Sunday).</li>
-                <li>A <strong>2-week advance notice</strong> is required for capital withdrawals.</li>
-                <li>Each withdrawal incurs a fee covering trade commissions, spreads, and network fees.</li>
+                <li>Withdrawals only on <strong>Saturdays & Sundays</strong>.</li>
+                <li>2-week advance notice required for capital withdrawals.</li>
+                <li>Withdrawal fees apply (commissions, spreads, network costs).</li>
               </ul>
 
               <hr />
-
               <h3>5. Capital Locking Period</h3>
+              <p>Capital is locked for <strong>120 days</strong>.  
+              Early withdrawal before lock period incurs a <strong>15% penalty</strong>.</p>
+
+              <hr />
+              <h3>6. Return on Investment (RoI)</h3>
+              <p>Target ROI: <strong>8-10% monthly</strong> (not guaranteed). Performance may vary with market conditions. Compounding option available.</p>
+
+              <hr />
+              <h3>7. User Responsibilities</h3>
+              <p>You must provide accurate details, comply with laws in your jurisdiction, and avoid fraudulent activity.</p>
+
+              <hr />
+              <h3>8. Fees and Charges</h3>
+              <p>Fees apply to withdrawals (Inc. network fees, trading commisions, traders fees etc.). These may change with market/network conditions.</p>
+
+              <hr />
+              <h3>9. Limitation of Liability</h3>
+              <p>AlgoMcube is a <strong>service provider & facilitator</strong>. We do not guarantee profits.  
+              Not liable for internet outages, broker failures, or technical issues.</p>
+
+              <hr />
+              <h3>10. Risk Disclaimer</h3>
+              <p>Forex trading is highly volatile and risky. You may lose part or all of your capital.  
+              AlgoMcube shall not be liable for financial losses, lost opportunities, or indirect damages.</p>
+
+              <hr />
+              <h3>11. Acceptance of Terms</h3>
+              <p>By checking the box and creating an account, you acknowledge:</p>
               <ul>
-                <li>All invested capital is subject to a <strong>120-day lock-in</strong>.</li>
-                <li>Early withdrawals attract a <strong>15% penalty</strong>.</li>
+                <li>You have read and understood these Terms.</li>
+                <li>You understand the risks of forex trading.</li>
+                <li>You agree to abide by AlgoMcube’s policies on deposits, withdrawals, and accounts.</li>
               </ul>
 
               <hr />
-
-              <h3>6. Compliance and Account Restrictions</h3>
+              <h3>Summary</h3>
               <ul>
-                <li>Only one account per person is permitted.</li>
-                <li>Multiple accounts may result in suspension or closure.</li>
-                <li>Deposits from third-party or unverified wallets will be rejected/refunded (fees apply).</li>
-              </ul>
-
-              <hr />
-
-              <h3>7. Limitation of Liability</h3>
-              <ul>
-                <li>AlgoMcube acts solely as a <strong>service provider and trading facilitator</strong>.</li>
-                <li>We do not provide investment advice or profit guarantees.</li>
-                <li>Trading outcomes may be affected by market risks, technical issues, or unforeseen events.</li>
-              </ul>
-
-              <hr />
-
-              <h3>8. Acknowledgment</h3>
-              <ul>
-                <li>You confirm that you have read and understood these Terms.</li>
-                <li>You acknowledge the risks of forex trading.</li>
-                <li>You agree to comply with AlgoMcube policies regarding deposits, withdrawals, and accounts.</li>
+                <li>Minimum Deposit: $100</li>
+                <li>Minimum Withdrawal: $20</li>
+                <li>Withdrawals: Saturday & Sunday only</li>
+                <li>Capital Lock-in: 120 days</li>
+                <li>Early Withdrawal Penalty: 15%</li>
+                <li>Advance Notice: 2 weeks for capital withdrawals</li>
+                <li>Target ROI: 8–10% monthly (not guaranteed)</li>
+                <li>One Account & One Wallet per person</li>
               </ul>
             </div>
 
@@ -278,7 +277,7 @@ const modalBox = {
   background: "#1E293B",
   padding: "20px",
   borderRadius: "12px",
-  maxWidth: "600px",
+  maxWidth: "650px",
   width: "90%",
   color: "#E5E7EB",
   boxShadow: "0 0 20px rgba(23,232,229,0.4)",
