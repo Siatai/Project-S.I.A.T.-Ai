@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [referrer, setReferrer] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [agree, setAgree] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const referrer = params.get("ref") || ""; // ✅ prefilled from referral link
+
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // Step 1: Send OTP
@@ -70,24 +73,44 @@ export default function SignUpForm() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "flex-start",
         padding: "30px 20px",
         background: "linear-gradient(135deg,#0B1220,#0F2F2D,#000)",
         color: "#E5E7EB",
       }}
     >
-      {/* 🔹 Logo (click → landing page) */}
-      <Link to="/" style={{ textDecoration: "none", marginBottom: "20px" }}>
-        <img
-          src="/logo.png"
-          alt="AlgoMcube Logo"
+      {/* 🔹 Header with logo + title */}
+      <header
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "30px",
+        }}
+      >
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <img
+            src="/logo.png"
+            alt="AlgoMcube Logo"
+            style={{
+              height: "60px",
+              cursor: "pointer",
+              filter: "drop-shadow(0 0 8px rgba(23,232,229,0.6))",
+            }}
+          />
+        </Link>
+        <h1
           style={{
-            height: "60px",
-            cursor: "pointer",
-            filter: "drop-shadow(0 0 8px rgba(23,232,229,0.6))",
+            fontFamily: "Orbitron, sans-serif",
+            fontSize: "22px",
+            fontWeight: "700",
+            color: "#17E8E5",
           }}
-        />
-      </Link>
+        >
+          Referral Signup
+        </h1>
+      </header>
 
       {/* 🔹 Signup Card */}
       <div
@@ -108,7 +131,7 @@ export default function SignUpForm() {
             color: "#17E8E5",
           }}
         >
-          Sign Up
+          Create Your Account
         </h2>
 
         {!otpSent ? (
@@ -127,12 +150,17 @@ export default function SignUpForm() {
               onChange={(e) => setEmail(e.target.value)}
               style={inputStyle}
             />
+            {/* ✅ Referral code prefilled + disabled */}
             <input
               type="text"
-              placeholder="Referral code (required)"
               value={referrer}
-              onChange={(e) => setReferrer(e.target.value)}
-              style={inputStyle}
+              disabled
+              style={{
+                ...inputStyle,
+                background: "rgba(31,41,55,0.8)",
+                color: "#9CA3AF",
+                cursor: "not-allowed",
+              }}
             />
 
             {/* ✅ Agreement checkbox */}
@@ -190,82 +218,31 @@ export default function SignUpForm() {
       {showTerms && (
         <div style={modalOverlay}>
           <div style={modalBox}>
-            <h2 style={{ marginTop: 0, color: "#17E8E5" }}>Terms & Conditions</h2>
+            <h2 style={{ marginTop: 0, color: "#17E8E5" }}>
+              Terms & Conditions
+            </h2>
             <div style={modalContent}>
+              {/* 👇 You can paste your T&C text here (kept shorter for readability) */}
               <p>
-                These Terms and Conditions (“Terms”) govern the use of AlgoMcube’s services.  
-                AlgoMcube acts solely as a <strong>facilitator of trade</strong> and is not a broker, exchange, or financial advisor.  
-                By creating an account, making a deposit, or engaging in trading activities, you confirm that you have read and agree to these Terms.
+                These Terms and Conditions (“Terms”) govern the use of AlgoMcube’s
+                services. By creating an account, making a deposit, or engaging
+                in trading, you agree to these Terms.
               </p>
-
               <hr />
-              <h3>1. Account Registration and Verification</h3>
-              <p><strong>Single Account Rule:</strong> One account per person. Multiple accounts may be suspended.</p>
-              <p><strong>Wallet Binding:</strong> First deposit wallet is permanently linked. All withdrawals go to the same wallet.</p>
-
+              <h3>1. Account Rules</h3>
+              <p>• One account per person.</p>
+              <p>• First deposit wallet is permanently linked.</p>
               <hr />
-              <h3>2. Minimum Deposit and Withdrawal</h3>
-              <p>Minimum Deposit: <strong>$100</strong></p>
-              <p>Minimum Withdrawal: <strong>$20</strong></p>
-
+              <h3>2. Deposits & Withdrawals</h3>
+              <p>• Minimum Deposit: $100</p>
+              <p>• Minimum Withdrawal: $20</p>
+              <p>• Withdrawals only on Saturdays & Sundays.</p>
               <hr />
-              <h3>3. Deposits and Fund Management</h3>
-              <p>Deposits must be from your registered wallet. Third-party deposits may be rejected with fees.</p>
-              <p>Deposits are allocated towards live forex trading with AlgoMcube’s systems and partners.</p>
-
-              <hr />
-              <h3>4. Withdrawal Policy</h3>
-              <ul>
-                <li>Withdrawals only on <strong>Saturdays & Sundays</strong>.</li>
-                <li>2-week advance notice required for capital withdrawals.</li>
-                <li>Withdrawal fees apply (commissions, spreads, network costs).</li>
-              </ul>
-
-              <hr />
-              <h3>5. Capital Locking Period</h3>
-              <p>Capital is locked for <strong>120 days</strong>. Early withdrawal before lock period incurs a <strong>15% penalty</strong>.</p>
-
-              <hr />
-              <h3>6. Return on Investment (RoI)</h3>
-              <p>Target ROI: <strong>8-10% monthly</strong> (not guaranteed). Performance may vary with market conditions. Compounding option available.</p>
-
-              <hr />
-              <h3>7. User Responsibilities</h3>
-              <p>You must provide accurate details, comply with laws in your jurisdiction, and avoid fraudulent activity.</p>
-
-              <hr />
-              <h3>8. Fees and Charges</h3>
-              <p>Fees apply to withdrawals (Inc. network fees, trading commissions, traders fees etc.). These may change with market/network conditions.</p>
-
-              <hr />
-              <h3>9. Limitation of Liability</h3>
-              <p>AlgoMcube is a <strong>service provider & facilitator</strong>. We do not guarantee profits. Not liable for internet outages, broker failures, or technical issues.</p>
-
-              <hr />
-              <h3>10. Risk Disclaimer</h3>
-              <p>Forex trading is highly volatile and risky. You may lose part or all of your capital. AlgoMcube shall not be liable for financial losses, lost opportunities, or indirect damages.</p>
-
-              <hr />
-              <h3>11. Acceptance of Terms</h3>
-              <p>By checking the box and creating an account, you acknowledge:</p>
-              <ul>
-                <li>You have read and understood these Terms.</li>
-                <li>You understand the risks of forex trading.</li>
-                <li>You agree to abide by AlgoMcube’s policies on deposits, withdrawals, and accounts.</li>
-              </ul>
-
-              <hr />
-              <h3>Summary</h3>
-              <ul>
-                <li>Minimum Deposit: $100</li>
-                <li>Minimum Withdrawal: $20</li>
-                <li>Withdrawals: Saturday & Sunday only</li>
-                <li>Capital Lock-in: 120 days</li>
-                <li>Early Withdrawal Penalty: 15%</li>
-                <li>Advance Notice: 2 weeks for capital withdrawals</li>
-                <li>Target ROI: 8–10% monthly (not guaranteed)</li>
-                <li>One Account & One Wallet per person</li>
-              </ul>
+              <h3>3. Risk Disclaimer</h3>
+              <p>
+                Forex trading is highly volatile and risky. AlgoMcube does not
+                guarantee profits. You may lose all or part of your investment.
+              </p>
             </div>
 
             <button style={buttonStyleTeal} onClick={() => setShowTerms(false)}>
