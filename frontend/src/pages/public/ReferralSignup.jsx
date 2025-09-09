@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 export default function ReferralSignup() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const navigate = useNavigate();
+  const [acceptedTnC, setAcceptedTnC] = useState(false);
 
+  const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const referralCode = params.get("ref") || "";
@@ -23,6 +24,10 @@ export default function ReferralSignup() {
     }
     if (!referralCode.trim()) {
       alert("⚠️ Referral code is required to sign up.");
+      return;
+    }
+    if (!acceptedTnC) {
+      alert("⚠️ You must accept Terms & Conditions to proceed.");
       return;
     }
     try {
@@ -167,6 +172,37 @@ export default function ReferralSignup() {
                   cursor: "not-allowed",
                 }}
               />
+
+              {/* ✅ TnC Checkbox */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "12px",
+                  fontSize: "13px",
+                  color: "#9CA3AF",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  id="tnc"
+                  checked={acceptedTnC}
+                  onChange={(e) => setAcceptedTnC(e.target.checked)}
+                  style={{ marginRight: "8px", cursor: "pointer" }}
+                />
+                <label htmlFor="tnc">
+                  I accept{" "}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#17E8E5", textDecoration: "underline" }}
+                  >
+                    Terms & Conditions
+                  </a>
+                </label>
+              </div>
+
               <button onClick={sendOtp} style={btnTeal}>
                 Send OTP
               </button>
@@ -185,6 +221,11 @@ export default function ReferralSignup() {
               </button>
             </>
           )}
+
+          {/* ✅ Home Button */}
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <button style={btnHome}>🏠 Home</button>
+          </Link>
         </div>
       </main>
 
@@ -254,4 +295,17 @@ const btnGreen = {
   cursor: "pointer",
   marginTop: "10px",
   boxShadow: "0 0 12px rgba(34,197,94,0.4)",
+};
+
+const btnHome = {
+  width: "100%",
+  padding: "10px",
+  border: "1px solid rgba(23,232,229,0.4)",
+  borderRadius: "8px",
+  background: "transparent",
+  color: "#17E8E5",
+  fontWeight: "600",
+  cursor: "pointer",
+  marginTop: "14px",
+  boxShadow: "0 0 8px rgba(23,232,229,0.2)",
 };
