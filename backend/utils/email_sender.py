@@ -12,12 +12,14 @@ SMTP_PASS = os.getenv("SMTP_PASS")
 
 
 def send_email_otp(to_email: str, otp: str):
-    subject = "Your OTP for AlgoMcube Signup"
+    subject = "Your OTP for AlgoMcube"
     body = f"""
     Hello,
 
     Your OTP is: {otp}
     This OTP will expire in 10 minutes.
+    
+    Thank you for being a part of trading revolution with AlgoMcube Fintech
 
     Thanks,
     Team Mcube
