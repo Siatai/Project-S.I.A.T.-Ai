@@ -307,11 +307,12 @@ def update_role(payload: RoleUpdate, db: Session = Depends(get_db), user=Depends
 
 @router.post("/send-otp-withdrawal")
 def send_withdrawal_otp(user=Depends(verify_token)):
-    otp = str(randint(100000, 999999))
-    if not send_email_otp(user["email"], otp):
+    otp = str(randint(100000, 999999))   # generate 6-digit OTP
+    if not send_email_otp(user["email"], otp):  # try sending email
         raise HTTPException(status_code=500, detail="Failed to send OTP")
-    store_otp(user["email"], otp)
+    store_otp(user["email"], otp)        # save OTP temporarily (DB/Redis/cache)
     return {"message": "OTP sent"}
+
 
 
 @router.post("/request-withdrawal")

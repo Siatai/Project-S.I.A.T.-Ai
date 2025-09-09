@@ -359,6 +359,19 @@ export default function Landing() {
           © {new Date().getFullYear()} AlgoMcube Fintech Pvt. Ltd.
         </p>
         <p>Global AI Trading Innovation Hub</p>
+        <p style={{ marginTop: "8px" }}>
+          {" "}
+          <a
+            href="mailto:support@algomcube.com"
+            style={{
+              color: "#17E8E5",
+              textDecoration: "none",
+              fontWeight: "600",
+            }}
+          >
+            support@algomcube.com
+          </a>
+        </p>
       </footer>
 
       {/* Animations + Fixes */}

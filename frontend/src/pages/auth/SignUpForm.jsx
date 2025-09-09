@@ -149,7 +149,7 @@ export default function SignUpForm() {
               <h3>1. Account Registration and Verification</h3>
               <p><strong>Single Account Rule:</strong> One account per person. Multiple accounts may be suspended.</p>
               <p><strong>Wallet Binding:</strong> First deposit wallet is permanently linked. All withdrawals go to the same wallet.</p>
-              <p><strong>KYC Verification:</strong> Additional documents may be required for compliance.</p>
+              
 
               <hr />
               <h3>2. Minimum Deposit and Withdrawal</h3>

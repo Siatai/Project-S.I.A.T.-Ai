@@ -51,6 +51,7 @@ class ReferralsRequest(BaseModel):
 
 
 # ========== SEND OTP (SIGNUP) ==========
+# ========== SEND OTP (SIGNUP) ==========
 @router.post("/send-otp-signup")
 def send_otp_signup(data: SignUpOTPRequest, db: Session = Depends(get_db)):
     email = data.email.lower().strip()
@@ -71,13 +72,14 @@ def send_otp_signup(data: SignUpOTPRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid referrer code")
 
     otp = str(randint(100000, 999999))
-    if not send_email_otp(email, otp):
+    # ✅ Pass purpose explicitly
+    if not send_email_otp(email, otp, purpose="signup"):
         raise HTTPException(status_code=500, detail="Failed to send OTP")
 
     store_otp(email, otp)
     PENDING_SIGNUPS[email] = {"name": name, "referrer": referrer}
 
-    print(f"✅ OTP for {email}: {otp}")
+    print(f"✅ Signup OTP for {email}: {otp}")
     return {"message": "OTP sent successfully"}
 
 
@@ -91,12 +93,14 @@ def send_otp_signin(data: SignInOTPRequest, db: Session = Depends(get_db)):
         return JSONResponse(status_code=404, content={"message": "User not found. Please sign up."})
 
     otp = str(randint(100000, 999999))
-    if not send_email_otp(email, otp):
+    # ✅ Pass purpose explicitly
+    if not send_email_otp(email, otp, purpose="login"):
         raise HTTPException(status_code=500, detail="Failed to send OTP")
 
     store_otp(email, otp)
-    print(f"✅ OTP for {email}: {otp}")
+    print(f"✅ Login OTP for {email}: {otp}")
     return {"message": "OTP sent successfully"}
+
 
 
 # ========== VERIFY OTP ==========
