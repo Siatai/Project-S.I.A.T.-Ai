@@ -13,7 +13,7 @@ DATABASE_URL = os.getenv(
     "sqlite:///./referral.db"   # Default local DB
 )
 
-# ✅ Add connect_args only for SQLite
+# ✅ Add connect_args only for SQLite or Postgres
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         DATABASE_URL, connect_args={"check_same_thread": False}
@@ -21,8 +21,15 @@ if DATABASE_URL.startswith("sqlite"):
 else:
     engine = create_engine(
         DATABASE_URL,
-        pool_pre_ping=True,          # Keeps connection alive
-        connect_args={"sslmode": "require"}  # 🔑 Needed for Render Postgres
+        pool_pre_ping=True,  # checks before using connection
+        pool_recycle=1800,   # recycle connections every 30 mins
+        connect_args={
+            "sslmode": "require",
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
+        },
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

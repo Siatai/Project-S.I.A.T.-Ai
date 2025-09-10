@@ -6,6 +6,7 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
+  const [sending, setSending] = useState(false); // 👈 new state
   const navigate = useNavigate();
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
@@ -16,12 +17,14 @@ export default function SignInForm() {
       return;
     }
     try {
+      setSending(true); // disable button
       await axios.post(`${API}/send-otp-signin`, { email });
       setOtpSent(true);
       alert("📧 OTP sent to your email.");
     } catch (err) {
       console.error("Send OTP error:", err);
       alert(err?.response?.data?.message || "Error sending OTP");
+      setSending(false); // allow retry on error
     }
   };
 
@@ -60,8 +63,16 @@ export default function SignInForm() {
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
           />
-          <button onClick={sendOtp} style={buttonStyleTeal}>
-            Send OTP
+          <button
+            onClick={sendOtp}
+            style={{
+              ...buttonStyleTeal,
+              opacity: sending ? 0.6 : 1,
+              cursor: sending ? "not-allowed" : "pointer",
+            }}
+            disabled={sending} // 👈 disable when sending
+          >
+            {sending ? "Sending..." : "Send OTP"}
           </button>
         </>
       ) : (

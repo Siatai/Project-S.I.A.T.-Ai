@@ -11,6 +11,7 @@ export default function SignUpForm() {
   const [otp, setOtp] = useState("");
   const [agree, setAgree] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [sending, setSending] = useState(false); // 👈 disable state
   const navigate = useNavigate();
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
@@ -29,12 +30,14 @@ export default function SignUpForm() {
       return;
     }
     try {
+      setSending(true); // disable button
       await axios.post(`${API}/send-otp-signup`, { email, name, referrer });
       setOtpSent(true);
       alert("📧 OTP sent to your email.");
     } catch (err) {
       console.error("Send OTP error:", err);
       alert(err?.response?.data?.detail || "Error sending OTP");
+      setSending(false); // allow retry if failed
     }
   };
 
@@ -114,12 +117,12 @@ export default function SignUpForm() {
             onClick={sendOtp}
             style={{
               ...buttonStyleTeal,
-              opacity: agree ? 1 : 0.6,
-              cursor: agree ? "pointer" : "not-allowed",
+              opacity: agree && !sending ? 1 : 0.6,
+              cursor: agree && !sending ? "pointer" : "not-allowed",
             }}
-            disabled={!agree}
+            disabled={!agree || sending} // 👈 disable if not agreed or already sending
           >
-            Send OTP
+            {sending ? "Sending..." : "Send OTP"}
           </button>
         </>
       ) : (
