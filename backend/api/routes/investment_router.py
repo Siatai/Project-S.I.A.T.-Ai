@@ -607,3 +607,41 @@ def reset_roi_dates(db: Session = Depends(get_db), user=Depends(verify_token)):
 
     db.commit()
     return {"message": "✅ All ROI dates reset successfully. You can re-run ROI crediting now."}
+
+from utils.roi_tracker import get_roi_status
+@router.get("/investor-roi-status")
+def investor_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
+    config = db.query(ROIConfig).first()
+    if not config:
+        return {"error": "ROI configuration not set"}
+
+    investments = db.query(Investment).filter(Investment.user_email == user.email).all()
+
+    return [get_roi_status(inv, config) for inv in investments]
+
+@router.post("/admin/set-roi-config")
+def set_roi_config(
+    payload: ROIConfigPayload,
+    db: Session = Depends(get_db),
+    user=Depends(verify_token)   # ✅ same as other admin routes
+):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    if payload.percentage <= 0:
+        raise HTTPException(status_code=400, detail="Percentage must be greater than 0")
+
+    roi = db.query(ROIConfig).first()
+    if not roi:
+        roi = ROIConfig(percentage=payload.percentage)
+        db.add(roi)
+    else:
+        roi.percentage = payload.percentage
+
+    db.commit()
+    db.refresh(roi)
+
+    return {
+        "message": "✅ ROI config updated",
+        "percentage": roi.percentage
+    }

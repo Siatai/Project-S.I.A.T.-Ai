@@ -8,3 +8,4 @@ class ROIConfig(Base):
     id = Column(Integer, primary_key=True, index=True)
     percentage = Column(Float, nullable=False)  # ROI percentage
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    max_roi_multiplier = Column(Float, default=2.0)

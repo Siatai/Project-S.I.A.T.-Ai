@@ -6,11 +6,11 @@ from models.referral_model import ReferralEarning
 from models.roi_model import ROIConfig
 from models.commission_model import CommissionConfig
 
+
 # ────────────────────────────────
 # 📌 Safe ROI Credit (once per day)
 # ────────────────────────────────
 def credit_daily_roi(db: Session):
-    now = datetime.utcnow()
     today = date.today()
 
     # ✅ Safety: check if ROI already credited today
@@ -22,30 +22,31 @@ def credit_daily_roi(db: Session):
     if already_done:
         return {"message": "ROI already credited today, try again tomorrow"}
 
-    return _process_roi_and_commissions(db, now, force=False)
+    return _process_roi_and_commissions(db, force=False)
 
 
 # ────────────────────────────────
-# 📌 Force ROI Credit (multi-run in same day)
+# 📌 Force ROI Credit (multi-run same day)
 # ────────────────────────────────
 def force_credit_daily_roi(db: Session):
+    return _process_roi_and_commissions(db, force=True)
+
+
+# ────────────────────────────────
+# 📌 Core Logic
+# ────────────────────────────────
+def _process_roi_and_commissions(db: Session, force: bool = False):
     now = datetime.utcnow()
-    return _process_roi_and_commissions(db, now, force=True)
-
-
-# ────────────────────────────────
-# 📌 Core logic (used by both safe + force)
-# ────────────────────────────────
-def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False):
     today = date.today()
 
     # ROI CONFIG
     roi_config = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
     if not roi_config:
-        return {"message": "No ROI config set"}
+        return {"message": "❌ No ROI config set"}
 
     monthly_roi_percentage = roi_config.percentage
     daily_roi_percentage = monthly_roi_percentage / 30  # % per day
+    max_multiplier = roi_config.max_roi_multiplier if hasattr(roi_config, "max_roi_multiplier") else 2.0
 
     # COMMISSION CONFIG
     commission_config = db.query(CommissionConfig).first()
@@ -67,12 +68,24 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
         if days_to_credit <= 0:
             continue  # nothing new to credit
 
-        # ✅ Calculate total ROI since last credit
+        # ✅ Flush logic: max ROI = 2× (or config multiplier)
+        max_return = inv.amount * max_multiplier
+        roi_received = inv.roi_received or 0.0
+        remaining_cap = max_return - roi_received
+        if remaining_cap <= 0:
+            continue  # already flushed
+
+        # Daily ROI
         daily_profit = inv.amount * (daily_roi_percentage / 100)
         total_profit = daily_profit * days_to_credit
-        user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
 
-        # Update last credited date
+        # Ensure we don’t exceed 2× cap
+        if total_profit > remaining_cap:
+            total_profit = remaining_cap
+
+        # Update investor wallet & ROI received
+        user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
+        inv.roi_received = roi_received + total_profit
         inv.last_roi_date = today
 
         credited.append({
@@ -80,11 +93,14 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
             "investment": inv.amount,
             "days": days_to_credit,
             "credited_profit": round(total_profit, 2),
+            "roi_received": round(inv.roi_received, 2),
+            "max_return": round(max_return, 2),
+            "flushed": inv.roi_received >= max_return,
             "force_mode": force
         })
 
-        # ✅ Commission (referrer earns % of investor’s ROI profit)
-        if user.referred_by:
+        # ✅ Referral Commission
+        if user.referred_by and total_profit > 0:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
             if referrer:
                 commission_amount = total_profit * (commission_percentage / 100)
@@ -112,4 +128,3 @@ def _process_roi_and_commissions(db: Session, now: datetime, force: bool = False
         "count": len(credited),
         "force_mode": force,
     }
-

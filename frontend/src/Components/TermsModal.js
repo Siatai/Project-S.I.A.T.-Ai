@@ -233,7 +233,7 @@ const windowBox = {
   width: "100%",           // inner window
   height: "60%",          // takes 60% height of modal
   background: "#0F172A",
-  border: "2px solid #ffffffff",
+  border: "2px solid #2b0808ff",
   borderRadius: "8px",
   overflow: "hidden",
   marginBottom: "10px",
