@@ -624,32 +624,36 @@ def investor_roi_status(user: User = Depends(verify_token), db: Session = Depend
 
     return [get_roi_status(inv, config) for inv in investments]
 
+class ROIMultiplierPayload(BaseModel):
+    multiplier: float
+
 @router.post("/admin/set-roi-config")
 def set_roi_config(
-    payload: ROIConfigPayload,
+    payload: ROIMultiplierPayload,
     db: Session = Depends(get_db),
-    user=Depends(verify_token)   # ✅ same as other admin routes
+    user=Depends(verify_token)
 ):
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin only")
 
-    if payload.percentage <= 0:
-        raise HTTPException(status_code=400, detail="Percentage must be greater than 0")
+    if payload.multiplier <= 0:
+        raise HTTPException(status_code=400, detail="Multiplier must be greater than 0")
 
-    roi = db.query(ROIConfig).first()
-    if not roi:
-        roi = ROIConfig(percentage=payload.percentage)
-        db.add(roi)
+    config = db.query(ROIConfig).first()
+    if not config:
+        config = ROIConfig(max_roi_multiplier=payload.multiplier)
+        db.add(config)
     else:
-        roi.percentage = payload.percentage
+        config.max_roi_multiplier = payload.multiplier
 
     db.commit()
-    db.refresh(roi)
+    db.refresh(config)
 
     return {
-        "message": "✅ ROI config updated",
-        "percentage": roi.percentage
+        "message": "✅ ROI multiplier updated",
+        "max_roi_multiplier": config.max_roi_multiplier
     }
+
 
 
 from utils.roi_tracker import get_roi_status
