@@ -1,15 +1,14 @@
 def get_roi_status(investment, config):
+    # Always force safe floats
     capital = float(investment.amount or 0)
     roi_received = float(getattr(investment, "roi_received", 0) or 0)
+    multiplier = float(getattr(config, "max_roi_multiplier", None) or 2.0)  # default 2x if missing
 
-    # 🔹 Fallback multiplier if None
-    multiplier = float(config.max_roi_multiplier or 2.0)
-
+    # Calculate
     max_return = capital * multiplier
     left_to_receive = max_return - roi_received
     flushed = left_to_receive <= 0
 
-    # 🔹 Always safe float values
     progress_percent = (roi_received / max_return * 100) if max_return > 0 else 0
 
     return {
