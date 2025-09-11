@@ -218,21 +218,26 @@ def get_all_investments_with_users(db: Session = Depends(get_db), user=Depends(v
 def get_roi_config(db: Session = Depends(get_db), user=Depends(verify_token)):
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin only")
-
     roi = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
-    return {"percentage": roi.percentage if roi else 0.0}
-
+    return {
+        "percentage": roi.percentage if roi else 0.0,
+        "max_roi_multiplier": roi.max_roi_multiplier if roi else 2.0
+    }
 
 @router.post("/admin/roi")
 def set_roi_config(data: ROIConfigPayload, db: Session = Depends(get_db), user=Depends(verify_token)):
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin only")
 
-    roi = ROIConfig(percentage=data.percentage)
-    db.add(roi)
+    roi = db.query(ROIConfig).first()
+    if not roi:
+        roi = ROIConfig(percentage=data.percentage, max_roi_multiplier=2.0)
+        db.add(roi)
+    else:
+        roi.percentage = data.percentage
     db.commit()
     db.refresh(roi)
-    return {"message": "ROI updated", "percentage": roi.percentage}
+    return {"message": "ROI config updated", "percentage": roi.percentage, "max_roi_multiplier": roi.max_roi_multiplier}
 
 
 
@@ -645,3 +650,49 @@ def set_roi_config(
         "message": "✅ ROI config updated",
         "percentage": roi.percentage
     }
+
+
+from utils.roi_tracker import get_roi_status
+
+@router.get("/investor-roi-status")
+def investor_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
+    config = db.query(ROIConfig).first()
+    if not config:
+        return {"error": "ROI configuration not set"}
+
+    investments = db.query(Investment).filter(Investment.user_email == user.email).all()
+    results = []
+    for inv in investments:
+        status = get_roi_status(inv, config)
+        status["progress_percent"] = round(
+            (status["roi_received"] / status["max_return"]) * 100, 2
+        ) if status["max_return"] > 0 else 0
+        results.append(status)
+    return results
+
+@router.get("/associate-roi-status")
+def associate_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
+    if not user.get("is_associate"):
+        raise HTTPException(status_code=403, detail="Associate access required")
+
+    config = db.query(ROIConfig).first()
+    if not config:
+        return {"error": "ROI configuration not set"}
+
+    referrals = db.query(User).filter(User.referred_by == user["referral_code"]).all()
+    data, total_left = [], 0
+
+    for ru in referrals:
+        investments = db.query(Investment).filter(Investment.user_email == ru.email).all()
+        for inv in investments:
+            status = get_roi_status(inv, config)
+            total_left += status["left_to_receive"]
+            data.append({
+                "investor_email": ru.email,
+                "capital": status["capital"],
+                "roi_received": status["roi_received"],
+                "left_to_receive": status["left_to_receive"],
+                "flushed": status["flushed"]
+            })
+
+    return {"details": data, "total_left_to_receive": total_left}
