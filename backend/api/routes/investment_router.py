@@ -683,39 +683,46 @@ def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db
 # ────────────────────────────────
 @router.get("/associate-roi-status")
 def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_db)):
-    if not user.get("is_associate"):
+    # ✅ Make sure it's an associate
+    db_user = db.query(User).filter(User.email == user["email"]).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not db_user.is_associate:
         raise HTTPException(status_code=403, detail="Associate access required")
 
+    # ✅ Fetch ROI multiplier config
     config = db.query(ROIConfig).first()
     if not config:
         return {"error": "ROI configuration not set"}
 
-    commission_config = db.query(CommissionConfig).first()
-    commission_pct = commission_config.percentage if commission_config else 0
+    # ✅ Fetch commission config (dynamic)
+    commission_cfg = db.query(CommissionConfig).first()
+    commission_pct = commission_cfg.associate_commission if commission_cfg else 10
 
-    referrals = db.query(User).filter(User.referred_by == user["referral_code"]).all()
-    data, total_left = [], 0
+    referrals = db.query(User).filter(User.referred_by == db_user.referral_code).all()
+    data, total_commission_left = [], 0
 
     for ru in referrals:
         investments = db.query(Investment).filter(Investment.user_email == ru.email).all()
         for inv in investments:
-            # full ROI status
             status = get_roi_status(inv, config)
 
-            # associate earnings on this referral
-            earned = status["roi_received"] * (commission_pct / 100)
-            max_earn = status["max_return"] * (commission_pct / 100)
-            left = max_earn - earned
-
-            total_left += left
+            # Commission left = associate % of what investor still has to receive
+            commission_left = (status["left_to_receive"] * commission_pct) / 100
+            total_commission_left += commission_left
 
             data.append({
-                "referee_name": ru.name,
+                "referee_name": ru.name,   # ✅ show name not email
                 "capital": status["capital"],
+                "roi_received": status["roi_received"],
+                "left_to_receive": status["left_to_receive"],
+                "flushed": status["flushed"],
                 "commission_pct": commission_pct,
-                "earned": round(earned, 2),
-                "max_earn": round(max_earn, 2),
-                "left_to_receive": round(left, 2)
+                "commission_left": round(commission_left, 2)
             })
 
-    return {"details": data, "total_left_to_receive": round(total_left, 2)}
+    return {
+        "details": data,
+        "commission_pct": commission_pct,
+        "total_commission_left": round(total_commission_left, 2)
+    }

@@ -3,8 +3,8 @@ import axios from "axios";
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
-  const [teamDeposits, setTeamDeposits] = useState([]);
-  const [totalTeamDeposits, setTotalTeamDeposits] = useState(0);
+  const [teamStatus, setTeamStatus] = useState(null);
+  const [infoVisible, setInfoVisible] = useState(false);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
@@ -17,11 +17,9 @@ export default function AssociateHome() {
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        const teamRes = await axios.get(`${API}/associate-roi-status`, {
-          headers,
-        });
-        setTeamDeposits(teamRes.data.details || []);
-        setTotalTeamDeposits(teamRes.data.total_left_to_receive || 0);
+        // Fetch associate ROI status
+        const teamRes = await axios.get(`${API}/associate-roi-status`, { headers });
+        setTeamStatus(teamRes.data);
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -30,84 +28,62 @@ export default function AssociateHome() {
     fetchData();
   }, []);
 
-  const copyReferral = () => {
-    if (user?.referral_code) {
-      const signupUrl = `${window.location.origin}/referral-signup?ref=${user.referral_code}`;
-      navigator.clipboard.writeText(signupUrl);
-      alert("Referral signup link copied!");
-    }
-  };
-
   if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
-
-  const signupUrl = `${window.location.origin}/referral-signup?ref=${user.referral_code}`;
+  if (!teamStatus) return <p style={{ color: "#E5E7EB" }}>Loading team data...</p>;
 
   return (
     <div style={{ color: "#E5E7EB", padding: "20px" }}>
       <h2 style={{ marginBottom: "15px", color: "#17E8E5" }}>
         Welcome, {user.name || "Associate"}
       </h2>
-      <p style={{ marginBottom: "25px", color: "#94A3B8" }}>
-        Share your unique referral link to grow your network. All deposits made
-        via your link will be tracked here.
-      </p>
 
-      {/* Referral Link */}
+      {/* Team Deposits Card */}
       <div style={cardStyle}>
-        <h3 style={sectionTitle}>Referral Link</h3>
-        <div
-          style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
-        >
-          <input type="text" value={signupUrl} readOnly style={inputStyle} />
-          <button onClick={copyReferral} style={btnTeal}>
-            Copy
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h3 style={sectionTitle}>Team Deposits</h3>
+          {/* Info Button */}
+          <button
+            style={infoBtn}
+            onClick={() => setInfoVisible(!infoVisible)}
+          >
+            ℹ️
           </button>
         </div>
-      </div>
 
-      <div style={glowLine}></div>
-
-      {/* Team Deposits */}
-      <div style={cardStyle}>
-        <h3 style={sectionTitle}>Team Deposits</h3>
-
-        <div style={rowHeader}>
-          <span>Total Left to Receive</span>
-          <span
-            style={{
-              color: "#22C55E",
-              fontWeight: "800",
-              fontSize: "16px",
-            }}
-          >
-            {totalTeamDeposits} USDT
-          </span>
-        </div>
-
-        {/* Table Header */}
-        {teamDeposits.length > 0 && (
-          <div style={tableHeader}>
-            <span>Investor</span>
-            <span>Capital</span>
-            <span>Progress</span>
+        {infoVisible && (
+          <div style={infoBox}>
+            You earn <strong>{teamStatus.commission_pct}%</strong> commission
+            from the ROI receivable of your referred investors until their account is flushed.
           </div>
         )}
 
-        {teamDeposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>
-            No team deposits yet
-          </p>
+        <div style={rowHeader}>
+          <span>Total Left to Receive</span>
+          <span style={{ color: "#22C55E", fontWeight: "800", fontSize: "16px" }}>
+            {teamStatus.total_commission_left} USDT
+          </span>
+        </div>
+
+        {/* Table Headings */}
+        {teamStatus.details.length > 0 && (
+          <div style={tableHeader}>
+            <span>Referee</span>
+            <span>Capital</span>
+            <span>Commission</span>
+          </div>
+        )}
+
+        {teamStatus.details.length === 0 ? (
+          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No team deposits yet</p>
         ) : (
-          teamDeposits.map((d, idx) => (
+          teamStatus.details.map((d, idx) => (
             <div key={idx} style={glowRowGrid}>
-              <span>{d.investor_email}</span>
+              <span>{d.referee_name}</span>
               <span>{d.capital} USDT</span>
-              <div>
-                <p style={{ fontSize: "12px", marginBottom: "4px" }}>
-                  ROI: {d.roi_received} / {d.capital * 2} USDT
-                </p>
-                <ProgressBar percent={((d.roi_received / (d.capital * 2)) * 100).toFixed(2)} />
-              </div>
+              <span>
+                Left: <strong style={{ color: "#FACC15" }}>{d.commission_left} USDT</strong>
+              </span>
+              <ProgressBar percent={(d.commission_left / ((d.left_to_receive * d.commission_pct) / 100)) * 100} />
             </div>
           ))
         )}
@@ -124,7 +100,7 @@ function ProgressBar({ percent }) {
         background: "#374151",
         borderRadius: "6px",
         overflow: "hidden",
-        height: "10px",
+        height: "8px",
         marginTop: "4px",
       }}
     >
@@ -132,7 +108,7 @@ function ProgressBar({ percent }) {
         style={{
           width: `${percent}%`,
           background: "linear-gradient(90deg,#17E8E5,#14B8A6)",
-          height: "10px",
+          height: "8px",
           transition: "width 0.5s ease",
         }}
       ></div>
@@ -147,41 +123,32 @@ const cardStyle = {
   borderRadius: "12px",
   marginBottom: "25px",
   boxShadow: "0 0 15px rgba(23,232,229,0.15)",
+  position: "relative",
 };
 
 const sectionTitle = {
   fontSize: "16px",
   fontWeight: "600",
   color: "#17E8E5",
-  marginBottom: "12px",
 };
 
-const inputStyle = {
-  flex: 1,
+const infoBtn = {
+  background: "transparent",
+  border: "none",
+  fontSize: "18px",
+  cursor: "pointer",
+  color: "#17E8E5",
+};
+
+const infoBox = {
+  background: "rgba(23,232,229,0.1)",
+  border: "1px solid #17E8E5",
   padding: "10px",
   borderRadius: "8px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.05)",
+  fontSize: "13px",
   color: "#E5E7EB",
-  fontSize: "14px",
-  marginRight: "10px",
-};
-
-const btnTeal = {
-  padding: "10px 16px",
-  border: "none",
-  borderRadius: "8px",
-  background: "linear-gradient(135deg,#17E8E5,#14B8A6)",
-  color: "#0B1220",
-  fontWeight: "700",
-  cursor: "pointer",
-  boxShadow: "0 0 10px rgba(23,232,229,0.3)",
-};
-
-const glowLine = {
-  height: "2px",
-  background: "linear-gradient(90deg,transparent,#17E8E5,transparent)",
-  margin: "30px 0",
+  marginBottom: "15px",
+  marginTop: "10px",
 };
 
 const rowHeader = {
@@ -190,11 +157,12 @@ const rowHeader = {
   padding: "8px 0",
   borderBottom: "2px solid rgba(255,255,255,0.1)",
   fontWeight: "600",
+  marginTop: "15px",
 };
 
 const tableHeader = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1.5fr",
+  gridTemplateColumns: "1fr 1fr 1fr",
   textAlign: "center",
   fontWeight: "600",
   fontSize: "14px",
@@ -206,7 +174,7 @@ const tableHeader = {
 
 const glowRowGrid = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1.5fr",
+  gridTemplateColumns: "1fr 1fr 1fr",
   textAlign: "center",
   padding: "10px",
   marginTop: "8px",
