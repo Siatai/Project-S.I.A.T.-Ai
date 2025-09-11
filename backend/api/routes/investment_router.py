@@ -615,6 +615,9 @@ def reset_roi_dates(db: Session = Depends(get_db), user=Depends(verify_token)):
 
 
 
+class ROIMultiplierPayload(BaseModel):
+    multiplier: float
+
 @router.post("/admin/set-roi-config")
 def set_roi_config(
     payload: ROIMultiplierPayload,
