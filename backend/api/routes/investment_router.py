@@ -613,19 +613,7 @@ def reset_roi_dates(db: Session = Depends(get_db), user=Depends(verify_token)):
     db.commit()
     return {"message": "✅ All ROI dates reset successfully. You can re-run ROI crediting now."}
 
-from utils.roi_tracker import get_roi_status
-@router.get("/investor-roi-status")
-def investor_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
-    config = db.query(ROIConfig).first()
-    if not config:
-        return {"error": "ROI configuration not set"}
 
-    investments = db.query(Investment).filter(Investment.user_email == user.email).all()
-
-    return [get_roi_status(inv, config) for inv in investments]
-
-class ROIMultiplierPayload(BaseModel):
-    multiplier: float
 
 @router.post("/admin/set-roi-config")
 def set_roi_config(
