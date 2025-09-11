@@ -110,8 +110,8 @@ export default function InvestorHome() {
               <div style={glowRowGreen}>
                 <span>{d.capital} USDT</span>
                 <span>
-  {d.timestamp ? new Date(d.timestamp).toLocaleDateString() : "-"}
-</span>
+                   {d.timestamp ? new Date(d.timestamp).toLocaleDateString() : "-"}
+                </span>
 
               </div>
               <p style={{ fontSize: "12px", marginTop: "5px" }}>
