@@ -15,13 +15,15 @@ from utils.auth_middleware import verify_token
 from utils.email_sender import send_email_otp
 from utils.user_logic import store_otp, verify_otp, calculate_investor_roi
 from utils.roi_creditor import credit_daily_roi, force_credit_daily_roi
-
+from utils.roi_tracker import get_roi_status
 router = APIRouter()
 
 # ────────────────────────────────
 # 📌 SCHEMAS
 # ────────────────────────────────
-
+class ROIMultiplierPayload(BaseModel):
+    multiplier: float
+    
 class WalletPayload(BaseModel):
     email: str
     wallet: str
@@ -615,9 +617,6 @@ def reset_roi_dates(db: Session = Depends(get_db), user=Depends(verify_token)):
 
 
 
-class ROIMultiplierPayload(BaseModel):
-    multiplier: float
-
 @router.post("/admin/set-roi-config")
 def set_roi_config(
     payload: ROIMultiplierPayload,
@@ -646,22 +645,21 @@ def set_roi_config(
     }
 
 
-
-from utils.roi_tracker import get_roi_status
-
+# ────────────────────────────────
+# 📌 INVESTOR: ROI Status
+# ────────────────────────────────
 @router.get("/investor-roi-status")
 def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db)):
     config = db.query(ROIConfig).first()
     if not config:
         return {"error": "ROI configuration not set"}
 
-    # 🔹 FIX: fetch real DB user from email in token payload
+    # ✅ Fetch actual DB user from token email
     db_user = db.query(User).filter(User.email == user["email"]).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
     investments = db.query(Investment).filter(Investment.user_email == db_user.email).all()
-
     results = [get_roi_status(inv, config) for inv in investments]
 
     total_invested = sum(r["capital"] for r in results)
@@ -680,10 +678,11 @@ def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db
     }
 
 
-
-
+# ────────────────────────────────
+# 📌 ASSOCIATE: ROI Status of Referrals
+# ────────────────────────────────
 @router.get("/associate-roi-status")
-def associate_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
+def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_db)):
     if not user.get("is_associate"):
         raise HTTPException(status_code=403, detail="Associate access required")
 
@@ -691,9 +690,14 @@ def associate_roi_status(user: User = Depends(verify_token), db: Session = Depen
     if not config:
         return {"error": "ROI configuration not set"}
 
-    referrals = db.query(User).filter(User.referred_by == user["referral_code"]).all()
-    data, total_left = [], 0
+    # ✅ Fetch actual DB user from token email
+    db_user = db.query(User).filter(User.email == user["email"]).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
 
+    referrals = db.query(User).filter(User.referred_by == db_user.referral_code).all()
+
+    data, total_left = [], 0
     for ru in referrals:
         investments = db.query(Investment).filter(Investment.user_email == ru.email).all()
         for inv in investments:
@@ -707,4 +711,4 @@ def associate_roi_status(user: User = Depends(verify_token), db: Session = Depen
                 "flushed": status["flushed"]
             })
 
-    return {"details": data, "total_left_to_receive": total_left}
+    return {"details": data, "total_left_to_receive": round(total_left, 2)}
