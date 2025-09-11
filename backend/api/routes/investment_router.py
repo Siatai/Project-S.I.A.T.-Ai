@@ -683,22 +683,24 @@ def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db
 # ────────────────────────────────
 @router.get("/associate-roi-status")
 def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_db)):
-    # ✅ Make sure it's an associate
+    # ✅ Fetch DB user
     db_user = db.query(User).filter(User.email == user["email"]).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
+
     if not db_user.is_associate:
         raise HTTPException(status_code=403, detail="Associate access required")
 
-    # ✅ Fetch ROI multiplier config
+    # ✅ ROI config
     config = db.query(ROIConfig).first()
     if not config:
         return {"error": "ROI configuration not set"}
 
-    # ✅ Fetch commission config (dynamic)
+    # ✅ Commission config (fetch from DB, fallback to 10%)
     commission_cfg = db.query(CommissionConfig).first()
-    commission_pct = commission_cfg.associate_commission if commission_cfg else 10
+    commission_pct = commission_cfg.associate_pct if commission_cfg else 10.0
 
+    # ✅ Get referrals by referral_code
     referrals = db.query(User).filter(User.referred_by == db_user.referral_code).all()
     data, total_commission_left = [], 0
 
@@ -706,13 +708,10 @@ def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_d
         investments = db.query(Investment).filter(Investment.user_email == ru.email).all()
         for inv in investments:
             status = get_roi_status(inv, config)
-
-            # Commission left = associate % of what investor still has to receive
             commission_left = (status["left_to_receive"] * commission_pct) / 100
             total_commission_left += commission_left
-
             data.append({
-                "referee_name": ru.name,   # ✅ show name not email
+                "referee_name": ru.name or "Unnamed User",
                 "capital": status["capital"],
                 "roi_received": status["roi_received"],
                 "left_to_receive": status["left_to_receive"],
