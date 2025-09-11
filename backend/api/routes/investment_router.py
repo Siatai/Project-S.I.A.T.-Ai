@@ -664,7 +664,7 @@ def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db
     if not config:
         return {"error": "ROI configuration not set"}
 
-    # ✅ user is dict from JWT, so fetch real DB user
+    # 🔹 FIX: fetch real DB user from email in token payload
     db_user = db.query(User).filter(User.email == user["email"]).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
