@@ -1,29 +1,22 @@
-from datetime import date
-
 def get_roi_status(investment, config):
-    """
-    Calculate ROI progress for a single investment.
-    Returns dict with capital, received ROI, max return, and progress %.
-    """
+    capital = float(investment.amount or 0)
+    roi_received = float(getattr(investment, "roi_received", 0) or 0)
 
-    # Capital invested
-    capital = investment.amount
+    # 🔹 Fallback multiplier if None
+    multiplier = float(config.max_roi_multiplier or 2.0)
 
-    # Max return (2x model, configurable from ROIConfig)
-    multiplier = getattr(config, "max_roi_multiplier", 2.0)
     max_return = capital * multiplier
+    left_to_receive = max_return - roi_received
+    flushed = left_to_receive <= 0
 
-    # ROI received so far = wallet_balance earned from this investment
-    # If you track per-investment earnings separately, adjust here.
-    roi_received = getattr(investment, "roi_received", 0.0)
-
-    # Progress %
-    progress_percent = (roi_received / max_return) * 100 if max_return > 0 else 0
+    # 🔹 Always safe float values
+    progress_percent = (roi_received / max_return * 100) if max_return > 0 else 0
 
     return {
         "capital": round(capital, 2),
         "roi_received": round(roi_received, 2),
         "max_return": round(max_return, 2),
+        "left_to_receive": round(max(0, left_to_receive), 2),
+        "flushed": flushed,
         "progress_percent": round(progress_percent, 2),
-        "timestamp": investment.timestamp
     }
