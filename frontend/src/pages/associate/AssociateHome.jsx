@@ -3,8 +3,6 @@ import axios from "axios";
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
-  const [deposits, setDeposits] = useState([]);
-  const [totalDeposits, setTotalDeposits] = useState(0);
   const [teamDeposits, setTeamDeposits] = useState([]);
   const [totalTeamDeposits, setTotalTeamDeposits] = useState(0);
 
@@ -19,24 +17,11 @@ export default function AssociateHome() {
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        if (res.data?.email) {
-          const depRes = await axios.get(
-            `${API}/investments?email=${res.data.email}`,
-            { headers }
-          );
-          setDeposits(depRes.data);
-          setTotalDeposits(
-            depRes.data.reduce((sum, d) => sum + Number(d.amount), 0)
-          );
-        }
-
-        const teamRes = await axios.get(`${API}/associate/deposits`, {
+        const teamRes = await axios.get(`${API}/associate-roi-status`, {
           headers,
         });
-        setTeamDeposits(teamRes.data);
-        setTotalTeamDeposits(
-          teamRes.data.reduce((sum, d) => sum + Number(d.amount), 0)
-        );
+        setTeamDeposits(teamRes.data.details || []);
+        setTotalTeamDeposits(teamRes.data.total_left_to_receive || 0);
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -82,42 +67,12 @@ export default function AssociateHome() {
 
       <div style={glowLine}></div>
 
-      {/* Own Deposits */}
-      <div style={cardStyle}>
-        <h3 style={sectionTitle}>My Deposits</h3>
-        <div style={rowHeader}>
-          <span>Total Deposits</span>
-          <span
-            style={{
-              color: "#22C55E",
-              fontWeight: "800",
-              fontSize: "16px",
-            }}
-          >
-            {totalDeposits} USDT
-          </span>
-        </div>
-        {deposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "10px" }}>No deposits yet</p>
-        ) : (
-          deposits.map((d, idx) => (
-            <div key={idx} style={glowRow}>
-              <span>{d.amount} USDT</span>
-              <span>{new Date(d.timestamp).toLocaleDateString()}</span>
-            </div>
-          ))
-        )}
-      </div>
-
-      <div style={glowLine}></div>
-
       {/* Team Deposits */}
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Team Deposits</h3>
 
-        {/* Total */}
         <div style={rowHeader}>
-          <span>Total Team Deposits</span>
+          <span>Total Left to Receive</span>
           <span
             style={{
               color: "#22C55E",
@@ -129,12 +84,12 @@ export default function AssociateHome() {
           </span>
         </div>
 
-        {/* Table Headings */}
+        {/* Table Header */}
         {teamDeposits.length > 0 && (
           <div style={tableHeader}>
-            <span>Name</span>
-            <span>USDT</span>
-            <span>Date</span>
+            <span>Investor</span>
+            <span>Capital</span>
+            <span>Progress</span>
           </div>
         )}
 
@@ -145,13 +100,42 @@ export default function AssociateHome() {
         ) : (
           teamDeposits.map((d, idx) => (
             <div key={idx} style={glowRowGrid}>
-              <span>{d.name}</span>
-              <span>{d.amount}</span>
-              <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+              <span>{d.investor_email}</span>
+              <span>{d.capital} USDT</span>
+              <div>
+                <p style={{ fontSize: "12px", marginBottom: "4px" }}>
+                  ROI: {d.roi_received} / {d.capital * 2} USDT
+                </p>
+                <ProgressBar percent={((d.roi_received / (d.capital * 2)) * 100).toFixed(2)} />
+              </div>
             </div>
           ))
         )}
       </div>
+    </div>
+  );
+}
+
+/* === Small ProgressBar Component === */
+function ProgressBar({ percent }) {
+  return (
+    <div
+      style={{
+        background: "#374151",
+        borderRadius: "6px",
+        overflow: "hidden",
+        height: "10px",
+        marginTop: "4px",
+      }}
+    >
+      <div
+        style={{
+          width: `${percent}%`,
+          background: "linear-gradient(90deg,#17E8E5,#14B8A6)",
+          height: "10px",
+          transition: "width 0.5s ease",
+        }}
+      ></div>
     </div>
   );
 }
@@ -208,23 +192,9 @@ const rowHeader = {
   fontWeight: "600",
 };
 
-/* 🔹 Glow Row for My Deposits */
-const glowRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "10px",
-  marginTop: "8px",
-  fontSize: "14px",
-  borderRadius: "8px",
-  background: "rgba(15,23,42,0.9)",
-  borderLeft: "4px solid #22C55E",
-  boxShadow: "0 0 10px rgba(34,197,94,0.25)",
-};
-
-/* 🔹 Fixed Table Header for Team Deposits */
 const tableHeader = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr", // ✅ Fixed 3 columns
+  gridTemplateColumns: "1fr 1fr 1.5fr",
   textAlign: "center",
   fontWeight: "600",
   fontSize: "14px",
@@ -234,10 +204,9 @@ const tableHeader = {
   marginTop: "10px",
 };
 
-/* 🔹 Glow Grid Row for Team Deposits */
 const glowRowGrid = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
+  gridTemplateColumns: "1fr 1fr 1.5fr",
   textAlign: "center",
   padding: "10px",
   marginTop: "8px",

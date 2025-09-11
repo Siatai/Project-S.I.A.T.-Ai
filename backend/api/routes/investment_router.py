@@ -690,25 +690,32 @@ def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_d
     if not config:
         return {"error": "ROI configuration not set"}
 
-    # ✅ Fetch actual DB user from token email
-    db_user = db.query(User).filter(User.email == user["email"]).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+    commission_config = db.query(CommissionConfig).first()
+    commission_pct = commission_config.percentage if commission_config else 0
 
-    referrals = db.query(User).filter(User.referred_by == db_user.referral_code).all()
-
+    referrals = db.query(User).filter(User.referred_by == user["referral_code"]).all()
     data, total_left = [], 0
+
     for ru in referrals:
         investments = db.query(Investment).filter(Investment.user_email == ru.email).all()
         for inv in investments:
+            # full ROI status
             status = get_roi_status(inv, config)
-            total_left += status["left_to_receive"]
+
+            # associate earnings on this referral
+            earned = status["roi_received"] * (commission_pct / 100)
+            max_earn = status["max_return"] * (commission_pct / 100)
+            left = max_earn - earned
+
+            total_left += left
+
             data.append({
-                "investor_email": ru.email,
+                "referee_name": ru.name,
                 "capital": status["capital"],
-                "roi_received": status["roi_received"],
-                "left_to_receive": status["left_to_receive"],
-                "flushed": status["flushed"]
+                "commission_pct": commission_pct,
+                "earned": round(earned, 2),
+                "max_earn": round(max_earn, 2),
+                "left_to_receive": round(left, 2)
             })
 
     return {"details": data, "total_left_to_receive": round(total_left, 2)}
