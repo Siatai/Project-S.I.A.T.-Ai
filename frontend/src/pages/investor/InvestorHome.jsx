@@ -109,7 +109,10 @@ export default function InvestorHome() {
             <div key={idx} style={{ marginBottom: "18px" }}>
               <div style={glowRowGreen}>
                 <span>{d.capital} USDT</span>
-                <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+                <span>
+  {d.timestamp ? new Date(d.timestamp).toLocaleDateString() : "-"}
+</span>
+
               </div>
               <p style={{ fontSize: "12px", marginTop: "5px" }}>
                 ROI: {d.roi_received} / {d.max_return} USDT

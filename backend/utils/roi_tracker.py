@@ -18,4 +18,5 @@ def get_roi_status(investment, config):
         "left_to_receive": round(max(0, left_to_receive), 2),
         "flushed": flushed,
         "progress_percent": round(progress_percent, 2),
+         "timestamp": investment.timestamp.isoformat() if investment.timestamp else None
     }
