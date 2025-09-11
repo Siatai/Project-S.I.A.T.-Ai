@@ -683,45 +683,44 @@ def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db
 # ────────────────────────────────
 @router.get("/associate-roi-status")
 def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_db)):
-    # ✅ Fetch DB user
+    # 🔹 Get full DB user first
     db_user = db.query(User).filter(User.email == user["email"]).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-
     if not db_user.is_associate:
         raise HTTPException(status_code=403, detail="Associate access required")
 
-    # ✅ ROI config
-    config = db.query(ROIConfig).first()
-    if not config:
-        return {"error": "ROI configuration not set"}
+    # 🔹 Get commission config (direct referrals = level 1)
+    commission_cfg = db.query(CommissionConfig).filter(CommissionConfig.level == 1).first()
+    commission_pct = commission_cfg.percentage if commission_cfg else 10.0  # default 10%
 
-    # ✅ Commission config (fetch from DB, fallback to 10%)
-    commission_cfg = db.query(CommissionConfig).first()
-    commission_pct = commission_cfg.associate_pct if commission_cfg else 10.0
-
-    # ✅ Get referrals by referral_code
+    # 🔹 Get referrals of this associate
     referrals = db.query(User).filter(User.referred_by == db_user.referral_code).all()
-    data, total_commission_left = [], 0
+    data, total_commission = [], 0
 
     for ru in referrals:
         investments = db.query(Investment).filter(Investment.user_email == ru.email).all()
         for inv in investments:
-            status = get_roi_status(inv, config)
+            status = get_roi_status(inv, db.query(ROIConfig).first())
+
+            commission_amount = (status["roi_received"] * commission_pct) / 100
             commission_left = (status["left_to_receive"] * commission_pct) / 100
-            total_commission_left += commission_left
+
+            total_commission += commission_left
+
             data.append({
-                "referee_name": ru.name or "Unnamed User",
+                "referee_name": ru.name,
                 "capital": status["capital"],
                 "roi_received": status["roi_received"],
                 "left_to_receive": status["left_to_receive"],
-                "flushed": status["flushed"],
                 "commission_pct": commission_pct,
-                "commission_left": round(commission_left, 2)
+                "commission_earned": commission_amount,
+                "commission_left": commission_left,
+                "flushed": status["flushed"]
             })
 
     return {
         "details": data,
-        "commission_pct": commission_pct,
-        "total_commission_left": round(total_commission_left, 2)
+        "commission_percent": commission_pct,
+        "total_left_to_receive": total_commission
     }
