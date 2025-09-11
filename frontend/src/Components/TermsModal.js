@@ -219,18 +219,18 @@ const modalBox = {
   background: "#1E293B",
   padding: "20px",
   borderRadius: "12px",
-  width: "40vw",          // 🔹 Wider rectangle
-  height: "40vh",         // 🔹 Shorter height
+  width: "60vw",          // 🔹 Wider rectangle
+  height: "30vh",         // 🔹 Shorter height
   color: "#E5E7EB",
-  border: "6px solid #17E8E5",
-  boxShadow: "0 0 30px rgba(23,232,229,0.5)",
+  border: "6px solid #00f4f099",
+  boxShadow: "0 0 30px rgba(19, 255, 251, 0.3)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
 };
 
 const windowBox = {
-  width: "90%",           // inner window
+  width: "100%",           // inner window
   height: "60%",          // takes 60% height of modal
   background: "#0F172A",
   border: "2px solid #ffffffff",
@@ -243,7 +243,7 @@ const modalContent = {
   width: "100%",
   height: "100%",
   overflowY: "auto",
-  fontSize: "11px",       // 🔹 Smaller font
+  fontSize: "6px",       // 🔹 Smaller font
   lineHeight: "1.6",
   fontWeight: 300,
   letterSpacing: "0.2px",
