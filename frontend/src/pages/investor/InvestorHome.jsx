@@ -6,7 +6,7 @@ export default function InvestorHome() {
   const [isAssociate, setIsAssociate] = useState(false);
   const [user, setUser] = useState(null);
   const [deposits, setDeposits] = useState([]);
-  const [totalDeposits, setTotalDeposits] = useState(0);
+  const [summary, setSummary] = useState(null);
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
   // 🔹 Fetch user and deposits
@@ -15,7 +15,6 @@ export default function InvestorHome() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-
         const headers = { Authorization: `Bearer ${token}` };
 
         // Get user info
@@ -25,26 +24,16 @@ export default function InvestorHome() {
         if (res.data.is_associate) setIsAssociate(true);
         if (res.data.pending_associate) setApplied(true);
 
-        // Get deposits
-        if (res.data.email) {
-          const depRes = await axios.get(
-            `${API}/investments?email=${res.data.email}`,
-            { headers }
-          );
-          setDeposits(depRes.data);
-
-          // Calculate total
-          const total = depRes.data.reduce(
-            (sum, d) => sum + Number(d.amount),
-            0
-          );
-          setTotalDeposits(total);
-        }
+        // Get deposits + ROI progress
+        const roiRes = await axios.get(`${API}/investor-roi-status`, {
+          headers,
+        });
+        setDeposits(roiRes.data.deposits || []);
+        setSummary(roiRes.data.summary || null);
       } catch (err) {
         console.error("Error fetching investor data:", err);
       }
     };
-
     fetchUserAndDeposits();
   }, []);
 
@@ -85,7 +74,7 @@ export default function InvestorHome() {
         You can deposit funds, withdraw profits, and track your ROI here.
       </p>
 
-      {/* ✅ My Deposits */}
+      {/* ✅ Deposits with Progress */}
       <div style={cardStyle}>
         <h3
           style={{
@@ -99,20 +88,33 @@ export default function InvestorHome() {
         </h3>
         <div style={glowLine} />
 
-        {/* Total Row (Bigger + Bold + Strong Glow) */}
-        <div style={glowRowTotal}>
-          <span>Total Deposits</span>
-          <span>{totalDeposits} USDT</span>
-        </div>
+        {summary && (
+          <div style={{ marginBottom: "20px" }}>
+            <div style={glowRowTotal}>
+              <span>Total Deposits</span>
+              <span>{summary.total_invested} USDT</span>
+            </div>
+            <p style={{ fontSize: "13px", marginTop: "5px" }}>
+              ROI Received: {summary.total_received} /{" "}
+              {summary.total_max_return} USDT
+            </p>
+            <ProgressBar percent={summary.progress_percent} />
+          </div>
+        )}
 
-        {/* Deposit List */}
         {deposits.length === 0 ? (
           <p style={{ color: "#9CA3AF", marginTop: "12px" }}>No deposits yet</p>
         ) : (
           deposits.map((d, idx) => (
-            <div key={idx} style={glowRowGreen}>
-              <span>{d.amount} USDT</span>
-              <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+            <div key={idx} style={{ marginBottom: "18px" }}>
+              <div style={glowRowGreen}>
+                <span>{d.capital} USDT</span>
+                <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+              </div>
+              <p style={{ fontSize: "12px", marginTop: "5px" }}>
+                ROI: {d.roi_received} / {d.max_return} USDT
+              </p>
+              <ProgressBar percent={d.progress_percent} />
             </div>
           ))
         )}
@@ -138,6 +140,30 @@ export default function InvestorHome() {
   );
 }
 
+/* === Small ProgressBar Component === */
+function ProgressBar({ percent }) {
+  return (
+    <div
+      style={{
+        background: "#374151",
+        borderRadius: "6px",
+        overflow: "hidden",
+        height: "8px",
+        marginTop: "4px",
+      }}
+    >
+      <div
+        style={{
+          width: `${percent}%`,
+          background: "#17E8E5",
+          height: "8px",
+          transition: "width 0.5s ease",
+        }}
+      ></div>
+    </div>
+  );
+}
+
 /* === Styles === */
 const cardStyle = {
   marginTop: 30,
@@ -156,7 +182,7 @@ const glowLine = {
   margin: "8px 0 18px 0",
 };
 
-/* 🔹 Glowing green row for deposits */
+/* 🔹 Row for deposits */
 const glowRowGreen = {
   display: "flex",
   justifyContent: "space-between",
@@ -169,7 +195,7 @@ const glowRowGreen = {
   boxShadow: "0 0 6px rgba(34,197,94,0.25)",
 };
 
-/* 🔹 Special styling for Total row */
+/* 🔹 Special row for totals */
 const glowRowTotal = {
   ...glowRowGreen,
   fontSize: "16px",

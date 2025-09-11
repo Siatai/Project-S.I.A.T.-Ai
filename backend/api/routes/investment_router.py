@@ -659,20 +659,37 @@ def set_roi_config(
 from utils.roi_tracker import get_roi_status
 
 @router.get("/investor-roi-status")
-def investor_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
+def investor_roi_status(user=Depends(verify_token), db: Session = Depends(get_db)):
     config = db.query(ROIConfig).first()
     if not config:
         return {"error": "ROI configuration not set"}
 
-    investments = db.query(Investment).filter(Investment.user_email == user.email).all()
-    results = []
-    for inv in investments:
-        status = get_roi_status(inv, config)
-        status["progress_percent"] = round(
-            (status["roi_received"] / status["max_return"]) * 100, 2
-        ) if status["max_return"] > 0 else 0
-        results.append(status)
-    return results
+    # ✅ user is dict from JWT, so fetch real DB user
+    db_user = db.query(User).filter(User.email == user["email"]).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    investments = db.query(Investment).filter(Investment.user_email == db_user.email).all()
+
+    results = [get_roi_status(inv, config) for inv in investments]
+
+    total_invested = sum(r["capital"] for r in results)
+    total_received = sum(r["roi_received"] for r in results)
+    total_max_return = sum(r["max_return"] for r in results)
+    total_progress = (total_received / total_max_return) * 100 if total_max_return > 0 else 0
+
+    return {
+        "deposits": results,
+        "summary": {
+            "total_invested": round(total_invested, 2),
+            "total_received": round(total_received, 2),
+            "total_max_return": round(total_max_return, 2),
+            "progress_percent": round(total_progress, 2)
+        }
+    }
+
+
+
 
 @router.get("/associate-roi-status")
 def associate_roi_status(user: User = Depends(verify_token), db: Session = Depends(get_db)):
