@@ -143,6 +143,14 @@ export default function DashboardLayout() {
             })}
           </div>
 
+          {/* ✅ Raise a Request button */}
+          <a
+            href="mailto:support@algomcube.com"
+            className="request-btn"
+          >
+            Raise a Request
+          </a>
+
           <div className="logout-btn" onClick={handleLogout}>
             Logout
           </div>
@@ -280,9 +288,24 @@ export default function DashboardLayout() {
           box-shadow: 0 0 12px rgba(23,232,166,0.5);
         }
 
+        /* ✅ Raise a Request button */
+        .request-btn {
+          display: block;
+          padding: 12px 15px;
+          margin: 15px 0;
+          border-radius: 10px;
+          cursor: pointer;
+          text-align: center;
+          font-weight: 600;
+          text-decoration: none;
+          color: #0B1220;
+          background: linear-gradient(135deg,#17E8E5,#14B8A6);
+          box-shadow: 0 0 12px rgba(23,232,166,0.5);
+        }
+
         .logout-btn {
           padding: 12px 15px;
-          margin: 20px 0 40px;
+          margin: 10px 0 40px;
           border-radius: 10px;
           cursor: pointer;
           background: rgba(255,255,255,0.08);
