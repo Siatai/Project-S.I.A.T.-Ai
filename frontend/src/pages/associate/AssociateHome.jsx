@@ -122,7 +122,7 @@ export default function AssociateHome() {
                 <div style={rowGrid}>
                   <span>{d.referee_name}</span>
                   <span>{d.capital} USDT</span>
-                  <span style={{ color: "#FACC15", fontWeight: "600" }}>
+                  <span style={{ color: "#FACC15", fontWeight: "300" }}>
                     Left: {d.commission_left} USDT
                   </span>
                 </div>

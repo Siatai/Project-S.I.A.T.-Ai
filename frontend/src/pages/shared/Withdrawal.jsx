@@ -7,9 +7,12 @@ export default function Withdrawal() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
+
   const [showWalletPopup, setShowWalletPopup] = useState(false);
   const [newWallet, setNewWallet] = useState("");
-  const [popupMessage, setPopupMessage] = useState(null); // ✅ message for popup (success/error)
+  const [walletPopupMessage, setWalletPopupMessage] = useState(null);
+  const [buttonMessage, setButtonMessage] = useState(null); // ✅ local popup above button
+
   const [email, setEmail] = useState("");
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
@@ -69,13 +72,28 @@ export default function Withdrawal() {
       setShowWalletPopup(true);
       return;
     }
+
+    if (summary.withdrawable < 20) {
+      setButtonMessage({ type: "error", text: "⚠️ Minimum withdrawal limit is $20." });
+      return;
+    }
+
+    const today = new Date().getDay(); // 0=Sunday, 6=Saturday
+    if (today !== 0 && today !== 6) {
+      setButtonMessage({
+        type: "error",
+        text: "⚠️ Withdrawals are allowed only on Saturday and Sunday.",
+      });
+      return;
+    }
+
     try {
       await axios.post(`${API}/send-otp-withdrawal`, {}, { headers: { Authorization: `Bearer ${token}` } });
       setOtpSent(true);
-      setPopupMessage({ type: "success", text: "📧 OTP sent to your email." });
+      setButtonMessage({ type: "success", text: "📧 OTP sent to your email." });
     } catch (err) {
       console.error("Error sending OTP:", err);
-      setPopupMessage({ type: "error", text: err?.response?.data?.detail || "Failed to send OTP" });
+      setButtonMessage({ type: "error", text: err?.response?.data?.detail || "❌ Failed to send OTP" });
     }
   };
 
@@ -88,22 +106,22 @@ export default function Withdrawal() {
         { otp },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setPopupMessage({ type: "success", text: res.data.message || "Withdrawal request submitted" });
+      setButtonMessage({ type: "success", text: res.data.message || "✅ Withdrawal request submitted" });
       setOtp("");
       setOtpSent(false);
       fetchSummary();
     } catch (err) {
       console.error("Error withdrawing:", err);
-      setPopupMessage({ type: "error", text: err?.response?.data?.detail || "Withdrawal failed" });
+      setButtonMessage({ type: "error", text: err?.response?.data?.detail || "❌ Withdrawal failed" });
     } finally {
       setWithdrawing(false);
     }
   };
 
-  // 🔹 Save wallet (with email)
+  // 🔹 Save wallet (local popup inside modal)
   const saveWallet = async () => {
     if (!newWallet.trim()) {
-      setPopupMessage({ type: "error", text: "⚠️ Please enter a valid TRC20 wallet address." });
+      setWalletPopupMessage({ type: "error", text: "⚠️ Please enter a valid TRC20 wallet address." });
       return;
     }
     try {
@@ -112,19 +130,22 @@ export default function Withdrawal() {
         { email, wallet: newWallet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setPopupMessage({ type: "success", text: "✅ Wallet bound successfully!" });
-      setShowWalletPopup(false);
+      setWalletPopupMessage({ type: "success", text: "✅ Wallet bound successfully!" });
+      setTimeout(() => {
+        setShowWalletPopup(false);
+        setWalletPopupMessage(null);
+      }, 1500);
       setNewWallet("");
       fetchSummary();
     } catch (err) {
       console.error("Error saving wallet:", err);
-      if (
-        err?.response?.data?.detail &&
-        err.response.data.detail.toLowerCase().includes("duplicate")
-      ) {
-        setPopupMessage({ type: "error", text: "⚠️ This wallet is already bound to another account." });
+      if (err?.response?.status === 400 && err.response.data.detail.toLowerCase().includes("duplicate")) {
+        setWalletPopupMessage({
+          type: "error",
+          text: "⚠️ Duplicate wallets will not be saved — each wallet can only be linked to one account.",
+        });
       } else {
-        setPopupMessage({ type: "error", text: err?.response?.data?.detail || "Failed to bind wallet" });
+        setWalletPopupMessage({ type: "error", text: err?.response?.data?.detail || "❌ Failed to bind wallet" });
       }
     }
   };
@@ -139,26 +160,8 @@ export default function Withdrawal() {
       </h2>
       <div style={glowLine} />
 
-      {/* ✅ Popup message */}
-      {popupMessage && (
-        <div
-          style={{
-            marginBottom: "15px",
-            padding: "12px",
-            borderRadius: "8px",
-            background: popupMessage.type === "error" ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)",
-            border: `1px solid ${popupMessage.type === "error" ? "#EF4444" : "#10B981"}`,
-            color: popupMessage.type === "error" ? "#F87171" : "#34D399",
-            fontWeight: "600",
-            textAlign: "center",
-          }}
-        >
-          {popupMessage.text}
-        </div>
-      )}
-
       {/* Wallet Summary */}
-      <div style={{ display: "flex", gap: "20px", marginBottom: "25px", marginTop: "20px", flexWrap: "wrap" }}>
+      <div style={summaryGrid}>
         <div style={cardStyle}><h3 style={cardTitle}>Total Earnings</h3><p style={valueStyle}>${summary.total.toFixed(2)}</p></div>
         <div style={cardStyle}><h3 style={cardTitle}>Withdrawn</h3><p style={valueStyle}>${summary.withdrawn.toFixed(2)}</p></div>
         <div style={cardStyle}><h3 style={cardTitle}>Pending</h3><p style={{ ...valueStyle, color: "#FACC15" }}>${summary.pending.toFixed(2)}</p></div>
@@ -169,13 +172,21 @@ export default function Withdrawal() {
       <div style={glowLine} />
 
       {/* Withdraw Earnings */}
-      {summary.withdrawable > 0 && !otpSent && (
-        <button onClick={requestOtp} style={btnTeal}>Request Withdrawal</button>
+      {!otpSent && (
+        <div style={{ maxWidth: "420px" }}>
+          {buttonMessage && <div style={popupBoxMsg(buttonMessage.type)}>{buttonMessage.text}</div>}
+          <button
+            onClick={requestOtp}
+            style={{ ...btnTeal, opacity: summary.withdrawable >= 20 ? 1 : 0.6 }}
+          >
+            Request Withdrawal
+          </button>
+        </div>
       )}
 
       {/* OTP Confirmation */}
       {otpSent && (
-        <div style={{ marginBottom: "20px", maxWidth: "420px", background: "rgba(17,24,39,0.7)", padding: "18px", borderRadius: "12px", marginTop: "20px" }}>
+        <div style={otpBox}>
           <input type="text" placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} style={inputStyle} />
           <button onClick={confirmWithdrawal} disabled={withdrawing || !otp} style={btnTeal}>
             {withdrawing ? "Submitting..." : "Confirm Withdrawal"}
@@ -189,12 +200,12 @@ export default function Withdrawal() {
           <div style={popupBox} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>Bind Your TRC20 Wallet</h3>
             <div style={glowLine} />
-            <p style={{ fontSize: "14px", marginBottom: "8px", color: "#94A3B8" }}>
-              You must bind a withdrawal wallet before requesting withdrawal.
-            </p>
-            <p style={{ fontSize: "12px", color: "#F87171", marginBottom: "12px", fontStyle: "italic" }}>
-              ⚠️ Duplicate wallets will not be saved — each wallet can only be linked to one account.
-            </p>
+
+            {/* 🔹 Error inside modal */}
+            {walletPopupMessage && <div style={popupBoxMsg(walletPopupMessage.type)}>{walletPopupMessage.text}</div>}
+
+            <p style={popupInfo}>You must bind a withdrawal wallet before requesting withdrawal.</p>
+            <p style={popupWarn}>⚠️ Each wallet can only be linked to one account.</p>
             <input type="text" placeholder="Enter TRC20 Wallet Address" value={newWallet} onChange={(e) => setNewWallet(e.target.value)} style={inputStyle} />
             <button onClick={saveWallet} style={btnTeal}>Save Wallet</button>
           </div>
@@ -205,11 +216,26 @@ export default function Withdrawal() {
 }
 
 /* === Styles === */
+const summaryGrid = { display: "flex", gap: "20px", marginBottom: "25px", marginTop: "20px", flexWrap: "wrap" };
 const cardStyle = { flex: "1", padding: "18px", borderRadius: "12px", background: "rgba(17,24,39,0.8)", backdropFilter: "blur(8px)", boxShadow: "0 0 20px rgba(23,232,229,0.15)", minWidth: "200px" };
 const cardTitle = { fontSize: "14px", color: "#94A3B8", marginBottom: "8px", fontWeight: "500" };
 const valueStyle = { fontSize: "20px", fontWeight: "700", color: "#E5E7EB" };
 const btnTeal = { marginTop: "10px", padding: "12px 20px", border: "none", borderRadius: "8px", background: "linear-gradient(135deg,#17E8E5,#14B8E5)", color: "#0B1220", fontWeight: "700", cursor: "pointer", boxShadow: "0 0 15px rgba(23,232,229,0.3)", transition: "all 0.3s ease", width: "100%", maxWidth: "420px" };
 const inputStyle = { width: "100%", maxWidth: "420px", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#E5E7EB", marginBottom: "12px", boxSizing: "border-box" };
+const otpBox = { marginBottom: "20px", maxWidth: "420px", background: "rgba(17,24,39,0.7)", padding: "18px", borderRadius: "12px", marginTop: "20px" };
 const popupOverlay = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 };
 const popupBox = { background: "rgba(17,24,39,0.95)", padding: "25px", borderRadius: "12px", maxWidth: "420px", width: "100%", boxShadow: "0 0 20px rgba(23,232,229,0.25)", textAlign: "center" };
 const glowLine = { height: "2px", background: "linear-gradient(90deg, transparent, #17E8E5, transparent)", boxShadow: "0 0 10px #17E8E5", margin: "8px 0 20px 0" };
+const popupInfo = { fontSize: "14px", marginBottom: "8px", color: "#94A3B8" };
+const popupWarn = { fontSize: "12px", color: "#F87171", marginBottom: "12px", fontStyle: "italic" };
+const popupBoxMsg = (type) => ({
+  marginBottom: "12px",
+  padding: "10px",
+  borderRadius: "8px",
+  background: type === "error" ? "rgba(239,68,68,0.15)" : "rgba(16,185,129,0.15)",
+  border: `1px solid ${type === "error" ? "#EF4444" : "#10B981"}`,
+  color: type === "error" ? "#F87171" : "#34D399",
+  fontWeight: "300",
+  textAlign: "center",
+  fontSize: "14px",
+});
