@@ -237,7 +237,7 @@ const rowGrid = {
   display: "grid",
   gridTemplateColumns: "1fr 1fr 1fr",
   alignItems: "center",
-  fontSize: "14px",
+  fontSize: "10px",
   marginBottom: "6px",
 };
 
