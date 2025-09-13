@@ -289,7 +289,7 @@ def get_last_roi_credit(db: Session = Depends(get_db), user=Depends(verify_token
 
 @router.get("/commission-percent")
 def get_commission_percent(db: Session = Depends(get_db)):
-    cfg = db.query(CommissionConfig).first()
+    cfg = db.query(CommissionConfig).filter(CommissionConfig.level == 1).first()
     if not cfg:
         return {"commission_percent": 0}
-    return {"commission_percent": cfg.direct_referral_percent}
+    return {"commission_percent": cfg.percentage}
