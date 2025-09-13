@@ -8,6 +8,7 @@ from typing import Dict
 from db import get_db, SessionLocal
 from models.user_model import User
 from models.withdrawal_model import Investment, Withdrawal
+from models.commission_model import CommissionConfig
 from models.user_logic import (
     create_or_update_user,
     verify_otp,
@@ -285,3 +286,10 @@ def get_last_roi_credit(db: Session = Depends(get_db), user=Depends(verify_token
         return {"last_credit": None, "message": "ROI has never been credited yet"}
     
     return {"last_credit": last_credit}
+
+@router.get("/commission-percent")
+def get_commission_percent(db: Session = Depends(get_db)):
+    cfg = db.query(CommissionConfig).first()
+    if not cfg:
+        return {"commission_percent": 0}
+    return {"commission_percent": cfg.direct_referral_percent}
