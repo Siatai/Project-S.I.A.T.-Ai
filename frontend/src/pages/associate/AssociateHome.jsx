@@ -7,6 +7,7 @@ export default function AssociateHome() {
   const [totalReceivable, setTotalReceivable] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
   const [myDeposits, setMyDeposits] = useState([]);
+  const [commissionRate, setCommissionRate] = useState(null); // ✅ new
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
@@ -32,6 +33,10 @@ export default function AssociateHome() {
         });
         setTeamDeposits(teamRes.data.details || []);
         setTotalReceivable(teamRes.data.total_commission_left || 0);
+
+        // ✅ Fetch commission config
+        const commRes = await axios.get(`${API}/commission-config`, { headers });
+        setCommissionRate(commRes.data.direct_referral_percent || 0);
       } catch (err) {
         console.error("Error fetching associate data:", err);
       }
@@ -53,6 +58,21 @@ export default function AssociateHome() {
 
   return (
     <div style={{ color: "#E5E7EB", padding: "20px", maxWidth: "700px", margin: "0 auto" }}>
+      
+      {/* ✅ Welcome Banner */}
+      {commissionRate !== null && (
+        <div style={bannerStyle}>
+          <span style={{ fontWeight: "700" }}>
+            Welcome, {user.name || user.email}!
+          </span>{" "}
+          Now enjoy{" "}
+          <span style={{ fontWeight: "700", color: "#17E8E5" }}>
+            {commissionRate}%
+          </span>{" "}
+          of earnings of your referrals.
+        </div>
+      )}
+
       {/* Referral Card */}
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Referral Link</h3>
@@ -141,6 +161,18 @@ export default function AssociateHome() {
 }
 
 /* === Styles === */
+const bannerStyle = {
+  background: "linear-gradient(135deg, #0f172a, #1e293b)",
+  padding: "14px 18px",
+  borderRadius: "10px",
+  marginBottom: "20px",
+  textAlign: "center",
+  fontSize: "14px",
+  fontWeight: "400",
+  color: "#E5E7EB",
+  boxShadow: "0 0 12px rgba(23,232,229,0.3)",
+};
+
 const cardStyle = {
   background: "rgba(17,24,39,0.85)",
   padding: "20px",
