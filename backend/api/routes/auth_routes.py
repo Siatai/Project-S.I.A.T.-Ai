@@ -226,7 +226,7 @@ def get_all_users(db: Session = Depends(get_db)):
                 referrer_name = ref.name or ref.email
 
         # ✅ Calculate deposits for this user
-        deposits = db.query(Investment).filter(Investment.user_id == u.id).all()
+        deposits = db.query(Investment).filter(Investment.user_id == u.email).all()
         deposit_sum = sum(d.amount for d in deposits)
         total_deposits += deposit_sum
 
