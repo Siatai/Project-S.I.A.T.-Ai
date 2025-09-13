@@ -218,14 +218,14 @@ def get_all_users(db: Session = Depends(get_db)):
     total_deposits = 0
 
     for u in users:
-        # Find referrer name
-        referrer = None
-        if u.referrer_code:
-            ref = db.query(User).filter(User.referral_code == u.referrer_code).first()
+        # ✅ Find referrer using referral_code
+        referrer_name = None
+        if u.referred_by:
+            ref = db.query(User).filter(User.referral_code == u.referred_by).first()
             if ref:
-                referrer = ref.name  # or ref.email
+                referrer_name = ref.name or ref.email
 
-        # Calculate deposits
+        # ✅ Calculate deposits for this user
         deposits = db.query(Investment).filter(Investment.user_id == u.id).all()
         deposit_sum = sum(d.amount for d in deposits)
         total_deposits += deposit_sum
@@ -235,8 +235,8 @@ def get_all_users(db: Session = Depends(get_db)):
             "email": u.email,
             "is_admin": u.is_admin,
             "is_associate": u.is_associate,
-            "balance": u.balance,
-            "referrer_name": referrer,
+            "balance": u.wallet_balance,
+            "referrer_name": referrer_name,
             "deposit": deposit_sum
         })
 
