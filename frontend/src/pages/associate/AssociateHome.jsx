@@ -59,8 +59,6 @@ export default function AssociateHome() {
 
   if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
-  const signupUrl = `${window.location.origin}/referral-signup?ref=${user.referral_code}`;
-
   return (
     <div
       style={{
@@ -86,15 +84,22 @@ export default function AssociateHome() {
 
       {/* Referral Card */}
       <div style={cardStyle}>
-        <h3 style={sectionTitle}>Your Referral Link</h3>
+        <h3 style={sectionTitle}>Your Referral Code</h3>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <input type="text" value={signupUrl} readOnly style={inputStyle} />
+          {/* Only show referral code */}
+          <input
+            type="text"
+            value={user.referral_code}
+            readOnly
+            style={inputStyle}
+          />
           <button onClick={copyReferral} style={btnTeal}>
             Copy
           </button>
         </div>
         <p style={helpText}>
-          Share this link with others to grow your team and earn commission.
+          Share this code with others. When copied, it will include the full
+          referral link automatically.
         </p>
       </div>
 
