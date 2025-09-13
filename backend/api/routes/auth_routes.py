@@ -7,6 +7,7 @@ from sqlalchemy import func
 from typing import Dict
 from db import get_db, SessionLocal
 from models.user_model import User
+from models.withdrawal_model import Investment, Withdrawal
 from models.user_logic import (
     create_or_update_user,
     verify_otp,
@@ -209,24 +210,37 @@ def approve_associate(data: ApproveRequest, token_user=Depends(verify_token), db
 
 
 # ========== ADMIN: GET ALL USERS ==========
+# FastAPI backend
 @router.get("/all-users")
-def all_users(token_user=Depends(verify_token)):
-    if not token_user.get("is_admin"):
-        raise HTTPException(status_code=403, detail="Admin only")
+def get_all_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    results = []
+    total_deposits = 0
 
-    users = get_all_users()
-    return [
-        {
+    for u in users:
+        # Find referrer name
+        referrer = None
+        if u.referrer_code:
+            ref = db.query(User).filter(User.referral_code == u.referrer_code).first()
+            if ref:
+                referrer = ref.name  # or ref.email
+
+        # Calculate deposits
+        deposits = db.query(Investment).filter(Investment.user_id == u.id).all()
+        deposit_sum = sum(d.amount for d in deposits)
+        total_deposits += deposit_sum
+
+        results.append({
             "id": u.id,
             "email": u.email,
-            "name": u.name,
             "is_admin": u.is_admin,
             "is_associate": u.is_associate,
-            "pending_associate": u.pending_associate,
-        }
-        for u in users
-    ]
+            "balance": u.balance,
+            "referrer_name": referrer,
+            "deposit": deposit_sum
+        })
 
+    return {"users": results, "total_deposits": total_deposits}
 
 # ========== USER: UPDATE NAME ==========
 @router.post("/update-name")
