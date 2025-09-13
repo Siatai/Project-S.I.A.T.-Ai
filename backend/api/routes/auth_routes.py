@@ -235,6 +235,7 @@ def get_all_users(db: Session = Depends(get_db)):
             "email": u.email,
             "is_admin": u.is_admin,
             "is_associate": u.is_associate,
+            "pending_associate": u.pending_associate,
             "balance": u.wallet_balance,
             "referrer_name": referrer_name,
             "deposit": deposit_sum
