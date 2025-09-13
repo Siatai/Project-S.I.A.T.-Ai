@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
+  const [showAppliedMsg, setShowAppliedMsg] = useState(false); // ✅ new
   const [isAssociate, setIsAssociate] = useState(false);
   const [user, setUser] = useState(null);
   const [deposits, setDeposits] = useState([]);
@@ -50,6 +51,8 @@ export default function InvestorHome() {
         }
       );
       setApplied(true);
+      setShowAppliedMsg(true); // ✅ show msg
+      setTimeout(() => setShowAppliedMsg(false), 10000); // ✅ auto hide after 10s
       alert("Request sent to admin for approval.");
     } catch (err) {
       console.error(err);
@@ -137,7 +140,9 @@ export default function InvestorHome() {
               <div style={glowRowGreen}>
                 <span>{d.capital} USDT</span>
                 <span>
-                  {d.timestamp ? new Date(d.timestamp).toLocaleDateString() : "-"}
+                  {d.timestamp
+                    ? new Date(d.timestamp).toLocaleDateString()
+                    : "-"}
                 </span>
               </div>
               <ProgressBarSmall
@@ -161,9 +166,11 @@ export default function InvestorHome() {
             Apply to become Associate
           </button>
         ) : (
-          <p style={{ color: "#FACC15", fontWeight: "600" }}>
-            ⏳ Pending approval from Admin...
-          </p>
+          showAppliedMsg && ( // ✅ show only temporarily
+            <p style={{ color: "#FACC15", fontWeight: "600" }}>
+              ⏳ Pending approval from Admin...
+            </p>
+          )
         )}
       </div>
 

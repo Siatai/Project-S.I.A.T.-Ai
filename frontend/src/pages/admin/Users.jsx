@@ -18,7 +18,6 @@ export default function AdminUsers() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Expect API to return { users: [...], total_deposits: number }
       setUsers(res.data.users || []);
       setTotalDeposits(res.data.total_deposits || 0);
     } catch (err) {
@@ -40,7 +39,6 @@ export default function AdminUsers() {
     }
   };
 
-  // ✅ Filter users by referrer name
   const filteredUsers = users.filter((u) => {
     if (!filter) return true;
     const refName = u.referrer_name?.toLowerCase() || "";
@@ -51,12 +49,10 @@ export default function AdminUsers() {
     <div style={{ color: "#E5E7EB" }}>
       <h2>Manage Users</h2>
 
-      {/* 🔹 Show total deposits */}
       <h3 style={{ margin: "10px 0", color: "#17E8E5" }}>
         Total Deposits: ${totalDeposits}
       </h3>
 
-      {/* 🔹 Filter Box */}
       <input
         type="text"
         placeholder="Filter by Referrer Name"
@@ -86,6 +82,7 @@ export default function AdminUsers() {
             <th>Role</th>
             <th>Balance</th>
             <th>Deposits</th>
+            <th>Associate Request</th> {/* ✅ new column */}
             <th>Action</th>
           </tr>
         </thead>
@@ -103,6 +100,22 @@ export default function AdminUsers() {
               </td>
               <td>${u.balance}</td>
               <td>${u.deposit || 0}</td>
+              <td style={{ textAlign: "center" }}>
+                {u.pending_associate ? (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
+                      background: "#22C55E", // green light
+                      boxShadow: "0 0 6px #22C55E",
+                    }}
+                  ></span>
+                ) : (
+                  "-"
+                )}
+              </td>
               <td>
                 {!u.is_admin && (
                   <>
