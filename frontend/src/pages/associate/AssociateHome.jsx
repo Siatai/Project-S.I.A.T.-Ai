@@ -7,7 +7,7 @@ export default function AssociateHome() {
   const [totalReceivable, setTotalReceivable] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
   const [myDeposits, setMyDeposits] = useState([]);
-  const [commissionRate, setCommissionRate] = useState(null); // ✅ new
+  const [commissionRate, setCommissionRate] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
@@ -17,9 +17,11 @@ export default function AssociateHome() {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
+        // User info
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
+        // My deposits
         if (res.data?.email) {
           const depRes = await axios.get(
             `${API}/investments?email=${res.data.email}`,
@@ -28,15 +30,18 @@ export default function AssociateHome() {
           setMyDeposits(depRes.data || []);
         }
 
+        // Team deposits & commission progress
         const teamRes = await axios.get(`${API}/associate-roi-status`, {
           headers,
         });
         setTeamDeposits(teamRes.data.details || []);
         setTotalReceivable(teamRes.data.total_commission_left || 0);
 
-        // ✅ Fetch commission config
-        const commRes = await axios.get(`${API}/commission-config`, { headers });
-        setCommissionRate(commRes.data.direct_referral_percent || 0);
+        // Commission % (from backend API)
+        const commRes = await axios.get(`${API}/commission-percent`, {
+          headers,
+        });
+        setCommissionRate(commRes.data.commission_percent || 0);
       } catch (err) {
         console.error("Error fetching associate data:", err);
       }
@@ -57,36 +62,47 @@ export default function AssociateHome() {
   const signupUrl = `${window.location.origin}/referral-signup?ref=${user.referral_code}`;
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px", maxWidth: "700px", margin: "0 auto" }}>
-      
+    <div
+      style={{
+        color: "#E5E7EB",
+        padding: "20px",
+        maxWidth: "700px",
+        margin: "0 auto",
+      }}
+    >
       {/* ✅ Welcome Banner */}
       {commissionRate !== null && (
         <div style={bannerStyle}>
           <span style={{ fontWeight: "700" }}>
             Welcome, {user.name || user.email}!
           </span>{" "}
-          Now enjoy{" "}
+          You now earn{" "}
           <span style={{ fontWeight: "700", color: "#17E8E5" }}>
             {commissionRate}%
           </span>{" "}
-          of earnings of your referrals.
+          from the profits of your referrals.
         </div>
       )}
 
       {/* Referral Card */}
       <div style={cardStyle}>
-        <h3 style={sectionTitle}>Referral Link</h3>
+        <h3 style={sectionTitle}>Your Referral Link</h3>
         <div style={{ display: "flex", alignItems: "center" }}>
           <input type="text" value={signupUrl} readOnly style={inputStyle} />
-          <button onClick={copyReferral} style={btnTeal}>Copy</button>
+          <button onClick={copyReferral} style={btnTeal}>
+            Copy
+          </button>
         </div>
+        <p style={helpText}>
+          Share this link with others to grow your team and earn commission.
+        </p>
       </div>
 
-      {/* My Deposit Card */}
+      {/* My Deposits */}
       <div style={cardStyle}>
         <h3 style={sectionTitle}>My Deposits</h3>
         {myDeposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF" }}>You have not invested yet</p>
+          <p style={{ color: "#9CA3AF" }}>You have not made any deposits yet.</p>
         ) : (
           myDeposits.map((d, idx) => (
             <div key={idx} style={glowRow}>
@@ -97,20 +113,23 @@ export default function AssociateHome() {
         )}
       </div>
 
-      {/* Team Deposits Card */}
+      {/* Team Deposits */}
       <div style={cardStyle}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <h3 style={sectionTitle}>Team Deposits</h3>
-          <button
-            style={infoBtn}
-            onClick={() => setShowInfo(!showInfo)}
-          >
+          <button style={infoBtn} onClick={() => setShowInfo(!showInfo)}>
             ℹ️
           </button>
         </div>
 
         <div style={rowHeader}>
-          <span>Total Receivable</span>
+          <span>Total Pending Commission</span>
           <span style={{ color: "#22C55E", fontWeight: "700" }}>
             {totalReceivable} USDT
           </span>
@@ -118,24 +137,25 @@ export default function AssociateHome() {
 
         {showInfo && (
           <div style={infoBox}>
-            Commission is earned daily as a % of your referee’s ROI until their
-            package is fully flushed (~20 months).
+            You earn daily commission as a percentage of your team’s ROI,
+            continuing until each deposit package completes (~20 months).
           </div>
         )}
 
         {/* Table headings */}
         <div style={tableHeader}>
           <span>Referee</span>
-          <span>Investment</span>
+          <span>Deposit</span>
           <span>Commission</span>
         </div>
 
         {teamDeposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF" }}>No referrals yet</p>
+          <p style={{ color: "#9CA3AF" }}>You don’t have any referrals yet.</p>
         ) : (
           teamDeposits.map((d, idx) => {
             const total = d.commission_earned + d.commission_left;
-            const percent = total > 0 ? (d.commission_earned / total) * 100 : 0;
+            const percent =
+              total > 0 ? (d.commission_earned / total) * 100 : 0;
 
             return (
               <div key={idx} style={depositCard}>
@@ -143,12 +163,13 @@ export default function AssociateHome() {
                   <span>{d.referee_name}</span>
                   <span>{d.capital} USDT</span>
                   <span style={{ color: "#FACC15", fontWeight: "300" }}>
-                    Left: {d.commission_left} USDT
+                    Remaining: {d.commission_left} USDT
                   </span>
                 </div>
-                {/* Progress Bar */}
                 <div style={progressTrack}>
-                  <div style={{ ...progressFill, width: `${percent}%` }}></div>
+                  <div
+                    style={{ ...progressFill, width: `${percent}%` }}
+                  ></div>
                 </div>
                 <p style={progressText}>{percent.toFixed(2)}% earned</p>
               </div>
@@ -197,6 +218,12 @@ const inputStyle = {
   color: "#E5E7EB",
   fontSize: "14px",
   marginRight: "10px",
+};
+
+const helpText = {
+  marginTop: "8px",
+  fontSize: "12px",
+  color: "#9CA3AF",
 };
 
 const btnTeal = {
