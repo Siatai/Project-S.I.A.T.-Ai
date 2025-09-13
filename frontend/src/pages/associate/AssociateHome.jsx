@@ -223,6 +223,7 @@ const inputStyle = {
   color: "#E5E7EB",
   fontSize: "14px",
   marginRight: "10px",
+   textAlign: "center",
 };
 
 const helpText = {
