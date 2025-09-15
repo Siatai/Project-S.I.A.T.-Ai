@@ -269,7 +269,7 @@ def get_roi_config_public(db: Session = Depends(get_db), user=Depends(verify_tok
 # 🔹 Admin-only PUT (sirf tu update kar sakta hai)
 @router.put("/admin/roi")
 def update_roi_config(payload: dict, db: Session = Depends(get_db), user=Depends(verify_token)):
-    allowed_admin_email = "admin@algomcube.com.io"  # change to your admin email
+    allowed_admin_email = "admin@algomcube.com"  # change to your admin email
     user_email = getattr(user, "email", None) or user.get("email")
 
     if user_email != allowed_admin_email:

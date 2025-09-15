@@ -13,6 +13,7 @@ export default function AssociateHome() {
   const [roiMultiplier, setRoiMultiplier] = useState(2.0);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
+  const ADMIN_EMAIL = "admin@algomcube.com"; // 🔑 admin email
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,8 +25,8 @@ export default function AssociateHome() {
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        // 🟢 Only fetch deposits if NOT admin
-        if (res.data?.email && res.data.email !== "admin@algomcube.com") {
+        // 🟢 Fetch deposits only for non-admin
+        if (res.data?.email && res.data.email !== ADMIN_EMAIL) {
           const depRes = await axios.get(
             `${API}/investments?email=${res.data.email}`,
             { headers }
@@ -70,7 +71,14 @@ export default function AssociateHome() {
   if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px", maxWidth: "750px", margin: "0 auto" }}>
+    <div
+      style={{
+        color: "#E5E7EB",
+        padding: "20px",
+        maxWidth: "750px",
+        margin: "0 auto",
+      }}
+    >
       {/* ✅ Welcome Banner */}
       {commissionRate !== null && (
         <div style={bannerStyle}>
@@ -89,25 +97,37 @@ export default function AssociateHome() {
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Your Referral Code</h3>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <input type="text" value={user.referral_code} readOnly style={inputStyle} />
+          <input
+            type="text"
+            value={user.referral_code}
+            readOnly
+            style={inputStyle}
+          />
           <button onClick={copyReferral} style={btnTeal}>
             Copy
           </button>
         </div>
         <p style={helpText}>
-          Share this code with others. When copied, it will include the full referral link automatically.
+          Share this code with others. When copied, it will include the full
+          referral link automatically.
         </p>
       </div>
 
-      {/* Deposits Section with Tabs */}
-      {user.email !== "admin@algomcube.com" && (
+      {/* Deposits Section with Tabs (skip for admin) */}
+      {user.email !== ADMIN_EMAIL && (
         <div style={cardStyle}>
           {/* Tabs */}
           <div style={tabsWrapper}>
-            <button onClick={() => setActiveTab("my")} style={activeTab === "my" ? tabActive : tabInactive}>
+            <button
+              onClick={() => setActiveTab("my")}
+              style={activeTab === "my" ? tabActive : tabInactive}
+            >
               Deposits
             </button>
-            <button onClick={() => setActiveTab("referral")} style={activeTab === "referral" ? tabActive : tabInactive}>
+            <button
+              onClick={() => setActiveTab("referral")}
+              style={activeTab === "referral" ? tabActive : tabInactive}
+            >
               Referral Investments
             </button>
           </div>
@@ -120,7 +140,12 @@ export default function AssociateHome() {
                 <p style={{ color: "#9CA3AF" }}>No self-investments yet.</p>
               ) : (
                 myDeposits.map((d, idx) => (
-                  <DepositCard key={idx} data={d} multiplier={roiMultiplier} label="Self Invested" />
+                  <DepositCard
+                    key={idx}
+                    data={d}
+                    multiplier={roiMultiplier}
+                    label="Self Invested"
+                  />
                 ))
               )}
             </>
@@ -131,10 +156,17 @@ export default function AssociateHome() {
             <>
               <TotalBox title="Total Referral Deposits" deposits={referralDeposits} />
               {referralDeposits.length === 0 ? (
-                <p style={{ color: "#9CA3AF" }}>No referral-based deposits yet.</p>
+                <p style={{ color: "#9CA3AF" }}>
+                  No referral-based deposits yet.
+                </p>
               ) : (
                 referralDeposits.map((d, idx) => (
-                  <DepositCard key={idx} data={d} multiplier={roiMultiplier} label="Referral Based" />
+                  <DepositCard
+                    key={idx}
+                    data={d}
+                    multiplier={roiMultiplier}
+                    label="Referral Based"
+                  />
                 ))
               )}
             </>
@@ -144,9 +176,17 @@ export default function AssociateHome() {
 
       {/* Team Deposits */}
       <div style={cardStyle}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <h3 style={sectionTitle}>Team Deposits</h3>
-          <button style={infoBtn} onClick={() => setShowInfo(!showInfo)}>ℹ️</button>
+          <button style={infoBtn} onClick={() => setShowInfo(!showInfo)}>
+            ℹ️
+          </button>
         </div>
 
         <div style={rowHeader}>
@@ -158,7 +198,8 @@ export default function AssociateHome() {
 
         {showInfo && (
           <div style={infoBox}>
-            You earn daily commission as a percentage of your team’s ROI, continuing until each deposit package completes (~20 months).
+            You earn daily commission as a percentage of your team’s ROI,
+            continuing until each deposit package completes (~20 months).
           </div>
         )}
 
@@ -230,7 +271,9 @@ function DepositCard({ data, multiplier, label }) {
       <p style={progressText}>
         ROI: {roiReceived.toFixed(2)} / {maxReturn.toFixed(2)} USDT
       </p>
-      {unlockMsg && <p style={{ fontSize: "11px", color: "#FACC15" }}>{unlockMsg}</p>}
+      {unlockMsg && (
+        <p style={{ fontSize: "11px", color: "#FACC15" }}>{unlockMsg}</p>
+      )}
     </div>
   );
 }
@@ -246,22 +289,142 @@ function TotalBox({ title, deposits }) {
 }
 
 /* === Styles === */
-const bannerStyle = { background: "linear-gradient(135deg, #0f172a, #1e293b)", padding: "14px 18px", borderRadius: "10px", marginBottom: "20px", textAlign: "center", fontSize: "14px", fontWeight: "400", color: "#E5E7EB", boxShadow: "0 0 12px rgba(23,232,229,0.3)" };
-const cardStyle = { background: "rgba(17,24,39,0.85)", padding: "20px", borderRadius: "12px", marginBottom: "25px", boxShadow: "0 0 15px rgba(23,232,229,0.15)" };
-const sectionTitle = { fontSize: "16px", fontWeight: "600", color: "#17E8E5", marginBottom: "12px" };
-const inputStyle = { flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#E5E7EB", fontSize: "14px", marginRight: "10px", textAlign: "center" };
+const bannerStyle = {
+  background: "linear-gradient(135deg, #0f172a, #1e293b)",
+  padding: "14px 18px",
+  borderRadius: "10px",
+  marginBottom: "20px",
+  textAlign: "center",
+  fontSize: "14px",
+  fontWeight: "400",
+  color: "#E5E7EB",
+  boxShadow: "0 0 12px rgba(23,232,229,0.3)",
+};
+const cardStyle = {
+  background: "rgba(17,24,39,0.85)",
+  padding: "20px",
+  borderRadius: "12px",
+  marginBottom: "25px",
+  boxShadow: "0 0 15px rgba(23,232,229,0.15)",
+};
+const sectionTitle = {
+  fontSize: "16px",
+  fontWeight: "600",
+  color: "#17E8E5",
+  marginBottom: "12px",
+};
+const inputStyle = {
+  flex: 1,
+  padding: "10px",
+  borderRadius: "8px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  fontSize: "14px",
+  marginRight: "10px",
+  textAlign: "center",
+};
 const helpText = { marginTop: "8px", fontSize: "12px", color: "#9CA3AF" };
-const btnTeal = { padding: "10px 16px", border: "none", borderRadius: "8px", background: "linear-gradient(135deg,#17E8E5,#14B8A6)", color: "#0B1220", fontWeight: "700", cursor: "pointer", boxShadow: "0 0 10px rgba(23,232,229,0.3)" };
-const infoBtn = { background: "transparent", border: "none", color: "#60A5FA", fontSize: "18px", cursor: "pointer" };
-const infoBox = { background: "rgba(31,41,55,0.9)", padding: "12px", borderRadius: "8px", fontSize: "13px", color: "#D1D5DB", marginBottom: "12px" };
-const rowHeader = { display: "flex", justifyContent: "space-between", padding: "8px 0", fontWeight: "600", borderBottom: "1px solid rgba(255,255,255,0.1)", marginBottom: "10px" };
-const totalBox = { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", padding: "10px", borderRadius: "8px", background: "rgba(31,41,55,0.7)", fontWeight: "600" };
-const depositCard = { background: "rgba(15,23,42,0.9)", borderRadius: "10px", padding: "12px", marginBottom: "12px", boxShadow: "0 0 10px rgba(23,232,229,0.2)" };
-const rowGrid = { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", alignItems: "center", fontSize: "10px", marginBottom: "6px" };
-const progressTrack = { background: "#374151", borderRadius: "6px", overflow: "hidden", height: "8px", marginTop: "8px" };
-const progressFill = { background: "#17E8E5", height: "8px", transition: "width 0.5s ease" };
+const btnTeal = {
+  padding: "10px 16px",
+  border: "none",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg,#17E8E5,#14B8A6)",
+  color: "#0B1220",
+  fontWeight: "700",
+  cursor: "pointer",
+  boxShadow: "0 0 10px rgba(23,232,229,0.3)",
+};
+const infoBtn = {
+  background: "transparent",
+  border: "none",
+  color: "#60A5FA",
+  fontSize: "18px",
+  cursor: "pointer",
+};
+const infoBox = {
+  background: "rgba(31,41,55,0.9)",
+  padding: "12px",
+  borderRadius: "8px",
+  fontSize: "13px",
+  color: "#D1D5DB",
+  marginBottom: "12px",
+};
+const rowHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "8px 0",
+  fontWeight: "600",
+  borderBottom: "1px solid rgba(255,255,255,0.1)",
+  marginBottom: "10px",
+};
+const totalBox = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "15px",
+  padding: "10px",
+  borderRadius: "8px",
+  background: "rgba(31,41,55,0.7)",
+  fontWeight: "600",
+};
+const depositCard = {
+  background: "rgba(15,23,42,0.9)",
+  borderRadius: "10px",
+  padding: "12px",
+  marginBottom: "12px",
+  boxShadow: "0 0 10px rgba(23,232,229,0.2)",
+};
+const rowGrid = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  alignItems: "center",
+  fontSize: "10px",
+  marginBottom: "6px",
+};
+const progressTrack = {
+  background: "#374151",
+  borderRadius: "6px",
+  overflow: "hidden",
+  height: "8px",
+  marginTop: "8px",
+};
+const progressFill = {
+  background: "#17E8E5",
+  height: "8px",
+  transition: "width 0.5s ease",
+};
 const progressText = { fontSize: "11px", color: "#9CA3AF", marginTop: "4px" };
-const tabsWrapper = { display: "flex", marginBottom: "15px", borderBottom: "2px solid #1F2937" };
-const tabActive = { flex: 1, padding: "12px", border: "none", borderBottom: "3px solid #17E8E5", background: "transparent", color: "#17E8E5", fontWeight: "700", cursor: "pointer" };
-const tabInactive = { flex: 1, padding: "12px", border: "none", borderBottom: "3px solid transparent", background: "transparent", color: "#9CA3AF", fontWeight: "600", cursor: "pointer" };
-const tableHeader = { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", fontWeight: "600", fontSize: "14px", color: "#9CA3AF", margin: "10px 0" };
+const tabsWrapper = {
+  display: "flex",
+  marginBottom: "15px",
+  borderBottom: "2px solid #1F2937",
+};
+const tabActive = {
+  flex: 1,
+  padding: "12px",
+  border: "none",
+  borderBottom: "3px solid #17E8E5",
+  background: "transparent",
+  color: "#17E8E5",
+  fontWeight: "700",
+  cursor: "pointer",
+};
+const tabInactive = {
+  flex: 1,
+  padding: "12px",
+  border: "none",
+  borderBottom: "3px solid transparent",
+  background: "transparent",
+  color: "#9CA3AF",
+  fontWeight: "600",
+  cursor: "pointer",
+};
+const tableHeader = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  fontWeight: "600",
+  fontSize: "14px",
+  color: "#9CA3AF",
+  margin: "10px 0",
+};
