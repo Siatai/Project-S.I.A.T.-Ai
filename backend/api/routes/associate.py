@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
 
-from db import get_db
+from backend.db import get_db
 from backend.models.user_model import User
 from backend.models.withdrawal_model import Investment
 from backend.models.associate_config_model import AssociateConfig
