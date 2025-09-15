@@ -48,13 +48,14 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
     daily_roi_percentage = monthly_roi_percentage / 30  # % per day
     max_multiplier = roi_config.max_roi_multiplier if hasattr(roi_config, "max_roi_multiplier") else 2.0
 
-    # COMMISSION CONFIG
+    # COMMISSION CONFIG (for ROI commissions, not associate deposits)
     commission_config = db.query(CommissionConfig).first()
     commission_percentage = commission_config.percentage if commission_config else 0.0
 
     credited = []
     referral_earnings = []
 
+    # ✅ Loop through ALL investments (normal + associate)
     investments = db.query(Investment).all()
     for inv in investments:
         user = db.query(User).filter_by(email=inv.user_email).first()
@@ -83,7 +84,7 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
         if total_profit > remaining_cap:
             total_profit = remaining_cap
 
-        # Update investor wallet & ROI received
+        # Update wallet + investment ROI
         user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
         inv.roi_received = roi_received + total_profit
         inv.last_roi_date = today
@@ -96,11 +97,12 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
             "roi_received": round(inv.roi_received, 2),
             "max_return": round(max_return, 2),
             "flushed": inv.roi_received >= max_return,
-            "force_mode": force
+            "force_mode": force,
+            "is_associate": inv.is_associate
         })
 
-        # ✅ Referral Commission
-        if user.referred_by and total_profit > 0:
+        # ✅ Referral Commission (ONLY for normal investor deposits, not associate ones)
+        if not inv.is_associate and user.referred_by and total_profit > 0:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
             if referrer:
                 commission_amount = total_profit * (commission_percentage / 100)

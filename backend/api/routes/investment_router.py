@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint
 from sqlalchemy import func
 from db import get_db
@@ -131,10 +131,19 @@ def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
         return {"message": "Transaction already recorded."}
 
     timestamp = datetime.utcnow()
-    inv = Investment(user_email=user.email, amount=data.amount, timestamp=timestamp, tx_hash=data.tx_hash)
+    inv = Investment(
+        user_email=user.email,
+        amount=data.amount,
+        timestamp=timestamp,
+        tx_hash=data.tx_hash
+    )
     db.add(inv)
 
-    # ───── One-Level Commission Logic ─────
+    # Track if associate deposit was created
+    associate_deposit_created = False
+    associate_deposit_id = None
+
+    # ───── Existing One-Level Commission Logic (KEEP) ─────
     if user.referred_by:
         referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
         config = db.query(CommissionConfig).first()
@@ -153,12 +162,36 @@ def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
             )
             db.add(earning)
 
+            # ───── NEW Associate Deposit Add-on ─────
+            from models.associate_config_model import AssociateConfig
+            assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+
+            if assoc_cfg:
+                assoc_amount = round(data.amount * (assoc_cfg.referral_percent / 100), 2)
+                assoc_dep = Investment(
+                    user_email=referrer.email,
+                    amount=assoc_amount,
+                    is_associate=True,
+                    source_investor=user.email,
+                    lock_days=assoc_cfg.lock_days,
+                    matured_at=datetime.utcnow() + timedelta(days=assoc_cfg.lock_days)
+                )
+                db.add(assoc_dep)
+                db.flush()  # get assoc_dep.id before commit
+                associate_deposit_created = True
+                associate_deposit_id = assoc_dep.id
+
     try:
         db.commit()
-        return {"message": f"Investment recorded for {user.email}"}
+        return {
+            "message": f"Investment recorded for {user.email}",
+            "associate_deposit_created": associate_deposit_created,
+            "associate_deposit_id": associate_deposit_id
+        }
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Duplicate transaction hash")
+
 
 
 @router.get("/check-deposit")
