@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from db import Base, DATABASE_URL
 
 # Import all models so Alembic sees them
-from models import user_model, commission_model, referral_model, roi_model, withdrawal_model
+from models import user_model, commission_model, referral_model, roi_model, withdrawal_model, associate_config_model
 # (user_logic.py is not a model, so skip it)
 
 # Alembic Config object, provides access to .ini values
