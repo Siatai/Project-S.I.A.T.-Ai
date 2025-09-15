@@ -21,13 +21,15 @@ app.add_middleware(
 )
 
 # ✅ Register routers (order doesn’t matter)
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(auth_router, )
 
-app.include_router(investment_router, prefix="/investments", tags=["Investments"])
+app.include_router(investment_router)
 
-app.include_router(associate_router, prefix="/associate", tags=["Associates"])
+app.include_router(associate_router)
 
 # ✅ Root endpoint
 @app.get("/", tags=["Root"])
 def root():
     return {"message": "Welcome to Project S-I-A-T-AI API"}
+print(app.routes)
+
