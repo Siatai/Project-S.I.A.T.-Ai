@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
 
-from backend.db import get_db
-from backend.models.user_model import User
-from backend.models.withdrawal_model import Investment
-from backend.models.associate_config_model import AssociateConfig
+from db import get_db
+from models.user_model import User
+from models.withdrawal_model import Investment
+from models.associate_config_model import AssociateConfig
 from utils.auth_middleware import verify_token
 
 router = APIRouter(prefix="/associate", tags=["Associate"])
