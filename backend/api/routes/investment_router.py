@@ -249,14 +249,8 @@ def get_all_investments_with_users(db: Session = Depends(get_db), user=Depends(v
 # 📌 ROI CONFIG + CREDIT
 # ────────────────────────────────
 
-@router.get("/admin/roi")
-def get_roi_config(db: Session = Depends(get_db), user=Depends(verify_token)):
-    # ✅ Allow only specific email instead of role
-    allowed_admin_email = "r.singhbundela@gmail.com"  # change to your actual admin email
-    
-    if user.get("email") != allowed_admin_email:
-        raise HTTPException(status_code=403, detail="Admin email required")
-
+@router.get("/roi")
+def get_roi_config_public(db: Session = Depends(get_db), user=Depends(verify_token)):
     roi = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
     return {
         "percentage": roi.percentage if roi else 0.0,
@@ -264,21 +258,23 @@ def get_roi_config(db: Session = Depends(get_db), user=Depends(verify_token)):
     }
 
 
-@router.post("/admin/roi")
-def set_roi_config(data: ROIConfigPayload, db: Session = Depends(get_db), user=Depends(verify_token)):
-    if not user.get("is_admin"):
-        raise HTTPException(status_code=403, detail="Admin only")
+# ✅ Admin-only (for updates)
+@router.put("/admin/roi")
+def update_roi_config(payload: dict, db: Session = Depends(get_db), user=Depends(verify_token)):
+    allowed_admin_email = "r.singhbundela@gmail.com"
+    user_email = getattr(user, "email", None) or user.get("email")
 
-    roi = db.query(ROIConfig).first()
-    if not roi:
-        roi = ROIConfig(percentage=data.percentage, max_roi_multiplier=2.0)
-        db.add(roi)
-    else:
-        roi.percentage = data.percentage
+    if user_email != allowed_admin_email:
+        raise HTTPException(status_code=403, detail="Admin email required")
+
+    roi = ROIConfig(
+        percentage=payload.get("percentage", 0.0),
+        max_roi_multiplier=payload.get("max_roi_multiplier", 2.0)
+    )
+    db.add(roi)
     db.commit()
     db.refresh(roi)
-    return {"message": "ROI config updated", "percentage": roi.percentage, "max_roi_multiplier": roi.max_roi_multiplier}
-
+    return roi
 
 
 
