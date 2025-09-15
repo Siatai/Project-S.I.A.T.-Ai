@@ -207,6 +207,42 @@ def check_deposit(email: str, db: Session = Depends(get_db)):
     return {"found": False}
 
 
+@router.get("/investments")
+def get_investments(email: str, db: Session = Depends(get_db)):
+    investments = (
+        db.query(Investment)
+        .filter_by(user_email=email)
+        .order_by(Investment.timestamp.desc())
+        .all()
+    )
+
+    return [
+        {
+            "amount": inv.amount,
+            "timestamp": inv.timestamp,
+            "tx_hash": inv.tx_hash
+        }
+        for inv in investments
+    ]
+
+
+@router.get("/admin/investments")
+def get_all_investments_with_users(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    investments = db.query(Investment).order_by(Investment.timestamp.desc()).all()
+    result = []
+    for inv in investments:
+        u = db.query(User).filter_by(email=inv.user_email).first()
+        result.append({
+            "email": inv.user_email,
+            "name": u.name if u else "-",
+            "amount": inv.amount,
+            "timestamp": inv.timestamp,
+            "tx_hash": inv.tx_hash,
+        })
+    return result
 
 
 # ────────────────────────────────
