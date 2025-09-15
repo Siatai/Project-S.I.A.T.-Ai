@@ -571,38 +571,56 @@ def get_financial_summary(db: Session = Depends(get_db), user=Depends(verify_tok
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin only")
 
-    # Total Deposits
-    total_deposits = db.query(func.sum(Investment.amount)).scalar() or 0
+    # Investor deposits
+    investor_deposits = db.query(func.sum(Investment.amount))\
+        .filter(Investment.is_associate == False).scalar() or 0
 
-    # Total Commission Paid
+    # Associate deposits
+    associate_total = db.query(func.sum(Investment.amount))\
+        .filter(Investment.is_associate == True).scalar() or 0
+
+    associate_locked = db.query(func.sum(Investment.amount))\
+        .filter(Investment.is_associate == True,
+                Investment.flushed == False,
+                Investment.matured_at > datetime.utcnow()).scalar() or 0
+
+    associate_matured = db.query(func.sum(Investment.amount))\
+        .filter(Investment.is_associate == True,
+                Investment.flushed == False,
+                Investment.matured_at <= datetime.utcnow()).scalar() or 0
+
+    associate_withdrawn = db.query(func.sum(Investment.amount))\
+        .filter(Investment.is_associate == True,
+                Investment.flushed == True).scalar() or 0
+
+    # Totals
+    total_deposits = investor_deposits + associate_total
+
+    # Global commissions (ROI referral commissions)
     total_commissions = db.query(func.sum(ReferralEarning.commission_amount)).scalar() or 0
 
-    # Total Withdrawals
+    # Global withdrawals (shared for both investors & associates)
     total_withdrawals = db.query(func.sum(Withdrawal.final_amount)).scalar() or 0
 
-    # Total Wallet Balances (handle NULLs safely)
+    # Total wallet balances (current live balances)
     total_wallet_balances = db.query(func.sum(User.wallet_balance)).scalar() or 0
 
-    # ROI Distributed = balances + withdrawals - commissions
-    total_roi = total_wallet_balances + total_withdrawals - total_commissions
-
-    # User payout list
-    users = db.query(User).all()
-    user_payouts = [
-        {
-            "name": u.name,
-            "email": u.email,
-            "wallet": u.wallet,
-            "wallet_balance": round(u.wallet_balance or 0.0, 2)  # ✅ fix
-        }
-        for u in users
-    ]
-
     return {
-        "total_deposits": round(total_deposits, 2),
-        "total_commissions": round(total_commissions, 2),
-        "total_roi_distributed": round(total_roi, 2),
-        "user_payouts": user_payouts
+        "investors": {
+            "total_deposits": round(investor_deposits, 2),
+        },
+        "associates": {
+            "total_deposits": round(associate_total, 2),
+            "locked": round(associate_locked, 2),
+            "matured": round(associate_matured, 2),
+            "withdrawn_or_reinvested": round(associate_withdrawn, 2),
+        },
+        "global": {
+            "total_commissions": round(total_commissions, 2),
+            "total_withdrawals": round(total_withdrawals, 2),
+            "wallet_balances": round(total_wallet_balances, 2),
+            "total_deposits": round(total_deposits, 2),
+        }
     }
 
     

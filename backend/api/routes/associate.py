@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from datetime import datetime, timedelta
 
 from db import get_db
@@ -191,3 +192,40 @@ def get_my_associate_deposits(user=Depends(verify_token), db: Session = Depends(
         })
 
     return result
+@router.get("/admin/config")
+def get_associate_config(db: Session = Depends(get_db), admin=Depends(verify_token)):
+    if not getattr(admin, "is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+    if not config:
+        return {"referral_percent": 0, "lock_days": 0}
+
+    return {
+        "referral_percent": float(config.referral_percent),
+        "lock_days": config.lock_days,
+        "updated_at": config.updated_at
+    }
+
+
+@router.get("/admin/summary")
+def get_associate_summary(db: Session = Depends(get_db), admin=Depends(verify_token)):
+    if not getattr(admin, "is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    total = db.query(func.sum(Investment.amount)).filter(Investment.is_associate == True).scalar() or 0
+    matured = db.query(func.sum(Investment.amount)).filter(
+        Investment.is_associate == True,
+        Investment.matured_at <= datetime.utcnow(),
+        Investment.flushed == False
+    ).scalar() or 0
+    withdrawn = db.query(func.sum(Investment.amount)).filter(
+        Investment.is_associate == True,
+        Investment.flushed == True
+    ).scalar() or 0
+
+    return {
+        "total_associate_deposits": round(total, 2),
+        "total_matured": round(matured, 2),
+        "total_withdrawn_or_reinvested": round(withdrawn, 2)
+    }
