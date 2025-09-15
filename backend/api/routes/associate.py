@@ -11,7 +11,6 @@ from utils.auth_middleware import verify_token
 
 router = APIRouter(prefix="/associate", tags=["Associate"])
 
-
 # ────────────────────────────────
 # 📌 SCHEMAS
 # ────────────────────────────────
@@ -85,7 +84,6 @@ def withdraw_associate_deposit(deposit_id: int, db: Session = Depends(get_db), u
     dep.flushed = True
     db.commit()
 
-    # Here you’d trigger actual withdrawal logic (e.g., to TRC20 wallet)
     return ActionResponse(
         message="Deposit withdrawn successfully",
         amount=payout_amount,
@@ -142,12 +140,7 @@ def update_associate_config(
     db: Session = Depends(get_db), 
     user=Depends(verify_token)
 ):
-    """Update referral percent and lock days (owner only)."""
-
-    # If you want to still hardcheck your email explicitly:
-    # if user["email"].lower() != "your-admin@email.com":
-    #     raise HTTPException(status_code=403, detail="Not allowed")
-
+    """Update referral percent and lock days (now open)."""
     config = AssociateConfig(
         referral_percent=payload.referral_percent,
         lock_days=payload.lock_days
@@ -160,7 +153,6 @@ def update_associate_config(
         referral_percent=config.referral_percent,
         lock_days=config.lock_days
     )
-
 
 
 @router.get("/my-deposits")
@@ -198,11 +190,11 @@ def get_my_associate_deposits(user=Depends(verify_token), db: Session = Depends(
         })
 
     return result
-@router.get("/admin/config")
-def get_associate_config(db: Session = Depends(get_db), admin=Depends(verify_token)):
-    if not getattr(admin, "is_admin", False):
-        raise HTTPException(status_code=403, detail="Admin access required")
 
+
+@router.get("/admin/config")
+def get_associate_config(db: Session = Depends(get_db), user=Depends(verify_token)):
+    """Fetch latest associate config (no admin restriction)."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
         return {"referral_percent": 0, "lock_days": 0}
@@ -215,10 +207,8 @@ def get_associate_config(db: Session = Depends(get_db), admin=Depends(verify_tok
 
 
 @router.get("/admin/summary")
-def get_associate_summary(db: Session = Depends(get_db), admin=Depends(verify_token)):
-    if not getattr(admin, "is_admin", False):
-        raise HTTPException(status_code=403, detail="Admin access required")
-
+def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_token)):
+    """Fetch associate deposit summary (no admin restriction)."""
     total = db.query(func.sum(Investment.amount)).filter(Investment.is_associate == True).scalar() or 0
     matured = db.query(func.sum(Investment.amount)).filter(
         Investment.is_associate == True,
@@ -239,9 +229,7 @@ def get_associate_summary(db: Session = Depends(get_db), admin=Depends(verify_to
 
 @router.post("/admin/backfill-associates")
 def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
-    if not user.get("is_admin"):
-        raise HTTPException(status_code=403, detail="Admin only")
-
+    """Backfill referral-based associate deposits (no admin restriction)."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
         raise HTTPException(status_code=400, detail="No associate config set")
