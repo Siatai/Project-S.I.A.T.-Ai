@@ -229,3 +229,53 @@ def get_associate_summary(db: Session = Depends(get_db), admin=Depends(verify_to
         "total_matured": round(matured, 2),
         "total_withdrawn_or_reinvested": round(withdrawn, 2)
     }
+
+
+@router.post("/admin/backfill-associates")
+def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+    if not config:
+        raise HTTPException(status_code=400, detail="No associate config set")
+
+    referral_percent = config.referral_percent
+    lock_days = config.lock_days
+    created_count = 0
+
+    # loop all normal investor deposits
+    investors = db.query(Investment).filter(Investment.is_associate == False).all()
+
+    for inv in investors:
+        db_user = db.query(User).filter_by(email=inv.user_email).first()
+        if not db_user or not db_user.referred_by:
+            continue
+
+        referrer = db.query(User).filter_by(referral_code=db_user.referred_by).first()
+        if not referrer:
+            continue
+
+        # check if an associate deposit already exists for this investor+tx
+        exists = db.query(Investment).filter(
+            Investment.is_associate == True,
+            Investment.source_investor == db_user.email,
+            Investment.tx_hash == inv.tx_hash
+        ).first()
+        if exists:
+            continue
+
+        assoc_amount = round(inv.amount * (float(referral_percent) / 100), 2)
+        assoc_dep = Investment(
+            user_email=referrer.email,
+            amount=assoc_amount,
+            is_associate=True,
+            source_investor=db_user.email,
+            lock_days=lock_days,
+            matured_at=datetime.utcnow() + timedelta(days=lock_days)
+        )
+        db.add(assoc_dep)
+        created_count += 1
+
+    db.commit()
+    return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}

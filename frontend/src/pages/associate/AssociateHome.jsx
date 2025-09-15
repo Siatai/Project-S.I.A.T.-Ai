@@ -7,6 +7,7 @@ export default function AssociateHome() {
   const [totalReceivable, setTotalReceivable] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
   const [myDeposits, setMyDeposits] = useState([]);
+  const [associateDeposits, setAssociateDeposits] = useState([]);
   const [commissionRate, setCommissionRate] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
@@ -21,7 +22,7 @@ export default function AssociateHome() {
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        // My deposits
+        // My deposits (regular investor deposits)
         if (res.data?.email) {
           const depRes = await axios.get(
             `${API}/investments?email=${res.data.email}`,
@@ -29,6 +30,12 @@ export default function AssociateHome() {
           );
           setMyDeposits(depRes.data || []);
         }
+
+        // My associate deposits (locked/matured/withdrawn)
+        const assocRes = await axios.get(`${API}/associate/my-deposits`, {
+          headers,
+        });
+        setAssociateDeposits(assocRes.data || []);
 
         // Team deposits & commission progress
         const teamRes = await axios.get(`${API}/associate-roi-status`, {
@@ -86,26 +93,19 @@ export default function AssociateHome() {
       <div style={cardStyle}>
         <h3 style={sectionTitle}>Your Referral Code</h3>
         <div style={{ display: "flex", alignItems: "center" }}>
-          {/* Only show referral code */}
-          <input
-            type="text"
-            value={user.referral_code}
-            readOnly
-            style={inputStyle}
-          />
+          <input type="text" value={user.referral_code} readOnly style={inputStyle} />
           <button onClick={copyReferral} style={btnTeal}>
             Copy
           </button>
         </div>
         <p style={helpText}>
-          Share this code with others. When copied, it will include the full
-          referral link automatically.
+          Share this code with others. When copied, it will include the full referral link automatically.
         </p>
       </div>
 
-      {/* My Deposits */}
+      {/* Investor Deposits */}
       <div style={cardStyle}>
-        <h3 style={sectionTitle}>My Deposits</h3>
+        <h3 style={sectionTitle}>My Investor Deposits</h3>
         {myDeposits.length === 0 ? (
           <p style={{ color: "#9CA3AF" }}>You have not made any deposits yet.</p>
         ) : (
@@ -118,15 +118,25 @@ export default function AssociateHome() {
         )}
       </div>
 
+      {/* Associate Deposits */}
+      <div style={cardStyle}>
+        <h3 style={sectionTitle}>My Associate Deposits</h3>
+        {associateDeposits.length === 0 ? (
+          <p style={{ color: "#9CA3AF" }}>You don’t have any associate deposits yet.</p>
+        ) : (
+          associateDeposits.map((d, idx) => (
+            <div key={idx} style={glowRow}>
+              <span>{d.amount} USDT</span>
+              <span>{d.status}</span>
+              <span>{new Date(d.timestamp).toLocaleDateString()}</span>
+            </div>
+          ))
+        )}
+      </div>
+
       {/* Team Deposits */}
       <div style={cardStyle}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h3 style={sectionTitle}>Team Deposits</h3>
           <button style={infoBtn} onClick={() => setShowInfo(!showInfo)}>
             ℹ️
@@ -142,12 +152,10 @@ export default function AssociateHome() {
 
         {showInfo && (
           <div style={infoBox}>
-            You earn daily commission as a percentage of your team’s ROI,
-            continuing until each deposit package completes (~20 months).
+            You earn daily commission as a percentage of your team’s ROI, continuing until each deposit package completes (~20 months).
           </div>
         )}
 
-        {/* Table headings */}
         <div style={tableHeader}>
           <span>Referee</span>
           <span>Deposit</span>
@@ -159,8 +167,7 @@ export default function AssociateHome() {
         ) : (
           teamDeposits.map((d, idx) => {
             const total = d.commission_earned + d.commission_left;
-            const percent =
-              total > 0 ? (d.commission_earned / total) * 100 : 0;
+            const percent = total > 0 ? (d.commission_earned / total) * 100 : 0;
 
             return (
               <div key={idx} style={depositCard}>
@@ -172,9 +179,7 @@ export default function AssociateHome() {
                   </span>
                 </div>
                 <div style={progressTrack}>
-                  <div
-                    style={{ ...progressFill, width: `${percent}%` }}
-                  ></div>
+                  <div style={{ ...progressFill, width: `${percent}%` }}></div>
                 </div>
                 <p style={progressText}>{percent.toFixed(2)}% earned</p>
               </div>
@@ -223,7 +228,7 @@ const inputStyle = {
   color: "#E5E7EB",
   fontSize: "14px",
   marginRight: "10px",
-   textAlign: "center",
+  textAlign: "center",
 };
 
 const helpText = {
