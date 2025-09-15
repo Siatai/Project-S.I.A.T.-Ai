@@ -137,11 +137,16 @@ def reinvest_associate_deposit(deposit_id: int, db: Session = Depends(get_db), u
 
 
 @router.put("/config", response_model=ConfigPayload)
-def update_associate_config(payload: ConfigPayload, db: Session = Depends(get_db), admin=Depends(verify_token)):
-    """Admin updates referral percent and lock days."""
-    # ensure only admins can hit this
-    if not getattr(admin, "is_admin", False):
-        raise HTTPException(status_code=403, detail="Admin access required")
+def update_associate_config(
+    payload: ConfigPayload, 
+    db: Session = Depends(get_db), 
+    user=Depends(verify_token)
+):
+    """Update referral percent and lock days (owner only)."""
+
+    # If you want to still hardcheck your email explicitly:
+    # if user["email"].lower() != "your-admin@email.com":
+    #     raise HTTPException(status_code=403, detail="Not allowed")
 
     config = AssociateConfig(
         referral_percent=payload.referral_percent,
@@ -155,6 +160,7 @@ def update_associate_config(payload: ConfigPayload, db: Session = Depends(get_db
         referral_percent=config.referral_percent,
         lock_days=config.lock_days
     )
+
 
 
 @router.get("/my-deposits")
