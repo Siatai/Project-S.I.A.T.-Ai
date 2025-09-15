@@ -251,13 +251,18 @@ def get_all_investments_with_users(db: Session = Depends(get_db), user=Depends(v
 
 @router.get("/admin/roi")
 def get_roi_config(db: Session = Depends(get_db), user=Depends(verify_token)):
-    if not user.get("is_admin"):
-        raise HTTPException(status_code=403, detail="Admin only")
+    # ✅ Allow only specific email instead of role
+    allowed_admin_email = "r.singhbundela@gmail.com"  # change to your actual admin email
+    
+    if user.get("email") != allowed_admin_email:
+        raise HTTPException(status_code=403, detail="Admin email required")
+
     roi = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
     return {
         "percentage": roi.percentage if roi else 0.0,
         "max_roi_multiplier": roi.max_roi_multiplier if roi else 2.0
     }
+
 
 @router.post("/admin/roi")
 def set_roi_config(data: ROIConfigPayload, db: Session = Depends(get_db), user=Depends(verify_token)):
