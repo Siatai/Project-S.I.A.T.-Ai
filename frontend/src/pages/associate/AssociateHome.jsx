@@ -20,12 +20,12 @@ export default function AssociateHome() {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        // User info
+        // 🟢 User info
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        // All deposits
-        if (res.data?.email) {
+        // 🟢 Only fetch deposits if NOT admin
+        if (res.data?.email && res.data.email !== "admin@algomcube.com") {
           const depRes = await axios.get(
             `${API}/investments?email=${res.data.email}`,
             { headers }
@@ -35,21 +35,21 @@ export default function AssociateHome() {
           setReferralDeposits(all.filter((d) => d.is_associate));
         }
 
-        // Team deposits
+        // 🟢 Team deposits
         const teamRes = await axios.get(`${API}/associate-roi-status`, {
           headers,
         });
         setTeamDeposits(teamRes.data.details || []);
         setTotalReceivable(teamRes.data.total_commission_left || 0);
 
-        // Commission %
+        // 🟢 Commission %
         const commRes = await axios.get(`${API}/commission-percent`, {
           headers,
         });
         setCommissionRate(commRes.data.commission_percent || 0);
 
-        // ROI Config
-        const roiRes = await axios.get(`${API}/admin/roi`, { headers });
+        // 🟢 ROI Config
+        const roiRes = await axios.get(`${API}/roi`, { headers });
         if (roiRes.data?.max_roi_multiplier)
           setRoiMultiplier(roiRes.data.max_roi_multiplier);
       } catch (err) {
@@ -100,45 +100,47 @@ export default function AssociateHome() {
       </div>
 
       {/* Deposits Section with Tabs */}
-      <div style={cardStyle}>
-        {/* Tabs */}
-        <div style={tabsWrapper}>
-          <button onClick={() => setActiveTab("my")} style={activeTab === "my" ? tabActive : tabInactive}>
-            Deposits
-          </button>
-          <button onClick={() => setActiveTab("referral")} style={activeTab === "referral" ? tabActive : tabInactive}>
-            Referral Investments
-          </button>
+      {user.email !== "admin@algomcube.com" && (
+        <div style={cardStyle}>
+          {/* Tabs */}
+          <div style={tabsWrapper}>
+            <button onClick={() => setActiveTab("my")} style={activeTab === "my" ? tabActive : tabInactive}>
+              Deposits
+            </button>
+            <button onClick={() => setActiveTab("referral")} style={activeTab === "referral" ? tabActive : tabInactive}>
+              Referral Investments
+            </button>
+          </div>
+
+          {/* My Deposits */}
+          {activeTab === "my" && (
+            <>
+              <TotalBox title="Total Deposits" deposits={myDeposits} />
+              {myDeposits.length === 0 ? (
+                <p style={{ color: "#9CA3AF" }}>No self-investments yet.</p>
+              ) : (
+                myDeposits.map((d, idx) => (
+                  <DepositCard key={idx} data={d} multiplier={roiMultiplier} label="Self Invested" />
+                ))
+              )}
+            </>
+          )}
+
+          {/* Referral Deposits */}
+          {activeTab === "referral" && (
+            <>
+              <TotalBox title="Total Referral Deposits" deposits={referralDeposits} />
+              {referralDeposits.length === 0 ? (
+                <p style={{ color: "#9CA3AF" }}>No referral-based deposits yet.</p>
+              ) : (
+                referralDeposits.map((d, idx) => (
+                  <DepositCard key={idx} data={d} multiplier={roiMultiplier} label="Referral Based" />
+                ))
+              )}
+            </>
+          )}
         </div>
-
-        {/* My Deposits */}
-        {activeTab === "my" && (
-          <>
-            <TotalBox title="Total Deposits" deposits={myDeposits} />
-            {myDeposits.length === 0 ? (
-              <p style={{ color: "#9CA3AF" }}>No self-investments yet.</p>
-            ) : (
-              myDeposits.map((d, idx) => (
-                <DepositCard key={idx} data={d} multiplier={roiMultiplier} label="Self Invested" />
-              ))
-            )}
-          </>
-        )}
-
-        {/* Referral Deposits */}
-        {activeTab === "referral" && (
-          <>
-            <TotalBox title="Total Referral Deposits" deposits={referralDeposits} />
-            {referralDeposits.length === 0 ? (
-              <p style={{ color: "#9CA3AF" }}>No referral-based deposits yet.</p>
-            ) : (
-              referralDeposits.map((d, idx) => (
-                <DepositCard key={idx} data={d} multiplier={roiMultiplier} label="Referral Based" />
-              ))
-            )}
-          </>
-        )}
-      </div>
+      )}
 
       {/* Team Deposits */}
       <div style={cardStyle}>
