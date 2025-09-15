@@ -249,6 +249,15 @@ def get_all_investments_with_users(db: Session = Depends(get_db), user=Depends(v
 # 📌 ROI CONFIG + CREDIT
 # ────────────────────────────────
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from db import get_db
+from models.roi_model import ROIConfig
+from utils.auth_middleware import verify_token
+
+router = APIRouter()
+
+# 🔹 Public GET (sab users dekh sakte hain)
 @router.get("/roi")
 def get_roi_config_public(db: Session = Depends(get_db), user=Depends(verify_token)):
     roi = db.query(ROIConfig).order_by(ROIConfig.id.desc()).first()
@@ -257,11 +266,10 @@ def get_roi_config_public(db: Session = Depends(get_db), user=Depends(verify_tok
         "max_roi_multiplier": roi.max_roi_multiplier if roi else 2.0
     }
 
-
-# ✅ Admin-only (for updates)
+# 🔹 Admin-only PUT (sirf tu update kar sakta hai)
 @router.put("/admin/roi")
 def update_roi_config(payload: dict, db: Session = Depends(get_db), user=Depends(verify_token)):
-    allowed_admin_email = "r.singhbundela@gmail.com"
+    allowed_admin_email = "admin@algomcube.com.io"  # change to your admin email
     user_email = getattr(user, "email", None) or user.get("email")
 
     if user_email != allowed_admin_email:
