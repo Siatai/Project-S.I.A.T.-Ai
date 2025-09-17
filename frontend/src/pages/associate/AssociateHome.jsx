@@ -16,6 +16,12 @@ export default function AssociateHome() {
   const ADMIN_EMAIL = "admin@algomcube.com";
 
   useEffect(() => {
+    // ✅ Apply global dark background + reset margins inline
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -148,9 +154,6 @@ function ProgressBar({ percent }) {
 
 /* === Styles === */
 const pageWrapper = {
-  margin: 0,
-  padding: 0,
-  background: "#0f172a",
   minHeight: "100vh",
   width: "100%",
   overflowX: "hidden",
@@ -164,6 +167,8 @@ const mainContent = {
   padding: "20px",
   marginTop: "80px",
   marginBottom: "70px",
+  marginleft: "15px" ,
+  marginright: "15px",
   width: "100%",
   display: "flex",
   justifyContent: "center",
@@ -173,6 +178,7 @@ const haloBox = {
   width: "100%",
   maxWidth: "420px",
   padding: "20px",
+  margin: "0 20px",
   borderRadius: "20px",
   background: "rgba(15,23,42,0.85)",
   boxShadow:
@@ -182,8 +188,10 @@ const haloBox = {
 const cardStyle3D = {
   background: "linear-gradient(145deg,#1E293B,#0F172A)",
   padding: "16px",
+  
   borderRadius: "14px",
   marginBottom: "18px",
+
   boxShadow:
     "5px 5px 15px rgba(0,0,0,0.7), -5px -5px 15px rgba(255,255,255,0.05)",
 };
