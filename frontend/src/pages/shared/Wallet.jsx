@@ -10,57 +10,57 @@ export default function Wallet() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // ✅ Decode email from JWT token
-  let email = "";
-  if (token) {
-    try {
-      email = JSON.parse(atob(token.split(".")[1])).email;
-    } catch (e) {
-      console.error("Error decoding token:", e);
-    }
-  }
-
-  // ✅ Fetch wallet on load
+  // ✅ Fetch wallet only
   useEffect(() => {
-    const fetchWallet = async () => {
+    const fetchWalletSummary = async () => {
       try {
-        const res = await axios.get(`${API}/user-info`, {
-          params: { email },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers = { Authorization: `Bearer ${token}` };
+        const res = await axios.get(`${API}/wallet/summary`, { headers });
+
         if (res.data.wallet) {
           setWallet(res.data.wallet);
           setSaved(true);
         }
       } catch (err) {
-        console.error("Error fetching wallet:", err);
-        setPopupMessage({ type: "error", text: "❌ Failed to fetch wallet info." });
+        console.error("Error fetching wallet summary:", err);
+        setPopupMessage({
+          type: "error",
+          text: "❌ Failed to fetch wallet info.",
+        });
       } finally {
         setLoading(false);
       }
     };
-    if (email) fetchWallet();
-  }, [token, email]);
+
+    if (token) fetchWalletSummary();
+  }, [token]);
 
   // ✅ Save wallet
   const saveWallet = async () => {
     if (!wallet.trim()) {
-      setPopupMessage({ type: "error", text: "⚠️ Please enter a valid TRC20 address." });
+      setPopupMessage({
+        type: "error",
+        text: "⚠️ Please enter a valid TRC20 address.",
+      });
       return;
     }
     try {
+      const headers = { Authorization: `Bearer ${token}` };
       await axios.post(
         `${API}/save-wallet`,
-        { email, wallet },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { wallet }, // ✅ backend uses token for user
+        { headers }
       );
       setSaved(true);
-      setPopupMessage({ type: "success", text: "✅ Wallet saved successfully!" });
+      setPopupMessage({
+        type: "success",
+        text: "✅ Wallet saved successfully!",
+      });
     } catch (err) {
       console.error("Error saving wallet:", err);
       if (
         err?.response?.data?.detail &&
-        err.response.data.detail.toLowerCase().includes("duplicate")
+        err.response.data.detail.toLowerCase().includes("bound")
       ) {
         setPopupMessage({
           type: "error",
@@ -119,9 +119,8 @@ export default function Wallet() {
             Bound TRC20 Wallet:
           </p>
           <p style={walletBox}>{wallet}</p>
-          <div style={glowLine} />
 
-          {/* 🔹 Strong warning */}
+          <div style={glowLine} />
           <div style={warningBox}>
             <p>⚠️ Only <b>one wallet</b> can be bound per account.</p>
             <p>⚠️ A wallet address cannot be used for <b>multiple accounts</b>.</p>
@@ -140,8 +139,6 @@ export default function Wallet() {
           <button onClick={saveWallet} style={btnTeal}>
             Save Wallet
           </button>
-
-          {/* 🔹 Warning before saving */}
           <div style={{ ...warningBox, marginTop: "15px" }}>
             <p>⚠️ You can bind only one wallet to your account.</p>
             <p>⚠️ Duplicate wallets across accounts will not be saved.</p>
@@ -162,7 +159,6 @@ const cardStyle = {
   maxWidth: "420px",
   boxShadow: "0 0 15px rgba(23,232,229,0.2)",
 };
-
 const walletBox = {
   padding: "12px",
   background: "rgba(31,41,55,0.8)",
@@ -173,7 +169,6 @@ const walletBox = {
   marginBottom: "10px",
   boxShadow: "0 0 8px rgba(23,232,229,0.3)",
 };
-
 const inputStyle = {
   width: "100%",
   maxWidth: "380px",
@@ -186,7 +181,6 @@ const inputStyle = {
   fontSize: "14px",
   boxSizing: "border-box",
 };
-
 const btnTeal = {
   padding: "12px 20px",
   border: "none",
@@ -199,20 +193,18 @@ const btnTeal = {
   width: "100%",
   maxWidth: "380px",
 };
-
 const glowLine = {
   height: "2px",
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 20px 0",
 };
-
 const warningBox = {
   background: "rgba(239,68,68,0.1)",
   border: "1px solid rgba(239,68,68,0.4)",
   borderRadius: "8px",
   padding: "12px",
-  fontSize: "13px",
+  fontSize: "7px",
   color: "#F87171",
   textAlign: "left",
   lineHeight: "1.5",

@@ -1,0 +1,169 @@
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  FaHome,
+  FaWallet,
+  FaHistory,
+  FaMoneyBillWave,
+  FaSignOutAlt,
+} from "react-icons/fa";
+import logo from "../../Components/logo.png";
+
+export default function InvestorNavbar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/");
+  };
+
+  return (
+    <div>
+      {/* HEADER */}
+      <header style={headerStyle}>
+        <div style={logoHalo}>
+          <div style={logoBox}>
+            <img src={logo} alt="Logo" style={logoStyle} />
+          </div>
+        </div>
+        <h2 style={neonHeader}>Investor Panel</h2>
+      </header>
+
+      {/* FOOTER NAV */}
+      <footer style={footerStyle}>
+        <FooterBtn
+          icon={<FaHome />}
+          label="Dashboard"
+          active={location.pathname === "/investor"}
+          to="/investor"
+        />
+        <FooterBtn
+          icon={<FaWallet />}
+          label="Wallet"
+          active={location.pathname === "/investor/wallet"}
+          to="/investor/wallet"
+        />
+        <FooterBtn
+          icon={<FaHistory />}
+          label="History"
+          active={location.pathname === "/investor/history"}
+          to="/investor/history"
+        />
+        <FooterBtn
+          icon={<FaMoneyBillWave />}
+          label="Withdraw"
+          active={location.pathname === "/investor/withdrawal"}
+          to="/investor/withdrawal"
+        />
+        <FooterBtn
+          icon={<FaSignOutAlt />}
+          label="Logout"
+          onClick={handleLogout}
+        />
+      </footer>
+    </div>
+  );
+}
+
+/* Footer Button */
+function FooterBtn({ icon, label, active, to, onClick }) {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    if (onClick) onClick();
+    if (to) navigate(to);
+  };
+
+  return (
+    <button
+      style={{
+        ...footerBtn,
+        color: active ? "#17E8E5" : "#9CA3AF",
+        borderTop: active ? "2px solid #17E8E5" : "2px solid transparent",
+      }}
+      onClick={handleClick}
+    >
+      {icon}
+      <span style={{ fontSize: "12px", marginTop: "2px" }}>{label}</span>
+    </button>
+  );
+}
+
+/* === Styles === */
+const headerStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  background: "#0f172a",
+  padding: "18px 20px",
+  borderBottom: "1px solid #1F2937",
+  zIndex: 1000,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const logoHalo = {
+  position: "absolute",
+  left: "15px",
+  width: "60px",
+  height: "60px",
+  borderRadius: "50%",
+  background:
+    "radial-gradient(circle, rgba(23,232,229,0.4) 0%, rgba(23,232,229,0) 70%)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const logoBox = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "50px",
+  height: "50px",
+  borderRadius: "12px",
+  border: "2px solid #17E8E5",
+  boxShadow: "0 0 12px #17E8E5, 0 0 24px rgba(23,232,229,0.6)",
+  background: "rgba(15,23,42,0.7)",
+};
+
+const logoStyle = {
+  height: "42px",
+  objectFit: "contain",
+};
+
+const neonHeader = {
+  margin: 0,
+  color: "#17E8E5",
+  fontWeight: "700",
+  fontFamily: "Orbitron",
+  textShadow: "0 0 10px #17E8E5, 0 0 20px #17E8E5",
+};
+
+const footerStyle = {
+  position: "fixed",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  background: "#0f172a",
+  display: "flex",
+  justifyContent: "space-around",
+  alignItems: "center",
+  padding: "12px 0",
+  borderTop: "1px solid #1F2937",
+  zIndex: 1000,
+};
+
+const footerBtn = {
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  background: "transparent",
+  border: "none",
+  fontSize: "16px",
+  cursor: "pointer",
+};

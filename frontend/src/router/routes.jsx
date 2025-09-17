@@ -10,10 +10,9 @@ import ReferralSignup from "../pages/public/ReferralSignup";
 
 // Investor pages
 import InvestorHome from "../pages/investor/InvestorHome";
-import Deposit from "../pages/shared/Deposit";
 import Withdrawal from "../pages/shared/Withdrawal";
-import Wallet from "../pages/shared/Wallet";
 import TransactionHistory from "../pages/shared/TransactionHistory";
+import WalletPage from "../pages/investor/WalletPage"; // ✅ Combined Wallet + Deposit
 
 // Associate pages
 import Commissions from "../pages/associate/Commissions";
@@ -57,9 +56,8 @@ export default function AppRoutes() {
         {/* 👤 Investor Dashboard */}
         <Route path="/investor/*" element={<DashboardLayout role="investor" />}>
           <Route index element={<InvestorHome />} />
-          <Route path="deposit" element={<Deposit />} />
+          <Route path="wallet" element={<WalletPage />} />
           <Route path="withdrawal" element={<Withdrawal />} />
-          <Route path="wallet" element={<Wallet />} />
           <Route path="history" element={<TransactionHistory />} />
         </Route>
 
@@ -68,15 +66,13 @@ export default function AppRoutes() {
           path="/associate/*"
           element={
             <RequireAssociate>
-              <DashboardLayout role="associate" />
+              <AssociateHome /> {/* ✅ Directly render AssociateHome */}
             </RequireAssociate>
           }
         >
-          <Route index element={<AssociateHome />} />
           <Route path="commissions" element={<Commissions />} />
-          <Route path="deposit" element={<Deposit />} />
+          <Route path="wallet" element={<WalletPage />} />
           <Route path="withdrawal" element={<Withdrawal />} />
-          <Route path="wallet" element={<Wallet />} />
           <Route path="history" element={<TransactionHistory />} />
         </Route>
 
@@ -93,8 +89,8 @@ export default function AppRoutes() {
           <Route path="users" element={<Users />} />
           <Route path="roi-config" element={<ROIConfig />} />
           <Route path="commission-config" element={<CommissionConfig />} />
-          <Route path="roi-credit" element={<AdminROICredit />} /> {/* ✅ fixed */}
-          <Route path="financial-summary" element={<AdminFinancialSummary />} /> {/* ✅ new */}
+          <Route path="roi-credit" element={<AdminROICredit />} />
+          <Route path="financial-summary" element={<AdminFinancialSummary />} />
           <Route path="approvals" element={<WithdrawApprovals />} />
           <Route path="transactions" element={<Transactions />} />
         </Route>

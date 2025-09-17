@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import InvestorNavbar from "../investor/Navbar"; // ✅ Navbar import
 
 export default function Withdrawal() {
   const [summary, setSummary] = useState(null);
@@ -37,24 +38,20 @@ export default function Withdrawal() {
       const settled = data.withdrawals.filter((w) => w.status === "settled");
       const pending = data.withdrawals.filter((w) => w.status === "pending");
 
-      // ✅ Total Earnings = all withdrawals (amount) + wallet balance
       const totalEarnings =
         (data.wallet_balance || 0) +
         data.withdrawals.reduce((sum, w) => sum + (w.amount || 0), 0);
 
-      // ✅ Withdrawn = all settled withdrawals (final_amount)
       const withdrawn = settled.reduce(
         (sum, w) => sum + (w.final_amount || 0),
         0
       );
 
-      // ✅ Pending = all pending withdrawal requests
       const pendingAmt = pending.reduce(
         (sum, w) => sum + (w.amount || 0),
         0
       );
 
-      // ✅ Deductions = total fee/loss in settled
       const deductions = settled.reduce(
         (sum, w) => sum + ((w.amount || 0) - (w.final_amount || 0)),
         0
@@ -87,7 +84,6 @@ export default function Withdrawal() {
       setShowWalletPopup(true);
       return;
     }
-
     if (summary.withdrawable < 20) {
       setButtonMessage({
         type: "error",
@@ -95,7 +91,6 @@ export default function Withdrawal() {
       });
       return;
     }
-
     const today = new Date().getDay(); // 0=Sunday, 6=Saturday
     if (today !== 0 && today !== 6) {
       setButtonMessage({
@@ -199,124 +194,129 @@ export default function Withdrawal() {
     return <p style={{ color: "#E5E7EB" }}>No wallet data available.</p>;
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px" }}>
-      <h2
-        style={{
-          marginBottom: "10px",
-          fontFamily: "Orbitron, sans-serif",
-          color: "#17E8E5",
-        }}
-      >
-        Withdrawal
-      </h2>
-      <div style={glowLine} />
+    <div style={{ color: "#E5E7EB" }}>
+      {/* ✅ Navbar */}
+      <InvestorNavbar />
 
-      {/* Wallet Summary */}
-      <div style={summaryGrid}>
-        <div style={cardStyle}>
-          <h3 style={cardTitle}>Total Earnings</h3>
-          <p style={valueStyle}>${summary.total.toFixed(2)}</p>
-        </div>
-        <div style={cardStyle}>
-          <h3 style={cardTitle}>Withdrawn</h3>
-          <p style={valueStyle}>${summary.withdrawn.toFixed(2)}</p>
-        </div>
-        <div style={cardStyle}>
-          <h3 style={cardTitle}>Pending</h3>
-          <p style={{ ...valueStyle, color: "#FACC15" }}>
-            ${summary.pending.toFixed(2)}
-          </p>
-        </div>
-        <div style={cardStyle}>
-          <h3 style={cardTitle}>Withdrawable</h3>
-          <p style={{ ...valueStyle, color: "#17E8E5" }}>
-            ${summary.withdrawable.toFixed(2)}
-          </p>
-        </div>
-        <div style={cardStyle}>
-          <h3 style={cardTitle}>Total Deductions</h3>
-          <p style={{ ...valueStyle, color: "#44ef77ff" }}>
-            -${summary.deductions.toFixed(2)}
-          </p>
-        </div>
-      </div>
+      <div style={{ padding: "20px", marginTop: "1px", marginBottom: "70px" }}>
+        <h2
+          style={{
+            marginBottom: "10px",
+            fontFamily: "Orbitron, sans-serif",
+            color: "#17E8E5",
+          }}
+        >
+          Withdrawal
+        </h2>
+        <div style={glowLine} />
 
-      <div style={glowLine} />
-
-      {/* Withdraw Earnings */}
-      {!otpSent && (
-        <div style={{ maxWidth: "420px" }}>
-          {buttonMessage && (
-            <div style={popupBoxMsg(buttonMessage.type)}>
-              {buttonMessage.text}
-            </div>
-          )}
-          <button
-            onClick={requestOtp}
-            style={{
-              ...btnTeal,
-              opacity: summary.withdrawable >= 20 ? 1 : 0.6,
-            }}
-          >
-            Request Withdrawal
-          </button>
-        </div>
-      )}
-
-      {/* OTP Confirmation */}
-      {otpSent && (
-        <div style={otpBox}>
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            style={inputStyle}
-          />
-          <button
-            onClick={confirmWithdrawal}
-            disabled={withdrawing || !otp}
-            style={btnTeal}
-          >
-            {withdrawing ? "Submitting..." : "Confirm Withdrawal"}
-          </button>
-        </div>
-      )}
-
-      {/* Wallet Binding Popup */}
-      {showWalletPopup && (
-        <div style={popupOverlay} onClick={() => setShowWalletPopup(false)}>
-          <div style={popupBox} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>
-              Bind Your TRC20 Wallet
-            </h3>
-            <div style={glowLine} />
-
-            {walletPopupMessage && (
-              <div style={popupBoxMsg(walletPopupMessage.type)}>
-                {walletPopupMessage.text}
-              </div>
-            )}
-
-            <p style={popupInfo}>
-              You must bind a withdrawal wallet before requesting withdrawal.
+        {/* Wallet Summary */}
+        <div style={summaryGrid}>
+          <div style={cardStyle}>
+            <h3 style={cardTitle}>Total Earnings</h3>
+            <p style={valueStyle}>${summary.total.toFixed(2)}</p>
+          </div>
+          <div style={cardStyle}>
+            <h3 style={cardTitle}>Withdrawn</h3>
+            <p style={valueStyle}>${summary.withdrawn.toFixed(2)}</p>
+          </div>
+          <div style={cardStyle}>
+            <h3 style={cardTitle}>Pending</h3>
+            <p style={{ ...valueStyle, color: "#FACC15" }}>
+              ${summary.pending.toFixed(2)}
             </p>
-            <p style={popupWarn}>
-              ⚠️ Each wallet can only be linked to one account.
+          </div>
+          <div style={cardStyle}>
+            <h3 style={cardTitle}>Withdrawable</h3>
+            <p style={{ ...valueStyle, color: "#17E8E5" }}>
+              ${summary.withdrawable.toFixed(2)}
             </p>
-            <input
-              type="text"
-              placeholder="Enter TRC20 Wallet Address"
-              value={newWallet}
-              onChange={(e) => setNewWallet(e.target.value)}
-              style={inputStyle}
-            />
-            <button onClick={saveWallet} style={btnTeal}>
-              Save Wallet
-            </button>
+          </div>
+          <div style={cardStyle}>
+            <h3 style={cardTitle}>Total Deductions</h3>
+            <p style={{ ...valueStyle, color: "#44ef77ff" }}>
+              -${summary.deductions.toFixed(2)}
+            </p>
           </div>
         </div>
-      )}
+
+        <div style={glowLine} />
+
+        {/* Withdraw Earnings */}
+        {!otpSent && (
+          <div style={{ maxWidth: "420px" }}>
+            {buttonMessage && (
+              <div style={popupBoxMsg(buttonMessage.type)}>
+                {buttonMessage.text}
+              </div>
+            )}
+            <button
+              onClick={requestOtp}
+              style={{
+                ...btnTeal,
+                opacity: summary.withdrawable >= 20 ? 1 : 0.6,
+              }}
+            >
+              Request Withdrawal
+            </button>
+          </div>
+        )}
+
+        {/* OTP Confirmation */}
+        {otpSent && (
+          <div style={otpBox}>
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              style={inputStyle}
+            />
+            <button
+              onClick={confirmWithdrawal}
+              disabled={withdrawing || !otp}
+              style={btnTeal}
+            >
+              {withdrawing ? "Submitting..." : "Confirm Withdrawal"}
+            </button>
+          </div>
+        )}
+
+        {/* Wallet Binding Popup */}
+        {showWalletPopup && (
+          <div style={popupOverlay} onClick={() => setShowWalletPopup(false)}>
+            <div style={popupBox} onClick={(e) => e.stopPropagation()}>
+              <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>
+                Bind Your TRC20 Wallet
+              </h3>
+              <div style={glowLine} />
+
+              {walletPopupMessage && (
+                <div style={popupBoxMsg(walletPopupMessage.type)}>
+                  {walletPopupMessage.text}
+                </div>
+              )}
+
+              <p style={popupInfo}>
+                You must bind a withdrawal wallet before requesting withdrawal.
+              </p>
+              <p style={popupWarn}>
+                ⚠️ Each wallet can only be linked to one account.
+              </p>
+              <input
+                type="text"
+                placeholder="Enter TRC20 Wallet Address"
+                value={newWallet}
+                onChange={(e) => setNewWallet(e.target.value)}
+                style={inputStyle}
+              />
+              <button onClick={saveWallet} style={btnTeal}>
+                Save Wallet
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

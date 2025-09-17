@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaWallet } from "react-icons/fa"; // Wallet icon
+import InvestorNavbar from "./Navbar"; // Custom Navbar with halo logo
 
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
-  const [showAppliedMsg, setShowAppliedMsg] = useState(false); // ✅ new
+  const [showAppliedMsg, setShowAppliedMsg] = useState(false);
   const [isAssociate, setIsAssociate] = useState(false);
   const [user, setUser] = useState(null);
   const [deposits, setDeposits] = useState([]);
   const [summary, setSummary] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
+
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // 🔹 Fetch user and deposits
+  // 🔹 Fetch user, wallet, deposits
   useEffect(() => {
-    const fetchUserAndDeposits = async () => {
+    const fetchUserAndData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
@@ -32,11 +35,18 @@ export default function InvestorHome() {
         });
         setDeposits(roiRes.data.deposits || []);
         setSummary(roiRes.data.summary || null);
+
+        // ✅ Get wallet balance from /wallet/summary
+        const walletRes = await axios.get(`${API}/wallet/summary`, { headers });
+        setUser((prev) => ({
+          ...prev,
+          wallet_balance: walletRes.data.wallet_balance,
+        }));
       } catch (err) {
         console.error("Error fetching investor data:", err);
       }
     };
-    fetchUserAndDeposits();
+    fetchUserAndData();
   }, []);
 
   // 🔹 Apply for associate
@@ -46,13 +56,11 @@ export default function InvestorHome() {
       await axios.post(
         `${API}/request-associate`,
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setApplied(true);
-      setShowAppliedMsg(true); // ✅ show msg
-      setTimeout(() => setShowAppliedMsg(false), 10000); // ✅ auto hide after 10s
+      setShowAppliedMsg(true);
+      setTimeout(() => setShowAppliedMsg(false), 10000);
       alert("Request sent to admin for approval.");
     } catch (err) {
       console.error(err);
@@ -63,241 +71,155 @@ export default function InvestorHome() {
   if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px" }}>
-      <h2
-        style={{
-          fontFamily: "Orbitron, sans-serif",
-          fontSize: "22px",
-          color: "#17E8E5",
-        }}
-      >
-        Welcome, Investor
-      </h2>
-      <div style={glowLine} />
-      <p style={{ marginTop: 10, color: "#9CA3AF" }}>
-        You can deposit funds, withdraw profits, and track your ROI here.
-      </p>
+    <div style={{ color: "#E5E7EB" }}>
+      <InvestorNavbar />
 
-      {/* ✅ Deposits with Progress */}
-      <div style={{ ...cardStyle, position: "relative" }}>
-        {/* Info Icon in Top Right */}
-        {summary && (
-          <span
-            onClick={() => setShowInfo(true)}
-            style={{
-              cursor: "pointer",
-              background: "#17E8E5",
-              color: "#0B1220",
-              borderRadius: "50%",
-              width: "20px",
-              height: "20px",
-              fontSize: "13px",
-              fontWeight: "700",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 0 6px rgba(23,232,229,0.6)",
-              position: "absolute",
-              top: "12px",
-              right: "12px",
-            }}
-          >
-            i
-          </span>
-        )}
-
-        <h3
+      <div style={{ padding: "20px", marginBottom: "70px" }}>
+        {/* ✅ Name greeting */}
+        <h2
           style={{
-            marginBottom: "10px",
-            fontSize: "18px",
-            fontWeight: "600",
+            fontFamily: "Orbitron, sans-serif",
+            fontSize: "22px",
             color: "#17E8E5",
           }}
         >
-          My Deposits
-        </h3>
+          Welcome, {user.name || user.email}
+        </h2>
         <div style={glowLine} />
 
-        {summary && (
-          <div style={{ marginBottom: "25px" }}>
-            <div style={glowRowTotal}>
-              <span>Total Deposits</span>
-              <span>{summary.total_invested} USDT</span>
-            </div>
-            <ProgressBarBig
-              percent={summary.progress_percent}
-              received={summary.total_received}
-              max={summary.total_max_return}
-            />
+        {/* ✅ Wallet Balance */}
+        <div style={walletCard}>
+          <div style={walletIconBox}>
+            <FaWallet style={walletIcon} />
           </div>
-        )}
-
-        {deposits.length === 0 ? (
-          <p style={{ color: "#9CA3AF", marginTop: "12px" }}>No deposits yet</p>
-        ) : (
-          deposits.map((d, idx) => (
-            <div key={idx} style={{ marginBottom: "18px" }}>
-              <div style={glowRowGreen}>
-                <span>{d.capital} USDT</span>
-                <span>
-                  {d.timestamp
-                    ? new Date(d.timestamp).toLocaleDateString()
-                    : "-"}
-                </span>
-              </div>
-              <ProgressBarSmall
-                percent={d.progress_percent}
-                received={d.roi_received}
-                max={d.max_return}
-              />
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* ✅ Associate Status / Button */}
-      <div style={{ marginTop: 40, textAlign: "center" }}>
-        {isAssociate ? (
-          <p style={{ color: "#4ADE80", fontWeight: "600" }}>
-            Welcome, <strong>Associate</strong>! You now have referral access.
-          </p>
-        ) : !applied ? (
-          <button onClick={applyForAssociate} style={btnTeal}>
-            Apply to become Associate
-          </button>
-        ) : (
-          showAppliedMsg && ( // ✅ show only temporarily
-            <p style={{ color: "#FACC15", fontWeight: "600" }}>
-              ⏳ Pending approval from Admin...
+          <div>
+            <p style={{ fontSize: "13px", color: "#9CA3AF", margin: 0 }}>
+              Wallet Balance
             </p>
-          )
-        )}
-      </div>
-
-      {/* ℹ️ Info Popup */}
-      {showInfo && (
-        <div style={popupOverlay} onClick={() => setShowInfo(false)}>
-          <div style={popupBox} onClick={(e) => e.stopPropagation()}>
-            <button style={closeBtn} onClick={() => setShowInfo(false)}>
-              ✕
-            </button>
-            <h3 style={{ color: "#17E8E5", marginBottom: "12px" }}>Info</h3>
-            <p style={{ fontSize: "14px", color: "#E5E7EB" }}>
-              Maximum Receivable:{" "}
-              <strong>{summary.total_max_return} USDT</strong>
-            </p>
+            <h3 style={{ fontSize: "20px", color: "#17E8E5", margin: 0 }}>
+              {user.wallet_balance !== undefined
+                ? user.wallet_balance.toFixed(2)
+                : 0}{" "}
+              USDT
+            </h3>
           </div>
         </div>
-      )}
+
+        <p style={{ marginTop: 15, color: "#9CA3AF" }}>
+          You can deposit funds, withdraw profits, and track your ROI here.
+        </p>
+
+        {/* ✅ Deposits with Depleting Progress */}
+        <div style={{ ...cardStyle, position: "relative" }}>
+          {summary && (
+            <span onClick={() => setShowInfo(true)} style={infoIcon}>
+              i
+            </span>
+          )}
+
+          <h3 style={depositTitle}>My Deposits</h3>
+          <div style={glowLine} />
+
+          {summary && (
+            <div style={{ marginBottom: "25px" }}>
+              <div style={glowRowTotal}>
+                <span>Total Deposits</span>
+                <span>{summary.total_invested} USDT</span>
+              </div>
+              <DepletingBar
+                received={summary.total_received}
+                max={summary.total_max_return}
+              />
+            </div>
+          )}
+
+          {deposits.length === 0 ? (
+            <p style={{ color: "#9CA3AF", marginTop: "12px" }}>
+              No deposits yet
+            </p>
+          ) : (
+            deposits.map((d, idx) => (
+              <div key={idx} style={{ marginBottom: "18px" }}>
+                <div style={glowRowGreen}>
+                  <span>{d.capital} USDT</span>
+                  <span>
+                    {d.timestamp
+                      ? new Date(d.timestamp).toLocaleDateString()
+                      : "-"}
+                  </span>
+                </div>
+                <DepletingBar received={d.roi_received} max={d.max_return} />
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ✅ Associate Status / Button */}
+        <div style={{ marginTop: 40, textAlign: "center" }}>
+          {isAssociate ? (
+            <p style={{ color: "#4ADE80", fontWeight: "600" }}>
+              Welcome, <strong>Associate</strong>! You now have referral access.
+            </p>
+          ) : !applied ? (
+            <button onClick={applyForAssociate} style={btnTeal}>
+              Apply to become Associate
+            </button>
+          ) : (
+            showAppliedMsg && (
+              <p style={{ color: "#FACC15", fontWeight: "600" }}>
+                ⏳ Pending approval from Admin...
+              </p>
+            )
+          )}
+        </div>
+
+        {/* ℹ️ Info Popup */}
+        {showInfo && (
+          <div style={popupOverlay} onClick={() => setShowInfo(false)}>
+            <div style={popupBox} onClick={(e) => e.stopPropagation()}>
+              <button style={closeBtn} onClick={() => setShowInfo(false)}>
+                ✕
+              </button>
+              <h3 style={{ color: "#17E8E5", marginBottom: "12px" }}>Info</h3>
+              <p style={{ fontSize: "14px", color: "#E5E7EB" }}>
+                Maximum Receivable:{" "}
+                <strong>{summary.total_max_return} USDT</strong>
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-/* === Big 3D Progress Bar for Total === */
-function ProgressBarBig({ percent, received, max }) {
+/* === Depleting Progress Bar === */
+function DepletingBar({ received, max }) {
+  const percentLeft = max > 0 ? ((max - received) / max) * 100 : 0;
+
+  // 🎨 Dynamic color based on depletion
+  let gradient = "linear-gradient(90deg,#17E8E5,#14B8E5)"; // neon blue
+  if (percentLeft < 70 && percentLeft >= 40) {
+    gradient = "linear-gradient(90deg,#FACC15,#FBBF24)"; // yellow
+  }
+  if (percentLeft < 40) {
+    gradient = "linear-gradient(90deg,#EF4444,#DC2626)"; // red
+  }
+
   return (
     <div style={{ marginTop: "10px" }}>
-      <div
-        style={{
-          background: "linear-gradient(145deg, #1F2937, #111827)",
-          borderRadius: "12px",
-          overflow: "hidden",
-          height: "18px",
-          boxShadow:
-            "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.1)",
-          position: "relative",
-        }}
-      >
+      <div style={progressBigTrack}>
         <div
           style={{
-            width: `${percent}%`,
-            background: "linear-gradient(90deg,#17E8E5,#14B8E5)",
-            height: "100%",
-            borderRadius: "12px",
-            boxShadow:
-              "0 0 15px rgba(23,232,229,0.7), inset 0 0 6px rgba(255,255,255,0.2)",
-            transition: "width 0.6s ease",
+            ...progressBigFill,
+            width: `${percentLeft}%`,
+            background: gradient,
           }}
         ></div>
-        <span
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontSize: "12px",
-            fontWeight: "700",
-            color: "#0B1220",
-            textShadow: "0 0 5px rgba(255,255,255,0.7)",
-          }}
-        >
-          {percent}%
-        </span>
+        <span style={progressBigText}>{Math.round(percentLeft)}%</span>
       </div>
-      <p
-        style={{
-          marginTop: "6px",
-          fontSize: "13px",
-          color: "#9CA3AF",
-          textAlign: "center",
-        }}
-      >
-        ROI Received: {received} / {max} USDT
-      </p>
-    </div>
-  );
-}
-
-/* === Small 3D Progress Bar for Individual Deposits === */
-function ProgressBarSmall({ percent, received, max }) {
-  return (
-    <div style={{ marginTop: "6px" }}>
-      <div
-        style={{
-          background: "linear-gradient(145deg, #1F2937, #111827)",
-          borderRadius: "8px",
-          overflow: "hidden",
-          height: "12px",
-          boxShadow:
-            "inset 2px 2px 5px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.1)",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            width: `${percent}%`,
-            background: "linear-gradient(90deg,#17E8E5,#14B8E5)",
-            height: "100%",
-            borderRadius: "8px",
-            boxShadow:
-              "0 0 10px rgba(23,232,229,0.7), inset 0 0 4px rgba(255,255,255,0.2)",
-            transition: "width 0.6s ease",
-          }}
-        ></div>
-        <span
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontSize: "10px",
-            fontWeight: "600",
-            color: "#0B1220",
-            textShadow: "0 0 4px rgba(255,255,255,0.7)",
-          }}
-        >
-          {percent}%
-        </span>
-      </div>
-      <p
-        style={{
-          marginTop: "4px",
-          fontSize: "12px",
-          color: "#9CA3AF",
-          textAlign: "center",
-        }}
-      >
-        ROI: {received} / {max} USDT
+      <p style={progressCaption}>
+        Remaining: {Math.max(max - received, 0)} / {max} USDT
       </p>
     </div>
   );
@@ -319,6 +241,33 @@ const glowLine = {
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 18px 0",
+};
+
+const walletCard = {
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  background: "rgba(17,24,39,0.85)",
+  borderRadius: "12px",
+  padding: "15px 20px",
+  margin: "15px 0",
+  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+};
+
+const walletIconBox = {
+  width: "40px",
+  height: "40px",
+  borderRadius: "10px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(23,232,229,0.1)",
+  boxShadow: "0 0 12px rgba(23,232,229,0.5)",
+};
+
+const walletIcon = {
+  fontSize: "20px",
+  color: "#17E8E5",
 };
 
 const glowRowGreen = {
@@ -354,7 +303,6 @@ const btnTeal = {
   transition: "all 0.3s ease",
 };
 
-/* === Popup Styles === */
 const popupOverlay = {
   position: "fixed",
   top: 0,
@@ -388,4 +336,63 @@ const closeBtn = {
   fontSize: "18px",
   color: "#E5E7EB",
   cursor: "pointer",
+};
+
+const infoIcon = {
+  cursor: "pointer",
+  background: "#17E8E5",
+  color: "#0B1220",
+  borderRadius: "50%",
+  width: "20px",
+  height: "20px",
+  fontSize: "13px",
+  fontWeight: "700",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 0 6px rgba(23,232,229,0.6)",
+  position: "absolute",
+  top: "12px",
+  right: "12px",
+};
+
+const depositTitle = {
+  marginBottom: "10px",
+  fontSize: "18px",
+  fontWeight: "600",
+  color: "#17E8E5",
+};
+
+const progressBigTrack = {
+  background: "linear-gradient(145deg, #1F2937, #111827)",
+  borderRadius: "12px",
+  overflow: "hidden",
+  height: "18px",
+  position: "relative",
+  boxShadow:
+    "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.1)",
+};
+
+const progressBigFill = {
+  height: "100%",
+  borderRadius: "12px",
+  transition: "width 0.6s ease",
+};
+
+const progressBigText = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  fontSize: "12px",
+  fontWeight: "700",
+  color: "#0B1220",
+  textShadow: "0 0 5px rgba(255,255,255,0.7)",
+};
+
+const progressCaption = {
+  marginTop: "6px",
+  fontSize: "13px",
+  color: "#9CA3AF",
+  textAlign: "center",
 };
