@@ -15,8 +15,11 @@ import TransactionHistory from "../pages/shared/TransactionHistory";
 import WalletPage from "../pages/investor/WalletPage"; // ✅ Combined Wallet + Deposit
 
 // Associate pages
-import Commissions from "../pages/associate/Commissions";
+import Referrals from "../pages/associate/Referrals"; // ✅ Fixed naming
 import AssociateHome from "../pages/associate/AssociateHome";
+import AssociateWalletPage from "../pages/associate/AssociateWalletPage"; // ✅ Associate wallet
+import AssociateHistory from "../pages/associate/AssociateHistory";
+import AssociateWithdrawal from "../pages/associate/AssociateWithdrawal";
 
 // Admin pages
 import Users from "../pages/admin/Users";
@@ -59,6 +62,7 @@ export default function AppRoutes() {
           <Route path="wallet" element={<WalletPage />} />
           <Route path="withdrawal" element={<Withdrawal />} />
           <Route path="history" element={<TransactionHistory />} />
+          <Route path="*" element={<Navigate to="/investor" replace />} />
         </Route>
 
         {/* 🤝 Associate Dashboard */}
@@ -66,14 +70,17 @@ export default function AppRoutes() {
           path="/associate/*"
           element={
             <RequireAssociate>
-              <AssociateHome /> {/* ✅ Directly render AssociateHome */}
+              <DashboardLayout role="associate" />
             </RequireAssociate>
           }
         >
-          <Route path="commissions" element={<Commissions />} />
-          <Route path="wallet" element={<WalletPage />} />
-          <Route path="withdrawal" element={<Withdrawal />} />
-          <Route path="history" element={<TransactionHistory />} />
+          <Route index element={<AssociateHome />} />
+          <Route path="wallet" element={<AssociateWalletPage />} /> {/* ✅ Associate Wallet */}
+          <Route path="referrals" element={<Referrals />} /> {/* ✅ Referrals page */}
+          <Route path="withdrawal" element={<AssociateWithdrawal />} />
+          
+          <Route path="history" element={<AssociateHistory />} />
+          <Route path="*" element={<Navigate to="/associate" replace />} /> {/* ✅ stay in associate */}
         </Route>
 
         {/* 🛠 Admin Dashboard */}
@@ -93,6 +100,7 @@ export default function AppRoutes() {
           <Route path="financial-summary" element={<AdminFinancialSummary />} />
           <Route path="approvals" element={<WithdrawApprovals />} />
           <Route path="transactions" element={<Transactions />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} /> {/* ✅ stay in admin */}
         </Route>
 
         {/* 🚨 Catch-All Redirect */}

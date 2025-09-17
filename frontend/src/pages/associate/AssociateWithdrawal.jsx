@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import InvestorNavbar from "../investor/Navbar"; // ✅ Investor Navbar
+import AssociateNavbar from "./AssociateNavbar"; // ✅ Associate Navbar
 
-export default function Withdrawal() {
+export default function AssociateWithdrawal() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [otpSent, setOtpSent] = useState(false);
@@ -59,18 +59,22 @@ export default function Withdrawal() {
     if (token) fetchSummary();
   }, [token, fetchSummary]);
 
-  // 🔹 Request OTP (with Sat/Sun + $20 check)
+  // 🔹 Request OTP
   const requestOtp = async () => {
-    if (summary.withdrawable < 20) {
-      return setMessage({ type: "error", text: "Minimum withdrawal is $20." });
-    }
-    const today = new Date().getDay(); // 0=Sunday, 6=Saturday
+    // ✅ Enforce weekend-only withdrawals
+    const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
     if (today !== 0 && today !== 6) {
       return setMessage({
         type: "error",
         text: "Withdrawals are allowed only on Saturday and Sunday.",
       });
     }
+
+    // ✅ Enforce $20 minimum
+    if (summary.withdrawable < 20) {
+      return setMessage({ type: "error", text: "Minimum withdrawal is $20." });
+    }
+
     try {
       await axios.post(
         `${API}/send-otp-withdrawal`,
@@ -114,7 +118,7 @@ export default function Withdrawal() {
 
   return (
     <div style={{ color: "#E5E7EB" }}>
-      <InvestorNavbar />
+      <AssociateNavbar />
 
       <div style={wrapper}>
         <h2 style={headerTitle}>Withdrawal</h2>

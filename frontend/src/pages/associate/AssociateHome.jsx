@@ -165,7 +165,7 @@ const pageWrapper = {
 
 const mainContent = {
   padding: "20px",
-  marginTop: "80px",
+  marginTop: "20px",
   marginBottom: "70px",
   marginleft: "15px" ,
   marginright: "15px",

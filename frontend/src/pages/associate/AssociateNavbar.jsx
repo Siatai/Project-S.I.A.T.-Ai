@@ -7,7 +7,8 @@ import {
   FaHistory,
   FaMoneyBillWave,
   FaSignOutAlt,
-} from "react-icons/fa"; // ✅ removed FaUser
+  FaBars, // ✅ Hamburger icon
+} from "react-icons/fa";
 import logo from "../../Components/logo.png";
 
 export default function AssociateNavbar() {
@@ -24,12 +25,23 @@ export default function AssociateNavbar() {
     <div>
       {/* HEADER */}
       <header style={headerStyle}>
+        {/* Left: Logo */}
         <div style={logoHalo}>
           <div style={logoBox}>
             <img src={logo} alt="Logo" style={logoStyle} />
           </div>
         </div>
-        <h2 style={neonHeader}>Associate Panel</h2>
+
+        {/* Center: Brand */}
+        <h2 style={brandText}>
+          AlgoM<sup style={{ fontSize: "12px" }}>3</sup> Ai
+        </h2>
+
+        {/* Right: Panel name + Menu */}
+        <div style={rightHeader}>
+          <span style={panelText}>Associate Panel</span>
+          <FaBars style={menuIcon} />
+        </div>
       </header>
 
       {/* FOOTER NAV */}
@@ -104,19 +116,17 @@ const headerStyle = {
   left: 0,
   right: 0,
   background: "#0f172a",
-  padding: "18px 20px",
+  padding: "14px 20px",
   borderBottom: "1px solid #1F2937",
   zIndex: 1000,
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "space-between",
 };
 
 const logoHalo = {
-  position: "absolute",
-  left: "15px",
-  width: "60px",
-  height: "60px",
+  width: "50px",
+  height: "50px",
   borderRadius: "50%",
   background:
     "radial-gradient(circle, rgba(23,232,229,0.4) 0%, rgba(23,232,229,0) 70%)",
@@ -129,25 +139,46 @@ const logoBox = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "50px",
-  height: "50px",
+  width: "42px",
+  height: "42px",
   borderRadius: "12px",
   border: "2px solid #17E8E5",
-  boxShadow: "0 0 12px #17E8E5, 0 0 24px rgba(23,232,229,0.6)",
+  boxShadow: "0 0 10px #17E8E5, 0 0 20px rgba(23,232,229,0.6)",
   background: "rgba(15,23,42,0.7)",
 };
 
 const logoStyle = {
-  height: "42px",
+  height: "32px",
   objectFit: "contain",
 };
 
-const neonHeader = {
-  margin: 0,
+const brandText = {
+  margin: "0",
   color: "#17E8E5",
   fontWeight: "700",
+  fontSize: "20px",
   fontFamily: "Orbitron",
   textShadow: "0 0 10px #17E8E5, 0 0 20px #17E8E5",
+  flex: 1,
+  textAlign: "center",
+};
+
+const rightHeader = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+};
+
+const panelText = {
+  color: "#E5E7EB",
+  fontSize: "14px",
+  fontWeight: "500",
+};
+
+const menuIcon = {
+  color: "#17E8E5",
+  fontSize: "18px",
+  cursor: "pointer",
 };
 
 const footerStyle = {
