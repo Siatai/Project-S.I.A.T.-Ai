@@ -322,7 +322,7 @@ export default function DashboardLayout() {
         }
 
         .dashboard-header {
-          height: 20px;
+          height: 45px;
           background: rgba(18,26,43,0.95);
           backdrop-filter: blur(6px); 
           display: flex;

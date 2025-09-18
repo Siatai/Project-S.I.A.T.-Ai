@@ -74,7 +74,7 @@ export default function InvestorHome() {
     <div style={{ color: "#E5E7EB" }}>
       <InvestorNavbar />
 
-      <div style={{ padding: "20px", marginBottom: "70px" }}>
+      <div style={{ padding: "20px", marginBottom: "70px", margintop: "80px" }}>
         {/* ✅ Name greeting */}
         <h2
           style={{
