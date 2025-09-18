@@ -11,7 +11,15 @@ export default function AssociateHistory() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // Handle resize → detect mobile
+  // ✅ Force dark background
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
+  // Handle resize
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
@@ -30,7 +38,6 @@ export default function AssociateHistory() {
           axios.get(`${API}/withdrawals/user`, { headers }),
         ]);
 
-        // Map deposits
         const deposits = (roiRes.data.deposits || []).map((d) => ({
           type: "Deposit",
           amount: d.capital,
@@ -39,7 +46,6 @@ export default function AssociateHistory() {
           tx: d.tx_hash || "-",
         }));
 
-        // Map withdrawals
         const withdrawals = (withdrawalsRes.data || []).map((w) => ({
           type: "Withdrawal",
           amount: w.final_amount,
@@ -71,20 +77,11 @@ export default function AssociateHistory() {
   });
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
-      {/* ✅ Associate Navbar */}
+    <div style={pageWrapper}>
       <AssociateNavbar />
 
-      <div style={{ padding: "20px", marginTop: "5px", marginBottom: "70px" }}>
-        <h2
-          style={{
-            marginBottom: "10px",
-            fontFamily: "Orbitron, sans-serif",
-            color: "#17E8E5",
-          }}
-        >
-          Transaction History
-        </h2>
+      <div style={mainContent}>
+        <h2 style={headerTitle}>Transaction History</h2>
         <div style={glowLine} />
 
         {/* Filters */}
@@ -121,99 +118,82 @@ export default function AssociateHistory() {
         </div>
 
         {/* Table / Mobile Cards */}
-        <div
-          style={{
-            background: "rgba(17,24,39,0.85)",
-            backdropFilter: "blur(8px)",
-            borderRadius: "12px",
-            boxShadow: "0 0 18px rgba(23,232,229,0.2)",
-            overflowX: "auto",
-            maxWidth: "100%",
-            padding: isMobile ? "10px" : "0",
-          }}
-        >
+        <div style={cardWrapper}>
           {loading ? (
             <p style={{ padding: "20px" }}>Loading transactions...</p>
           ) : filteredTx.length === 0 ? (
-            <p style={{ padding: "20px", color: "#9CA3AF" }}>
+            <p style={{ padding: "20px", color: colors.textSecondary }}>
               No transactions found.
             </p>
           ) : isMobile ? (
             // Mobile → Card View
             <div style={{ display: "grid", gap: "15px" }}>
               {filteredTx.map((t, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: "rgba(31,41,55,0.9)",
-                    borderRadius: "12px",
-                    padding: "15px",
-                    boxShadow: "0 0 12px rgba(23,232,229,0.2)",
-                  }}
-                >
+                <div key={i} style={mobileCard}>
                   <p>
-                    <strong>Type:</strong> {t.type}
+                    <strong style={{ color: colors.textSecondary }}>
+                      Type:
+                    </strong>{" "}
+                    <span style={{ color: colors.textPrimary }}>{t.type}</span>
                   </p>
                   <p>
-                    <strong>Amount:</strong> ${t.amount}
+                    <strong style={{ color: colors.textSecondary }}>
+                      Amount:
+                    </strong>{" "}
+                    <span style={{ color: colors.accentCyan }}>
+                      ${t.amount}
+                    </span>
                   </p>
                   {t.fee && (
                     <p>
-                      <strong>Fee:</strong> ${t.fee}
+                      <strong style={{ color: colors.textSecondary }}>
+                        Fee:
+                      </strong>{" "}
+                      <span style={{ color: colors.textPrimary }}>
+                        ${t.fee}
+                      </span>
                     </p>
                   )}
                   <p>
-                    <strong>Status:</strong>{" "}
+                    <strong style={{ color: colors.textSecondary }}>
+                      Status:
+                    </strong>{" "}
                     <span
                       style={{
                         color:
                           t.status === "pending"
-                            ? "#FACC15"
-                            : t.status === "approved" ||
-                              t.status === "confirmed"
-                            ? "#17E8E5"
-                            : "#EF4444",
+                            ? colors.accentYellow
+                            : t.status === "confirmed"
+                            ? colors.accentCyan
+                            : colors.accentRed,
                         fontWeight: "600",
                       }}
                     >
                       {t.status}
                     </span>
                   </p>
-                  <p
-                    style={{ fontFamily: "monospace", wordBreak: "break-all" }}
-                  >
+                  <p style={{ fontFamily: "monospace", color: colors.textSecondary }}>
                     <strong>Tx:</strong> {t.tx}
                   </p>
                   <p>
-                    <strong>Date:</strong> {t.date.toLocaleString()}
+                    <strong style={{ color: colors.textSecondary }}>
+                      Date:
+                    </strong>{" "}
+                    <span style={{ color: colors.textPrimary }}>
+                      {t.date.toLocaleString()}
+                    </span>
                   </p>
                 </div>
               ))}
             </div>
           ) : (
             // Desktop → Table View
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                minWidth: "700px",
-              }}
-            >
+            <table style={tableStyle}>
               <thead>
                 <tr style={{ background: "rgba(31,41,55,0.9)" }}>
                   {["Type", "Amount", "Fee", "Status", "Tx Hash", "Date"].map(
                     (h, i) => (
-                      <th
-                        key={i}
-                        style={{
-                          padding: "12px",
-                          textAlign: "left",
-                          fontSize: "14px",
-                          color: "#9CA3AF",
-                          fontWeight: "600",
-                          fontFamily: "Inter, sans-serif",
-                        }}
-                      >
+                      <th key={i} style={thStyle}>
                         {h}
                       </th>
                     )
@@ -222,34 +202,34 @@ export default function AssociateHistory() {
               </thead>
               <tbody>
                 {filteredTx.map((t, i) => (
-                  <tr
-                    key={i}
-                    style={{
-                      borderBottom: "1px solid rgba(255,255,255,0.05)",
-                    }}
-                  >
+                  <tr key={i} style={rowStyle}>
                     <td style={tdStyle}>{t.type}</td>
-                    <td style={tdStyle}>${t.amount}</td>
+                    <td style={{ ...tdStyle, color: colors.accentCyan }}>
+                      ${t.amount}
+                    </td>
                     <td style={tdStyle}>{t.fee ? `$${t.fee}` : "-"}</td>
                     <td
                       style={{
                         ...tdStyle,
                         color:
                           t.status === "pending"
-                            ? "#FACC15"
-                            : t.status === "approved" ||
-                              t.status === "confirmed"
-                            ? "#17E8E5"
-                            : "#4fef44ff",
+                            ? colors.accentYellow
+                            : t.status === "confirmed"
+                            ? colors.accentCyan
+                            : colors.accentRed,
                         fontWeight: "600",
                       }}
                     >
                       {t.status}
                     </td>
-                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>
+                    <td
+                      style={{ ...tdStyle, fontFamily: "monospace", color: colors.textSecondary }}
+                    >
                       {t.tx}
                     </td>
-                    <td style={tdStyle}>{t.date.toLocaleString()}</td>
+                    <td style={{ ...tdStyle, color: colors.textPrimary }}>
+                      {t.date.toLocaleString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -261,11 +241,32 @@ export default function AssociateHistory() {
   );
 }
 
-const tdStyle = {
-  padding: "12px",
-  fontSize: "14px",
-  color: "#E5E7EB",
-  fontFamily: "Inter, sans-serif",
+/* === Styles & Colors === */
+const colors = {
+  textPrimary: "#E5E7EB",
+  textSecondary: "#9CA3AF",
+  accentCyan: "#17E8E5",
+  accentYellow: "#FACC15",
+  accentRed: "#EF4444",
+};
+
+const pageWrapper = {
+  backgroundColor: "#0f172a",
+  minHeight: "100vh",
+  width: "100%",
+  overflowX: "hidden",
+};
+
+const mainContent = {
+  padding: "20px",
+  marginTop: "80px",
+  marginBottom: "70px",
+};
+
+const headerTitle = {
+  marginBottom: "10px",
+  fontFamily: "Orbitron, sans-serif",
+  color: "#17E8E5",
 };
 
 const glowLine = {
@@ -273,4 +274,45 @@ const glowLine = {
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 20px 0",
+};
+
+const cardWrapper = {
+  background: "rgba(17,24,39,0.85)",
+  backdropFilter: "blur(8px)",
+  borderRadius: "12px",
+  boxShadow: "0 0 18px rgba(23,232,229,0.2)",
+  overflowX: "auto",
+  maxWidth: "100%",
+  padding: "10px",
+};
+
+const mobileCard = {
+  background: "rgba(31,41,55,0.9)",
+  borderRadius: "12px",
+  padding: "15px",
+  boxShadow: "0 0 12px rgba(23,232,229,0.2)",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  minWidth: "700px",
+};
+
+const thStyle = {
+  padding: "12px",
+  textAlign: "left",
+  fontSize: "14px",
+  color: colors.textSecondary,
+  fontWeight: "600",
+  fontFamily: "Inter, sans-serif",
+};
+
+const rowStyle = { borderBottom: "1px solid rgba(255,255,255,0.05)" };
+
+const tdStyle = {
+  padding: "12px",
+  fontSize: "14px",
+  color: colors.textPrimary,
+  fontFamily: "Inter, sans-serif",
 };

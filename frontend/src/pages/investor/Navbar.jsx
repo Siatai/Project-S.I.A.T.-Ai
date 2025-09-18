@@ -5,7 +5,7 @@ import {
   FaWallet,
   FaHistory,
   FaMoneyBillWave,
-  FaChartLine, // ✅ Earn icon
+  FaChartLine,
   FaBars,
 } from "react-icons/fa";
 import logo from "../../Components/logo.png";
@@ -14,7 +14,7 @@ export default function InvestorNavbar() {
   const location = useLocation();
 
   return (
-    <div>
+    <>
       {/* HEADER */}
       <header style={headerStyle}>
         {/* Left: Logo */}
@@ -69,7 +69,7 @@ export default function InvestorNavbar() {
           to="/investor/earn"
         />
       </footer>
-    </div>
+    </>
   );
 }
 
@@ -85,11 +85,18 @@ function FooterBtn({ icon, label, active, to }) {
       style={{
         ...footerBtn,
         color: active ? "#17E8E5" : "#9CA3AF",
-        borderTop: active ? "2px solid #17E8E5" : "2px solid transparent",
-        paddingTop: "6px", // ✅ creates distance between highlight and icon
       }}
       onClick={handleClick}
     >
+      {/* ✅ Neon top line */}
+      <div
+        style={{
+          height: "4px",
+          marginBottom: "6px",
+          width: "100%",
+          borderTop: active ? "2px solid #17E8E5" : "2px solid transparent",
+        }}
+      />
       {icon}
       <span style={{ fontSize: "12px", marginTop: "4px" }}>{label}</span>
     </button>
@@ -103,9 +110,10 @@ const headerStyle = {
   left: 0,
   right: 0,
   height: "60px",
-  background: "#0f172a",
-  padding: "14px 20px calc(env(safe-area-inset-top) + 14px)", // ✅ safe area
-  borderBottom: "1px solid #1F2937",
+  background: "rgba(18,26,43,0.95)", // frosted dark
+  backdropFilter: "blur(6px)",
+  padding: "14px 20px calc(env(safe-area-inset-top) + 14px)",
+  borderBottom: "1px solid rgba(23,232,166,0.2)", // neon line
   zIndex: 1000,
   display: "flex",
   alignItems: "center",
@@ -117,7 +125,7 @@ const logoHalo = {
   height: "50px",
   borderRadius: "50%",
   background:
-    "radial-gradient(circle, rgba(23,232,229,0.4) 0%, rgba(23,232,229,0) 70%)",
+    "radial-gradient(circle, rgba(23,232,229,0.25) 0%, rgba(23,232,229,0) 70%)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -174,13 +182,14 @@ const footerStyle = {
   bottom: 0,
   left: 0,
   right: 0,
-  height: "45px",
-  background: "#0f172a",
+  height: "50px",
+  background: "rgba(18,26,43,0.95)", // frosted dark
+  backdropFilter: "blur(6px)",
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
-  padding: "12px 0 calc(env(safe-area-inset-bottom) + 12px)", // ✅ safe area bottom
-  borderTop: "1px solid #1F2937",
+  padding: "8px 0 calc(env(safe-area-inset-bottom) + 8px)",
+  borderTop: "1px solid rgba(23,232,166,0.2)", // neon line
   zIndex: 1000,
 };
 

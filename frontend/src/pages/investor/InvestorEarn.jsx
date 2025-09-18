@@ -11,6 +11,14 @@ export default function InvestorEarn() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
+  // 🔹 Apply global dark background + reset body
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,7 +30,7 @@ export default function InvestorEarn() {
         });
         setDirectPct(commRes.data.commission_percent || 0);
 
-        // 🔹 Team commission % (safe for investors)
+        // 🔹 Team commission %
         const configRes = await axios.get(`${API}/associate/admin/config`, {
           headers,
         });
@@ -55,7 +63,7 @@ export default function InvestorEarn() {
   };
 
   return (
-    <div style={{ color: "#E5E7EB", paddingBottom: "1px" }}>
+    <div style={pageWrapper}>
       <InvestorNavbar />
 
       <div style={wrapper}>
@@ -88,13 +96,16 @@ export default function InvestorEarn() {
           <h3 style={cardTitle}>Why Join?</h3>
           <ul style={listStyle}>
             <li>
-              <strong>Instant Payouts:</strong> Get rewarded with {directPct}% commission whenever you refer a new investor.
+              <strong>Instant Payouts:</strong> Get rewarded with {directPct}%
+              commission whenever you refer a new investor.
             </li>
             <li>
-              <strong>Residual Income:</strong> Earn {commissionPct}% every month from the profits of your referred investors.
+              <strong>Residual Income:</strong> Earn {commissionPct}% every
+              month from the profits of your referred investors.
             </li>
             <li>
-              <strong>Unlimited Growth:</strong> The more your network grows, the higher your recurring income.
+              <strong>Unlimited Growth:</strong> The more your network grows,
+              the higher your recurring income.
             </li>
           </ul>
         </div>
@@ -104,7 +115,19 @@ export default function InvestorEarn() {
 }
 
 /* === Styles === */
-const wrapper = { padding: "80px 20px 20px", textAlign: "center" };
+const pageWrapper = {
+  backgroundColor: "#0f172a", // 🔹 dark background
+  color: "#E5E7EB",
+  minHeight: "100vh",        // ✅ full screen
+  display: "flex",
+  flexDirection: "column",
+  overflowY: "auto",         // ✅ scrollable
+};
+
+const wrapper = {
+  padding: "100px 20px 70px", // ✅ header + footer safe space
+  textAlign: "center",
+};
 
 const heroCard = {
   background: "linear-gradient(145deg,#1E293B,#0F172A)",

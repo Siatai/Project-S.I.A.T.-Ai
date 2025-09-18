@@ -9,6 +9,14 @@ export default function Referrals() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
+  // ✅ Force global dark bg
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -66,7 +74,6 @@ export default function Referrals() {
             </strong>
           </div>
           <div style={progressTrack}>
-            {/* Remaining (left) visible part */}
             <div
               style={{
                 ...progressFill,
@@ -95,7 +102,6 @@ export default function Referrals() {
                 </strong>
               </div>
               <div style={progressTrack}>
-                {/* Remaining part shown */}
                 <div
                   style={{
                     ...progressFill,
@@ -117,16 +123,17 @@ export default function Referrals() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "#0f172a",
+  backgroundColor: "#0f172a", // ✅ full dark bg
   minHeight: "100vh",
   width: "100%",
   overflowX: "hidden",
+  color: "#E5E7EB",
 };
 
 const mainContent = {
   padding: "20px",
-  marginTop: "25px",
-  marginBottom: "70px",
+  marginTop: "80px",  // ✅ space for fixed navbar
+  marginBottom: "70px", // ✅ space for footer nav
 };
 
 const headerTitle = {

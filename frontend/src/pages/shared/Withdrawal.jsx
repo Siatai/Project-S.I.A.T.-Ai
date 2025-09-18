@@ -13,6 +13,14 @@ export default function Withdrawal() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
+  // 🔹 Apply global dark background + reset body (no bleed)
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
   // 🔹 Fetch wallet summary
   const fetchSummary = useCallback(async () => {
     try {
@@ -113,7 +121,7 @@ export default function Withdrawal() {
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={pageWrapper}>
       <InvestorNavbar />
 
       <div style={wrapper}>
@@ -148,6 +156,9 @@ export default function Withdrawal() {
               </strong>
             </div>
           </div>
+
+          {/* 🔹 Glow line below Wallet */}
+          <div style={glowLine} />
 
           {message && <div style={msgBox(message.type)}>{message.text}</div>}
 
@@ -220,7 +231,15 @@ export default function Withdrawal() {
 }
 
 /* === Styles === */
-const wrapper = { padding: "20px", marginTop: "1px", marginBottom: "70px" };
+const pageWrapper = {
+  backgroundColor: "#0f172a", // 🔹 dark background
+  color: "#E5E7EB",
+  minHeight: "100vh",
+  display: "flex",
+  flexDirection: "column",
+};
+
+const wrapper = { padding: "20px", marginTop: "80px", marginBottom: "70px" };
 const headerTitle = {
   fontFamily: "Orbitron, sans-serif",
   color: "#17E8E5",
@@ -253,6 +272,13 @@ const miniRow = {
   marginBottom: "6px",
   fontSize: "14px",
   color: "#E5E7EB",
+};
+
+const glowLine = {
+  height: "2px",
+  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
+  boxShadow: "0 0 10px #17E8E5",
+  margin: "16px 0 20px",
 };
 
 const btnTeal = {

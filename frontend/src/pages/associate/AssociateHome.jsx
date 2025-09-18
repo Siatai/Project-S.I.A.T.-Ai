@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCopy } from "react-icons/fa";
+import { FaCopy, FaWallet } from "react-icons/fa";
 import AssociateNavbar from "./AssociateNavbar"; // ✅ Fixed Navbar
 
 export default function AssociateHome() {
@@ -16,7 +16,6 @@ export default function AssociateHome() {
   const ADMIN_EMAIL = "admin@algomcube.com";
 
   useEffect(() => {
-    // ✅ Apply global dark background + reset margins inline
     document.body.style.margin = "0";
     document.body.style.padding = "0";
     document.body.style.background = "#0f172a";
@@ -83,7 +82,23 @@ export default function AssociateHome() {
 
       <main style={mainContent}>
         <div style={haloBox}>
+          {/* 🔹 Welcome Section */}
           <h3 style={welcomeText}>Welcome, {user.name || user.email}</h3>
+          <div style={glowLine} />
+
+          {/* 🔹 Wallet Balance Card */}
+          <div style={walletCard}>
+            <div style={walletIconBox}>
+              <FaWallet style={walletIcon} />
+            </div>
+            <div>
+              <p style={walletLabel}>Wallet Balance</p>
+              <h3 style={walletValue}>
+                {user.wallet_balance?.toFixed(2) || "0.00"} USDT
+              </h3>
+            </div>
+          </div>
+
           <p style={subCaption}>
             Now enjoy{" "}
             <span style={{ color: "#17E8E5", fontWeight: "600" }}>
@@ -108,7 +123,20 @@ export default function AssociateHome() {
             {copied && <p style={copiedText}>Copied!</p>}
           </div>
 
-          {/* Deposits */}
+          {/* 🔹 Commission First */}
+          <div style={cardStyle3D}>
+            <div style={glowRow}>
+              <span>Total Commission</span>
+              <strong>{Math.round(totalTeam)} USDT</strong>
+            </div>
+            <ProgressBar percent={percentLeftTeam} />
+            <p style={mutedText}>
+              Earned: {Math.round(earnedTeam)} USDT | Left:{" "}
+              {Math.round(leftTeam)} USDT
+            </p>
+          </div>
+
+          {/* 🔹 Deposits Second */}
           <div style={cardStyle3D}>
             <div style={glowRow}>
               <span>Total Deposits</span>
@@ -120,19 +148,6 @@ export default function AssociateHome() {
             </p>
             <p style={{ color: "#FACC15", fontSize: "13px" }}>
               {Math.round(leftSelf)} USDT left to receive
-            </p>
-          </div>
-
-          {/* Commission */}
-          <div style={cardStyle3D}>
-            <div style={glowRow}>
-              <span>Total Commission</span>
-              <strong>{Math.round(totalTeam)} USDT</strong>
-            </div>
-            <ProgressBar percent={percentLeftTeam} />
-            <p style={mutedText}>
-              Earned: {Math.round(earnedTeam)} USDT | Left:{" "}
-              {Math.round(leftTeam)} USDT
             </p>
           </div>
         </div>
@@ -165,10 +180,8 @@ const pageWrapper = {
 
 const mainContent = {
   padding: "20px",
-  marginTop: "20px",
+  marginTop: "100px",
   marginBottom: "70px",
-  marginleft: "15px" ,
-  marginright: "15px",
   width: "100%",
   display: "flex",
   justifyContent: "center",
@@ -185,13 +198,38 @@ const haloBox = {
     "0 0 25px rgba(23,232,229,0.3), 0 0 50px rgba(23,232,229,0.15), inset 0 0 10px rgba(23,232,229,0.1)",
 };
 
+/* Wallet card */
+const walletCard = {
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  background: "rgba(17,24,39,0.85)",
+  borderRadius: "12px",
+  padding: "15px 20px",
+  margin: "15px 0",
+  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+};
+
+const walletIconBox = {
+  width: "40px",
+  height: "40px",
+  borderRadius: "10px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(23,232,229,0.1)",
+  boxShadow: "0 0 12px rgba(23,232,229,0.5)",
+};
+
+const walletIcon = { fontSize: "20px", color: "#17E8E5" };
+const walletLabel = { fontSize: "13px", color: "#9CA3AF", margin: 0 };
+const walletValue = { fontSize: "20px", color: "#17E8E5", margin: 0 };
+
 const cardStyle3D = {
   background: "linear-gradient(145deg,#1E293B,#0F172A)",
   padding: "16px",
-  
   borderRadius: "14px",
   marginBottom: "18px",
-
   boxShadow:
     "5px 5px 15px rgba(0,0,0,0.7), -5px -5px 15px rgba(255,255,255,0.05)",
 };
@@ -234,11 +272,7 @@ const copyIconBtn = {
   cursor: "pointer",
 };
 
-const copiedText = {
-  fontSize: "11px",
-  color: "#22C55E",
-  marginTop: "4px",
-};
+const copiedText = { fontSize: "11px", color: "#22C55E", marginTop: "4px" };
 
 const progressTrack = {
   background: "#374151",
@@ -248,10 +282,7 @@ const progressTrack = {
   marginTop: "10px",
 };
 
-const progressFill = {
-  height: "100%",
-  transition: "width 0.6s ease",
-};
+const progressFill = { height: "100%", transition: "width 0.6s ease" };
 
 const mutedText = { color: "#9CA3AF", fontSize: "13px", margin: "6px 0" };
 
@@ -274,4 +305,11 @@ const sectionCaption = {
   fontSize: "13px",
   color: "#9CA3AF",
   marginBottom: "6px",
+};
+
+const glowLine = {
+  height: "2px",
+  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
+  boxShadow: "0 0 10px #17E8E5",
+  margin: "8px 0 18px 0",
 };

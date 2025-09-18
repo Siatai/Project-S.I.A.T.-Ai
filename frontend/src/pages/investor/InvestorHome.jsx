@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaWallet } from "react-icons/fa"; // Wallet icon
-import InvestorNavbar from "./Navbar"; // Custom Navbar with halo logo
+import { FaWallet } from "react-icons/fa";
+import InvestorNavbar from "./Navbar";
 
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
@@ -14,6 +14,14 @@ export default function InvestorHome() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
+  // 🔹 Apply global dark background + reset body
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
   // 🔹 Fetch user, wallet, deposits
   useEffect(() => {
     const fetchUserAndData = async () => {
@@ -22,21 +30,16 @@ export default function InvestorHome() {
         if (!token) return;
         const headers = { Authorization: `Bearer ${token}` };
 
-        // Get user info
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
         if (res.data.is_associate) setIsAssociate(true);
         if (res.data.pending_associate) setApplied(true);
 
-        // Get deposits + ROI progress
-        const roiRes = await axios.get(`${API}/investor-roi-status`, {
-          headers,
-        });
+        const roiRes = await axios.get(`${API}/investor-roi-status`, { headers });
         setDeposits(roiRes.data.deposits || []);
         setSummary(roiRes.data.summary || null);
 
-        // ✅ Get wallet balance from /wallet/summary
         const walletRes = await axios.get(`${API}/wallet/summary`, { headers });
         setUser((prev) => ({
           ...prev,
@@ -71,18 +74,13 @@ export default function InvestorHome() {
   if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={pageWrapper}>
       <InvestorNavbar />
 
-      <div style={{ padding: "20px", marginBottom: "70px", margintop: "80px" }}>
+      {/* Content Wrapper with header/footer spacing */}
+      <div style={contentWrapper}>
         {/* ✅ Name greeting */}
-        <h2
-          style={{
-            fontFamily: "Orbitron, sans-serif",
-            fontSize: "22px",
-            color: "#17E8E5",
-          }}
-        >
+        <h2 style={welcomeText}>
           Welcome, {user.name || user.email}
         </h2>
         <div style={glowLine} />
@@ -134,9 +132,7 @@ export default function InvestorHome() {
           )}
 
           {deposits.length === 0 ? (
-            <p style={{ color: "#9CA3AF", marginTop: "12px" }}>
-              No deposits yet
-            </p>
+            <p style={{ color: "#9CA3AF", marginTop: "12px" }}>No deposits yet</p>
           ) : (
             deposits.map((d, idx) => (
               <div key={idx} style={{ marginBottom: "18px" }}>
@@ -197,13 +193,12 @@ export default function InvestorHome() {
 function DepletingBar({ received, max }) {
   const percentLeft = max > 0 ? ((max - received) / max) * 100 : 0;
 
-  // 🎨 Dynamic color based on depletion
-  let gradient = "linear-gradient(90deg,#17E8E5,#14B8E5)"; // neon blue
+  let gradient = "linear-gradient(90deg,#17E8E5,#14B8E5)";
   if (percentLeft < 70 && percentLeft >= 40) {
-    gradient = "linear-gradient(90deg,#FACC15,#FBBF24)"; // yellow
+    gradient = "linear-gradient(90deg,#FACC15,#FBBF24)";
   }
   if (percentLeft < 40) {
-    gradient = "linear-gradient(90deg,#EF4444,#DC2626)"; // red
+    gradient = "linear-gradient(90deg,#EF4444,#DC2626)";
   }
 
   return (
@@ -226,6 +221,26 @@ function DepletingBar({ received, max }) {
 }
 
 /* === Styles === */
+const pageWrapper = {
+  minHeight: "100vh",
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  color: "#E5E7EB",
+};
+
+const contentWrapper = {
+  padding: "20px",
+  paddingTop: "80px",  // space for fixed header
+  paddingBottom: "70px", // space for fixed footer
+};
+
+const welcomeText = {
+  fontFamily: "Orbitron, sans-serif",
+  fontSize: "22px",
+  color: "#17E8E5",
+};
+
 const cardStyle = {
   marginTop: 30,
   padding: "20px",

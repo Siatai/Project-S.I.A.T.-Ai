@@ -13,6 +13,14 @@ export default function AssociateWithdrawal() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
+  // ✅ Force dark background on body
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
   // 🔹 Fetch wallet summary
   const fetchSummary = useCallback(async () => {
     try {
@@ -61,7 +69,6 @@ export default function AssociateWithdrawal() {
 
   // 🔹 Request OTP
   const requestOtp = async () => {
-    // ✅ Enforce weekend-only withdrawals
     const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
     if (today !== 0 && today !== 6) {
       return setMessage({
@@ -69,8 +76,6 @@ export default function AssociateWithdrawal() {
         text: "Withdrawals are allowed only on Saturday and Sunday.",
       });
     }
-
-    // ✅ Enforce $20 minimum
     if (summary.withdrawable < 20) {
       return setMessage({ type: "error", text: "Minimum withdrawal is $20." });
     }
@@ -117,7 +122,7 @@ export default function AssociateWithdrawal() {
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={pageWrapper}>
       <AssociateNavbar />
 
       <div style={wrapper}>
@@ -224,7 +229,15 @@ export default function AssociateWithdrawal() {
 }
 
 /* === Styles === */
-const wrapper = { padding: "20px", marginTop: "1px", marginBottom: "70px" };
+const pageWrapper = {
+  background: "#0f172a", // ✅ Dark bg covers full page
+  minHeight: "100vh",
+  width: "100%",
+  overflowX: "hidden",
+  color: "#E5E7EB",
+};
+
+const wrapper = { padding: "20px", marginTop: "80px", marginBottom: "70px" };
 const headerTitle = {
   fontFamily: "Orbitron, sans-serif",
   color: "#17E8E5",

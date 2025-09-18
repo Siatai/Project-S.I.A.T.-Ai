@@ -11,6 +11,14 @@ export default function TransactionHistory() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
+  // 🔹 Apply global dark background + reset body (no bleed)
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#0f172a";
+    document.body.style.overflowX = "hidden";
+  }, []);
+
   // Handle resize → detect mobile
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -30,7 +38,6 @@ export default function TransactionHistory() {
           axios.get(`${API}/withdrawals/user`, { headers }),
         ]);
 
-        // Map deposits
         const deposits = (roiRes.data.deposits || []).map((d) => ({
           type: "Deposit",
           amount: d.capital,
@@ -39,7 +46,6 @@ export default function TransactionHistory() {
           tx: d.tx_hash || "-",
         }));
 
-        // Map withdrawals
         const withdrawals = (withdrawalsRes.data || []).map((w) => ({
           type: "Withdrawal",
           amount: w.final_amount,
@@ -71,11 +77,11 @@ export default function TransactionHistory() {
   });
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={pageWrapper}>
       {/* ✅ Navbar */}
       <InvestorNavbar />
 
-      <div style={{ padding: "20px", marginTop: "1px", marginBottom: "70px" }}>
+      <div style={contentWrapper}>
         <h2
           style={{
             marginBottom: "10px",
@@ -121,17 +127,7 @@ export default function TransactionHistory() {
         </div>
 
         {/* Table / Mobile Cards */}
-        <div
-          style={{
-            background: "rgba(17,24,39,0.85)",
-            backdropFilter: "blur(8px)",
-            borderRadius: "12px",
-            boxShadow: "0 0 18px rgba(23,232,229,0.2)",
-            overflowX: "auto",
-            maxWidth: "100%",
-            padding: isMobile ? "10px" : "0",
-          }}
-        >
+        <div style={tableWrapper}>
           {loading ? (
             <p style={{ padding: "20px" }}>Loading transactions...</p>
           ) : filteredTx.length === 0 ? (
@@ -139,18 +135,9 @@ export default function TransactionHistory() {
               No transactions found.
             </p>
           ) : isMobile ? (
-            // Mobile → Card View
             <div style={{ display: "grid", gap: "15px" }}>
               {filteredTx.map((t, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: "rgba(31,41,55,0.9)",
-                    borderRadius: "12px",
-                    padding: "15px",
-                    boxShadow: "0 0 12px rgba(23,232,229,0.2)",
-                  }}
-                >
+                <div key={i} style={mobileCard}>
                   <p>
                     <strong>Type:</strong> {t.type}
                   </p>
@@ -179,9 +166,7 @@ export default function TransactionHistory() {
                       {t.status}
                     </span>
                   </p>
-                  <p
-                    style={{ fontFamily: "monospace", wordBreak: "break-all" }}
-                  >
+                  <p style={{ fontFamily: "monospace", wordBreak: "break-all" }}>
                     <strong>Tx:</strong> {t.tx}
                   </p>
                   <p>
@@ -191,29 +176,12 @@ export default function TransactionHistory() {
               ))}
             </div>
           ) : (
-            // Desktop → Table View
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                minWidth: "700px",
-              }}
-            >
+            <table style={tableStyle}>
               <thead>
                 <tr style={{ background: "rgba(31,41,55,0.9)" }}>
                   {["Type", "Amount", "Fee", "Status", "Tx Hash", "Date"].map(
                     (h, i) => (
-                      <th
-                        key={i}
-                        style={{
-                          padding: "12px",
-                          textAlign: "left",
-                          fontSize: "14px",
-                          color: "#9CA3AF",
-                          fontWeight: "600",
-                          fontFamily: "Inter, sans-serif",
-                        }}
-                      >
+                      <th key={i} style={thStyle}>
                         {h}
                       </th>
                     )
@@ -222,12 +190,7 @@ export default function TransactionHistory() {
               </thead>
               <tbody>
                 {filteredTx.map((t, i) => (
-                  <tr
-                    key={i}
-                    style={{
-                      borderBottom: "1px solid rgba(255,255,255,0.05)",
-                    }}
-                  >
+                  <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                     <td style={tdStyle}>{t.type}</td>
                     <td style={tdStyle}>${t.amount}</td>
                     <td style={tdStyle}>{t.fee ? `$${t.fee}` : "-"}</td>
@@ -240,7 +203,7 @@ export default function TransactionHistory() {
                             : t.status === "approved" ||
                               t.status === "confirmed"
                             ? "#17E8E5"
-                            : "#4fef44ff",
+                            : "#EF4444",
                         fontWeight: "600",
                       }}
                     >
@@ -261,6 +224,46 @@ export default function TransactionHistory() {
   );
 }
 
+/* === Styles === */
+const pageWrapper = {
+  backgroundColor: "#0f172a", // dark page background
+  color: "#E5E7EB",
+  minHeight: "100vh",
+  display: "flex",
+  flexDirection: "column",
+};
+
+const contentWrapper = {
+  padding: "20px",
+  paddingTop: "80px",    // space for fixed header
+  paddingBottom: "60px", // space for fixed footer
+};
+
+const tableWrapper = {
+  background: "rgba(17,24,39,0.85)",
+  backdropFilter: "blur(8px)",
+  borderRadius: "12px",
+  boxShadow: "0 0 18px rgba(23,232,229,0.2)",
+  overflowX: "auto",
+  maxWidth: "100%",
+  padding: "0",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  minWidth: "700px",
+};
+
+const thStyle = {
+  padding: "12px",
+  textAlign: "left",
+  fontSize: "14px",
+  color: "#9CA3AF",
+  fontWeight: "600",
+  fontFamily: "Inter, sans-serif",
+};
+
 const tdStyle = {
   padding: "12px",
   fontSize: "14px",
@@ -273,4 +276,11 @@ const glowLine = {
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 20px 0",
+};
+
+const mobileCard = {
+  background: "rgba(31,41,55,0.9)",
+  borderRadius: "12px",
+  padding: "15px",
+  boxShadow: "0 0 12px rgba(23,232,229,0.2)",
 };

@@ -86,11 +86,13 @@ function FooterBtn({ icon, label, active, to }) {
         ...footerBtn,
         color: active ? "#17E8E5" : "#9CA3AF",
         borderTop: active ? "2px solid #17E8E5" : "2px solid transparent",
+        paddingTop: "6px", // 🔹 pushes content slightly down
+        paddingBottom: "6px", // 🔹 gap from highlighter bar
       }}
       onClick={handleClick}
     >
       {icon}
-      <span style={{ fontSize: "12px", marginTop: "2px" }}>{label}</span>
+      <span style={{ fontSize: "12px", marginTop: "4px" }}>{label}</span>
     </button>
   );
 }
@@ -178,7 +180,7 @@ const footerStyle = {
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
-  padding: "12px 0",
+  padding: "8px 0",
   borderTop: "1px solid #1F2937",
   zIndex: 1000,
 };
@@ -188,8 +190,10 @@ const footerBtn = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  justifyContent: "center",
   background: "transparent",
   border: "none",
   fontSize: "16px",
   cursor: "pointer",
+  gap: "3px", // 🔹 ensures icon-text spacing
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-// Layout
+// Layout (only for Admin now)
 import DashboardLayout from "../Layouts/DashboardLayout";
 
 // Public
@@ -12,8 +12,8 @@ import ReferralSignup from "../pages/public/ReferralSignup";
 import InvestorHome from "../pages/investor/InvestorHome";
 import Withdrawal from "../pages/shared/Withdrawal";
 import TransactionHistory from "../pages/shared/TransactionHistory";
-import WalletPage from "../pages/investor/WalletPage"; // ✅ Combined Wallet + Deposit
-import InvestorEarn from "../pages/investor/InvestorEarn"; // ✅ Make sure file exists: InvestorEarn.jsx or InvestorEarn.js
+import WalletPage from "../pages/investor/WalletPage"; 
+import InvestorEarn from "../pages/investor/InvestorEarn"; 
 
 // Associate pages
 import Referrals from "../pages/associate/Referrals"; 
@@ -57,34 +57,61 @@ export default function AppRoutes() {
         <Route path="/" element={<Landing />} />
         <Route path="/referral-signup" element={<ReferralSignup />} />
 
-        {/* 👤 Investor Dashboard */}
-        <Route path="/investor/*" element={<DashboardLayout role="investor" />}>
-          <Route index element={<InvestorHome />} />
-          <Route path="wallet" element={<WalletPage />} />
-          <Route path="withdrawal" element={<Withdrawal />} />
-          <Route path="history" element={<TransactionHistory />} />
-          <Route path="earn" element={<InvestorEarn />} /> {/* ✅ New route */}
-          <Route path="*" element={<Navigate to="/investor" replace />} />
-        </Route>
+        {/* 👤 Investor Pages (no DashboardLayout) */}
+        <Route path="/investor" element={<InvestorHome />} />
+        <Route path="/investor/wallet" element={<WalletPage />} />
+        <Route path="/investor/withdrawal" element={<Withdrawal />} />
+        <Route path="/investor/history" element={<TransactionHistory />} />
+        <Route path="/investor/earn" element={<InvestorEarn />} />
+        <Route path="/investor/*" element={<Navigate to="/investor" replace />} />
 
-        {/* 🤝 Associate Dashboard */}
+        {/* 🤝 Associate Pages (no DashboardLayout) */}
         <Route
-          path="/associate/*"
+          path="/associate"
           element={
             <RequireAssociate>
-              <DashboardLayout role="associate" />
+              <AssociateHome />
             </RequireAssociate>
           }
-        >
-          <Route index element={<AssociateHome />} />
-          <Route path="wallet" element={<AssociateWalletPage />} />
-          <Route path="referrals" element={<Referrals />} />
-          <Route path="withdrawal" element={<AssociateWithdrawal />} />
-          <Route path="history" element={<AssociateHistory />} />
-          <Route path="*" element={<Navigate to="/associate" replace />} />
-        </Route>
+        />
+        <Route
+          path="/associate/wallet"
+          element={
+            <RequireAssociate>
+              <AssociateWalletPage />
+            </RequireAssociate>
+          }
+        />
+        <Route
+          path="/associate/referrals"
+          element={
+            <RequireAssociate>
+              <Referrals />
+            </RequireAssociate>
+          }
+        />
+        <Route
+          path="/associate/withdrawal"
+          element={
+            <RequireAssociate>
+              <AssociateWithdrawal />
+            </RequireAssociate>
+          }
+        />
+        <Route
+          path="/associate/history"
+          element={
+            <RequireAssociate>
+              <AssociateHistory />
+            </RequireAssociate>
+          }
+        />
+        <Route
+          path="/associate/*"
+          element={<Navigate to="/associate" replace />}
+        />
 
-        {/* 🛠 Admin Dashboard */}
+        {/* 🛠 Admin Dashboard (keeps DashboardLayout) */}
         <Route
           path="/admin/*"
           element={
