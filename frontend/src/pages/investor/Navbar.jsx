@@ -174,7 +174,7 @@ const footerStyle = {
   bottom: 0,
   left: 0,
   right: 0,
-  height: "60px",
+  height: "45px",
   background: "#0f172a",
   display: "flex",
   justifyContent: "space-around",
