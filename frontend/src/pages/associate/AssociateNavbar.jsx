@@ -6,20 +6,12 @@ import {
   FaUsers,
   FaHistory,
   FaMoneyBillWave,
-  FaSignOutAlt,
   FaBars, // ✅ Hamburger icon
 } from "react-icons/fa";
 import logo from "../../Components/logo.png";
 
 export default function AssociateNavbar() {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/");
-  };
 
   return (
     <div>
@@ -76,21 +68,15 @@ export default function AssociateNavbar() {
           active={location.pathname === "/associate/withdrawal"}
           to="/associate/withdrawal"
         />
-        <FooterBtn
-          icon={<FaSignOutAlt />}
-          label="Logout"
-          onClick={handleLogout}
-        />
       </footer>
     </div>
   );
 }
 
 /* Footer Button */
-function FooterBtn({ icon, label, active, to, onClick }) {
+function FooterBtn({ icon, label, active, to }) {
   const navigate = useNavigate();
   const handleClick = () => {
-    if (onClick) onClick();
     if (to) navigate(to);
   };
 
