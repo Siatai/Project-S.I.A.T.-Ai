@@ -5,14 +5,13 @@ import {
   FaWallet,
   FaHistory,
   FaMoneyBillWave,
-  FaChartLine, // ✅ New Earn icon
+  FaChartLine, // ✅ Earn icon
   FaBars,
 } from "react-icons/fa";
 import logo from "../../Components/logo.png";
 
 export default function InvestorNavbar() {
   const location = useLocation();
-  
 
   return (
     <div>
@@ -64,7 +63,7 @@ export default function InvestorNavbar() {
           to="/investor/withdrawal"
         />
         <FooterBtn
-          icon={<FaChartLine />} // ✅ Earn button
+          icon={<FaChartLine />}
           label="Earn"
           active={location.pathname === "/investor/earn"}
           to="/investor/earn"
@@ -87,11 +86,12 @@ function FooterBtn({ icon, label, active, to }) {
         ...footerBtn,
         color: active ? "#17E8E5" : "#9CA3AF",
         borderTop: active ? "2px solid #17E8E5" : "2px solid transparent",
+        paddingTop: "6px", // ✅ creates distance between highlight and icon
       }}
       onClick={handleClick}
     >
       {icon}
-      <span style={{ fontSize: "12px", marginTop: "2px" }}>{label}</span>
+      <span style={{ fontSize: "12px", marginTop: "4px" }}>{label}</span>
     </button>
   );
 }
@@ -104,7 +104,7 @@ const headerStyle = {
   right: 0,
   height: "60px",
   background: "#0f172a",
-  padding: "14px 20px",
+  padding: "14px 20px calc(env(safe-area-inset-top) + 14px)", // ✅ safe area
   borderBottom: "1px solid #1F2937",
   zIndex: 1000,
   display: "flex",
@@ -174,12 +174,12 @@ const footerStyle = {
   bottom: 0,
   left: 0,
   right: 0,
-  height:"60px",
+  height: "60px",
   background: "#0f172a",
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
-  padding: "12px 0",
+  padding: "12px 0 calc(env(safe-area-inset-bottom) + 12px)", // ✅ safe area bottom
   borderTop: "1px solid #1F2937",
   zIndex: 1000,
 };
