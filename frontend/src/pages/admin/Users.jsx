@@ -39,6 +39,20 @@ export default function AdminUsers() {
     }
   };
 
+  const denyAssociate = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${API}/admin/deny-associate`,
+        { id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchUsers();
+    } catch (err) {
+      console.error("Error denying associate request:", err);
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     if (!filter) return true;
     const refName = u.referrer_name?.toLowerCase() || "";
@@ -82,7 +96,7 @@ export default function AdminUsers() {
             <th>Role</th>
             <th>Balance</th>
             <th>Deposits</th>
-            <th>Associate Request</th> {/* ✅ new column */}
+            <th>Associate Request</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -108,8 +122,8 @@ export default function AdminUsers() {
                       width: "12px",
                       height: "12px",
                       borderRadius: "50%",
-                      background: "#22C55E", // green light
-                      boxShadow: "0 0 6px #22C55E",
+                      background: "#FACC15", // yellow = pending
+                      boxShadow: "0 0 6px #FACC15",
                     }}
                   ></span>
                 ) : (
@@ -117,16 +131,34 @@ export default function AdminUsers() {
                 )}
               </td>
               <td>
-                {!u.is_admin && (
+                {!u.is_admin && u.pending_associate && (
                   <>
                     <button
                       onClick={() => updateRole(u.id, "associate")}
-                      style={{ marginRight: 10 }}
+                      style={{
+                        marginRight: 10,
+                        background: "#22C55E",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 10px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
                     >
-                      Make Associate
+                      Approve
                     </button>
-                    <button onClick={() => updateRole(u.id, "investor")}>
-                      Make Investor
+                    <button
+                      onClick={() => denyAssociate(u.id)}
+                      style={{
+                        background: "#EF4444",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 10px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Deny
                     </button>
                   </>
                 )}

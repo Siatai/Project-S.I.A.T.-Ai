@@ -5,6 +5,8 @@ import InvestorNavbar from "./Navbar";
 export default function InvestorEarn() {
   const [directPct, setDirectPct] = useState(0);
   const [commissionPct, setCommissionPct] = useState(0);
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
@@ -32,6 +34,26 @@ export default function InvestorEarn() {
     if (token) fetchData();
   }, [token]);
 
+  // 🔹 Handle Apply Now
+  const handleApply = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        `${API}/request-associate`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage({ type: "success", text: res.data.message });
+    } catch (err) {
+      setMessage({
+        type: "error",
+        text: err?.response?.data?.detail || "Failed to submit request",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ color: "#E5E7EB", paddingBottom: "1px" }}>
       <InvestorNavbar />
@@ -53,9 +75,12 @@ export default function InvestorEarn() {
           </p>
         </div>
 
-        {/* Apply Now Button (moved above Why Join) */}
+        {/* Apply Now Button */}
         <div style={ctaBox}>
-          <button style={btnApply}>Apply Now</button>
+          <button style={btnApply} onClick={handleApply} disabled={loading}>
+            {loading ? "Submitting..." : "Apply Now"}
+          </button>
+          {message && <div style={msgBox(message.type)}>{message.text}</div>}
         </div>
 
         {/* Why Join Card */}
@@ -140,3 +165,14 @@ const btnApply = {
   color: "#0B1220",
   boxShadow: "0 0 12px rgba(23,232,229,0.4)",
 };
+
+const msgBox = (type) => ({
+  marginTop: "12px",
+  padding: "10px",
+  borderRadius: "8px",
+  background:
+    type === "error" ? "rgba(239,68,68,0.15)" : "rgba(16,185,129,0.15)",
+  border: `1px solid ${type === "error" ? "#EF4444" : "#10B981"}`,
+  color: type === "error" ? "#F87171" : "#34D399",
+  fontSize: "14px",
+});
