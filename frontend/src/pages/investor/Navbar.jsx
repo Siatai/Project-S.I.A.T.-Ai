@@ -5,20 +5,14 @@ import {
   FaWallet,
   FaHistory,
   FaMoneyBillWave,
-  FaSignOutAlt,
+  FaChartLine, // ✅ New Earn icon
   FaBars,
 } from "react-icons/fa";
 import logo from "../../Components/logo.png";
 
 export default function InvestorNavbar() {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/");
-  };
+  
 
   return (
     <div>
@@ -70,9 +64,10 @@ export default function InvestorNavbar() {
           to="/investor/withdrawal"
         />
         <FooterBtn
-          icon={<FaSignOutAlt />}
-          label="Logout"
-          onClick={handleLogout}
+          icon={<FaChartLine />} // ✅ Earn button
+          label="Earn"
+          active={location.pathname === "/investor/earn"}
+          to="/investor/earn"
         />
       </footer>
     </div>
@@ -80,10 +75,9 @@ export default function InvestorNavbar() {
 }
 
 /* Footer Button */
-function FooterBtn({ icon, label, active, to, onClick }) {
+function FooterBtn({ icon, label, active, to }) {
   const navigate = useNavigate();
   const handleClick = () => {
-    if (onClick) onClick();
     if (to) navigate(to);
   };
 

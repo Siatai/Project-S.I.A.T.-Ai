@@ -13,11 +13,12 @@ import InvestorHome from "../pages/investor/InvestorHome";
 import Withdrawal from "../pages/shared/Withdrawal";
 import TransactionHistory from "../pages/shared/TransactionHistory";
 import WalletPage from "../pages/investor/WalletPage"; // ✅ Combined Wallet + Deposit
+import InvestorEarn from "../pages/investor/InvestorEarn"; // ✅ Make sure file exists: InvestorEarn.jsx or InvestorEarn.js
 
 // Associate pages
-import Referrals from "../pages/associate/Referrals"; // ✅ Fixed naming
+import Referrals from "../pages/associate/Referrals"; 
 import AssociateHome from "../pages/associate/AssociateHome";
-import AssociateWalletPage from "../pages/associate/AssociateWalletPage"; // ✅ Associate wallet
+import AssociateWalletPage from "../pages/associate/AssociateWalletPage"; 
 import AssociateHistory from "../pages/associate/AssociateHistory";
 import AssociateWithdrawal from "../pages/associate/AssociateWithdrawal";
 
@@ -28,7 +29,7 @@ import CommissionConfig from "../pages/admin/CommissionConfig";
 import WithdrawApprovals from "../pages/admin/WithdrawApprovals";
 import Transactions from "../pages/admin/Transactions";
 import AdminROICredit from "../pages/admin/AdminROICredit";
-import AdminFinancialSummary from "../pages/admin/AdminFinancialSummary"; // ✅ new
+import AdminFinancialSummary from "../pages/admin/AdminFinancialSummary";
 
 // --- Role Guards ---
 function RequireAssociate({ children }) {
@@ -62,6 +63,7 @@ export default function AppRoutes() {
           <Route path="wallet" element={<WalletPage />} />
           <Route path="withdrawal" element={<Withdrawal />} />
           <Route path="history" element={<TransactionHistory />} />
+          <Route path="earn" element={<InvestorEarn />} /> {/* ✅ New route */}
           <Route path="*" element={<Navigate to="/investor" replace />} />
         </Route>
 
@@ -75,12 +77,11 @@ export default function AppRoutes() {
           }
         >
           <Route index element={<AssociateHome />} />
-          <Route path="wallet" element={<AssociateWalletPage />} /> {/* ✅ Associate Wallet */}
-          <Route path="referrals" element={<Referrals />} /> {/* ✅ Referrals page */}
+          <Route path="wallet" element={<AssociateWalletPage />} />
+          <Route path="referrals" element={<Referrals />} />
           <Route path="withdrawal" element={<AssociateWithdrawal />} />
-          
           <Route path="history" element={<AssociateHistory />} />
-          <Route path="*" element={<Navigate to="/associate" replace />} /> {/* ✅ stay in associate */}
+          <Route path="*" element={<Navigate to="/associate" replace />} />
         </Route>
 
         {/* 🛠 Admin Dashboard */}
@@ -100,7 +101,7 @@ export default function AppRoutes() {
           <Route path="financial-summary" element={<AdminFinancialSummary />} />
           <Route path="approvals" element={<WithdrawApprovals />} />
           <Route path="transactions" element={<Transactions />} />
-          <Route path="*" element={<Navigate to="/admin" replace />} /> {/* ✅ stay in admin */}
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
 
         {/* 🚨 Catch-All Redirect */}
