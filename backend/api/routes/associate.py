@@ -281,7 +281,7 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 
 
 
-@router.get("/associate/referral-packages")
+@router.get("/referral-packages")
 def get_referral_packages(
     db: Session = Depends(get_db),
     token_user=Depends(verify_token)   # ✅ replaces get_current_user

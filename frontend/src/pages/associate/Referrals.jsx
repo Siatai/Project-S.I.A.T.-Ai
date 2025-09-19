@@ -3,14 +3,12 @@ import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar"; // ✅ Navbar
 
 export default function Referrals() {
-  const [teamDeposits, setTeamDeposits] = useState([]);
+  const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReferee, setSelectedReferee] = useState(null);
-  const [message, setMessage] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
 
   // ✅ Global bg
   useEffect(() => {
@@ -20,15 +18,18 @@ export default function Referrals() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // ✅ Load ROI summary (earned/left)
+  // ✅ Load packages from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const headers = { Authorization: `Bearer ${token}` }; // moved inside
         setLoading(true);
-        const res = await axios.get(`${API}/associate-roi-status`, { headers });
-        setTeamDeposits(res.data.details || []);
+        const res = await axios.get(`${API}/associate/referral-packages`, {
+          headers,
+        });
+        setPackages(res.data.packages || []);
       } catch (err) {
-        console.error("Error fetching referrals:", err);
+        console.error("Error fetching referral packages:", err);
       } finally {
         setLoading(false);
       }
@@ -38,46 +39,23 @@ export default function Referrals() {
 
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
 
-  // ✅ Group deposits by referee (name + email)
-  const grouped = teamDeposits.reduce((acc, d) => {
-    const name = d.referee_name || "Unknown User";
-    const email = d.referee_email || "unknown@email";
-    if (!acc[email]) acc[email] = { name, email, earned: 0, left: 0 };
-    acc[email].earned += d.commission_earned || 0;
-    acc[email].left += d.commission_left || 0;
+  // ✅ Group by referee email
+  const grouped = packages.reduce((acc, p) => {
+    if (!acc[p.referee_email]) acc[p.referee_email] = [];
+    acc[p.referee_email].push(p);
     return acc;
   }, {});
 
-  const referees = Object.values(grouped).map((r) => ({
-    name: r.name,
-    email: r.email,
-    earned: r.earned,
-    left: r.left,
-    total: r.earned + r.left,
+  const referees = Object.keys(grouped).map((email) => ({
+    email,
+    packages: grouped[email],
+    totalCommission: grouped[email].reduce(
+      (s, p) => s + p.commission_amount,
+      0
+    ),
   }));
 
-  const totalEarned = referees.reduce((s, r) => s + r.earned, 0);
-  const totalLeft = referees.reduce((s, r) => s + r.left, 0);
-  const totalAll = totalEarned + totalLeft;
-
-  // ✅ On click, build a "virtual package"
-  const handleRefClick = (ref) => {
-    const lockDays = 30; // Or fetch from /associate-config if needed
-    const now = new Date();
-    const maturedAt = new Date();
-    maturedAt.setDate(now.getDate() + lockDays);
-
-    setSelectedReferee({
-      ...ref,
-      package: {
-        amount: ref.left,
-        status: ref.left > 0 ? "Locked" : "Matured",
-        daysLeft: lockDays,
-        maturedAt,
-      },
-    });
-    setMessage(null);
-  };
+  const totalAll = packages.reduce((s, p) => s + p.commission_amount, 0);
 
   return (
     <div style={pageWrapper}>
@@ -85,64 +63,34 @@ export default function Referrals() {
       <main style={mainContent}>
         <h2 style={headerTitle}>Referral Earnings</h2>
 
-        {/* === TOTAL BAR (Depleting) === */}
+        {/* === TOTAL SUMMARY === */}
         <div style={cardStyle}>
           <div style={glowRow}>
-            <span>Total from All Referrals</span>
-            <strong>
-              ${totalEarned.toFixed(2)} / ${totalAll.toFixed(2)}
-            </strong>
+            <span>Total Commission from All Referrals</span>
+            <strong>${totalAll.toFixed(2)}</strong>
           </div>
-          <div style={progressTrack}>
-            <div
-              style={{
-                ...progressFill,
-                width: totalAll > 0 ? `${(totalLeft / totalAll) * 100}%` : "0%",
-                background: "#17E8E5",
-              }}
-            />
-          </div>
-          <p style={mutedText}>
-            Earned: ${totalEarned.toFixed(2)} | Left: ${totalLeft.toFixed(2)}
-          </p>
         </div>
 
-        {/* === PER REFEREE BAR (clickable) === */}
+        {/* === PER REFEREE === */}
         <h3 style={subHeader}>Referrals</h3>
         {referees.length === 0 && (
           <p style={{ color: "#9CA3AF" }}>No referrals yet.</p>
         )}
-        {referees.map((r, i) => {
-          const percentLeft = r.total > 0 ? (r.left / r.total) * 100 : 0;
-          return (
-            <div
-              key={i}
-              style={{ ...cardStyle, cursor: "pointer" }}
-              onClick={() => handleRefClick(r)}
-            >
-              <div style={glowRow}>
-                <span style={{ color: "#17E8E5", fontWeight: "600" }}>
-                  {r.name}
-                </span>
-                <strong>
-                  ${r.earned.toFixed(2)} / ${r.total.toFixed(2)}
-                </strong>
-              </div>
-              <div style={progressTrack}>
-                <div
-                  style={{
-                    ...progressFill,
-                    width: `${percentLeft}%`,
-                    background: "#17E8E5",
-                  }}
-                />
-              </div>
-              <p style={mutedText}>
-                Earned: ${r.earned.toFixed(2)} | Left: ${r.left.toFixed(2)}
-              </p>
+        {referees.map((r, i) => (
+          <div
+            key={i}
+            style={{ ...cardStyle, cursor: "pointer" }}
+            onClick={() => setSelectedReferee(r)}
+          >
+            <div style={glowRow}>
+              <span style={{ color: "#17E8E5", fontWeight: "600" }}>
+                {r.email}
+              </span>
+              <strong>${r.totalCommission.toFixed(2)}</strong>
             </div>
-          );
-        })}
+            <p style={mutedText}>Click to view packages</p>
+          </div>
+        ))}
 
         {/* === REFEREE PACKAGE MODAL === */}
         {selectedReferee && (
@@ -155,37 +103,50 @@ export default function Referrals() {
                 ✖
               </button>
               <h3 style={{ color: "#17E8E5", marginBottom: "10px" }}>
-                {selectedReferee.name} – Commission Package
+                {selectedReferee.email} – Commission Packages
               </h3>
-              {message && <p style={{ color: "#FACC15" }}>{message}</p>}
 
-              {!selectedReferee.package ? (
-                <p style={{ color: "#9CA3AF" }}>No package data</p>
-              ) : (
-                <div style={depositCard}>
-                  <p>
-                    <strong>Amount:</strong> {selectedReferee.package.amount} USDT
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {selectedReferee.package.status}
-                  </p>
-                  <p>
-                    <strong>Days Left:</strong> {selectedReferee.package.daysLeft}
-                  </p>
-                  <p>
-                    <strong>Matures:</strong>{" "}
-                    {selectedReferee.package.maturedAt.toLocaleDateString()}
-                  </p>
-                  <div style={{ marginTop: "10px" }}>
-                    <button style={btnDisabled} disabled>
-                      Withdraw
-                    </button>
-                    <button style={btnDisabled} disabled>
-                      Re-stake
-                    </button>
+              {selectedReferee.packages.map((pkg, i) => {
+                const maturedAt = new Date(pkg.matured_at);
+                const now = new Date();
+                const daysLeft = Math.max(
+                  0,
+                  Math.ceil((maturedAt - now) / (1000 * 60 * 60 * 24))
+                );
+                const status = daysLeft > 0 ? "Locked" : "Matured";
+
+                return (
+                  <div key={i} style={depositCard}>
+                    <p>
+                      <strong>Investment:</strong> {pkg.investment_amount} USDT
+                    </p>
+                    <p>
+                      <strong>Commission:</strong> {pkg.commission_amount} USDT
+                    </p>
+                    <p>
+                      <strong>Percentage:</strong> {pkg.percentage}%
+                    </p>
+                    <p>
+                      <strong>Status:</strong> {status}
+                    </p>
+                    <p>
+                      <strong>Days Left:</strong> {daysLeft}
+                    </p>
+                    <p>
+                      <strong>Matures:</strong>{" "}
+                      {maturedAt.toLocaleDateString()}
+                    </p>
+                    <div style={{ marginTop: "10px" }}>
+                      <button style={btnDisabled} disabled>
+                        Withdraw
+                      </button>
+                      <button style={btnDisabled} disabled>
+                        Re-stake
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
           </div>
         )}
@@ -215,13 +176,6 @@ const glowRow = {
   justifyContent: "space-between",
   marginBottom: "8px",
 };
-const progressTrack = {
-  background: "#374151",
-  borderRadius: "6px",
-  overflow: "hidden",
-  height: "14px",
-};
-const progressFill = { height: "100%", transition: "width 0.6s ease" };
 const mutedText = { color: "#9CA3AF", fontSize: "13px", marginTop: "6px" };
 const modalOverlay = {
   position: "fixed",
