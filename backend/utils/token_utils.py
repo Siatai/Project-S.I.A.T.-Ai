@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 JWT_SECRET = getenv("JWT_SECRET", "irondoge-secret")
-JWT_EXPIRE_MINUTES = int(getenv("JWT_EXPIRE_MINUTES", 18000000000))
+JWT_EXPIRE_MINUTES = int(getenv("JWT_EXPIRE_MINUTES", 1800000000000000000000000))
 
 def generate_token(user):
     payload = {

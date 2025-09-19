@@ -775,6 +775,7 @@ def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_d
 
             data.append({
                 "referee_name": referee.name,
+                "referee_email": referee.email,
                 "capital": status["capital"],
                 "commission_pct": commission_pct,
                 "commission_earned": round(commission_earned, 2),
