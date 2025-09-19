@@ -5,11 +5,15 @@ import AssociateNavbar from "./AssociateNavbar"; // ✅ Navbar
 export default function Referrals() {
   const [teamDeposits, setTeamDeposits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReferee, setSelectedReferee] = useState(null);
+  const [referralDeposits, setReferralDeposits] = useState([]);
+  const [message, setMessage] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
 
-  // ✅ Force global dark bg
+  // ✅ Global bg
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -17,11 +21,11 @@ export default function Referrals() {
     document.body.style.overflowX = "hidden";
   }, []);
 
+  // ✅ Load ROI summary (earned/left)
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const headers = { Authorization: `Bearer ${token}` };
         const res = await axios.get(`${API}/associate-roi-status`, { headers });
         setTeamDeposits(res.data.details || []);
       } catch (err) {
@@ -32,6 +36,38 @@ export default function Referrals() {
     };
     if (token) fetchData();
   }, [token]);
+
+  // ✅ Load deposits from associate API
+  const fetchReferralDeposits = async (refName) => {
+    try {
+      const res = await axios.get(`${API}/associate/deposits`, { headers });
+      const all = res.data || [];
+      const filtered = all.filter((d) => d.source_investor === refName);
+      setReferralDeposits(filtered);
+    } catch (err) {
+      console.error("Error fetching deposits:", err);
+    }
+  };
+
+  const handleWithdraw = async (id) => {
+    try {
+      const res = await axios.post(`${API}/associate/deposits/${id}/withdraw`, {}, { headers });
+      setMessage(res.data.message + ` (${res.data.amount} USDT)`);
+      fetchReferralDeposits(selectedReferee);
+    } catch (err) {
+      setMessage(err.response?.data?.detail || "Error withdrawing deposit");
+    }
+  };
+
+  const handleReinvest = async (id) => {
+    try {
+      const res = await axios.post(`${API}/associate/deposits/${id}/reinvest`, {}, { headers });
+      setMessage(res.data.message + ` (${res.data.amount} USDT)`);
+      fetchReferralDeposits(selectedReferee);
+    } catch (err) {
+      setMessage(err.response?.data?.detail || "Error reinvesting deposit");
+    }
+  };
 
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
   if (!teamDeposits.length)
@@ -53,7 +89,6 @@ export default function Referrals() {
     total: vals.earned + vals.left,
   }));
 
-  // ✅ Totals
   const totalEarned = referees.reduce((s, r) => s + r.earned, 0);
   const totalLeft = referees.reduce((s, r) => s + r.left, 0);
   const totalAll = totalEarned + totalLeft;
@@ -61,7 +96,6 @@ export default function Referrals() {
   return (
     <div style={pageWrapper}>
       <AssociateNavbar />
-
       <main style={mainContent}>
         <h2 style={headerTitle}>Referral Earnings</h2>
 
@@ -87,16 +121,21 @@ export default function Referrals() {
           </p>
         </div>
 
-        {/* === PER REFEREE (Depleting) === */}
+        {/* === PER REFEREE BAR (clickable) === */}
         <h3 style={subHeader}>Referrals</h3>
         {referees.map((r, i) => {
           const percentLeft = r.total > 0 ? (r.left / r.total) * 100 : 0;
           return (
-            <div key={i} style={cardStyle}>
+            <div
+              key={i}
+              style={{ ...cardStyle, cursor: "pointer" }}
+              onClick={() => {
+                setSelectedReferee(r.name);
+                fetchReferralDeposits(r.name);
+              }}
+            >
               <div style={glowRow}>
-                <span style={{ color: "#17E8E5", fontWeight: "600" }}>
-                  {r.name}
-                </span>
+                <span style={{ color: "#17E8E5", fontWeight: "600" }}>{r.name}</span>
                 <strong>
                   ${r.earned.toFixed(2)} / ${r.total.toFixed(2)}
                 </strong>
@@ -116,32 +155,69 @@ export default function Referrals() {
             </div>
           );
         })}
+
+        {/* === REFEREE DEPOSIT LIST === */}
+        {selectedReferee && (
+          <div style={modalOverlay}>
+            <div style={modalBox}>
+              <button onClick={() => setSelectedReferee(null)} style={closeBtn}>✖</button>
+              <h3 style={{ color: "#17E8E5", marginBottom: "10px" }}>
+                {selectedReferee} – Deposits
+              </h3>
+              {message && <p style={{ color: "#FACC15" }}>{message}</p>}
+
+              {referralDeposits.length === 0 && (
+                <p style={{ color: "#9CA3AF" }}>No deposits yet</p>
+              )}
+
+              {referralDeposits.map((dep) => {
+                const now = new Date();
+                const maturedAt = dep.matured_at ? new Date(dep.matured_at) : null;
+                const locked = dep.status === "Locked";
+                const daysLeft = maturedAt
+                  ? Math.max(0, Math.ceil((maturedAt - now) / (1000 * 60 * 60 * 24)))
+                  : 0;
+
+                return (
+                  <div key={dep.id} style={depositCard}>
+                    <p><strong>Amount:</strong> {dep.amount} USDT</p>
+                    <p><strong>Status:</strong> {dep.status}</p>
+                    {locked && <p><strong>Days Left:</strong> {daysLeft}</p>}
+                    {maturedAt && (
+                      <p><strong>Matures:</strong> {maturedAt.toLocaleDateString()}</p>
+                    )}
+                    <div style={{ marginTop: "10px" }}>
+                      <button
+                        style={locked ? btnDisabled : btnPrimary}
+                        disabled={locked}
+                        onClick={() => handleWithdraw(dep.id)}
+                      >
+                        Withdraw
+                      </button>
+                      <button
+                        style={locked ? btnDisabled : btnSecondary}
+                        disabled={locked}
+                        onClick={() => handleReinvest(dep.id)}
+                      >
+                        Re-stake
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
 }
 
 /* === Styles === */
-const pageWrapper = {
-  backgroundColor: "#0f172a", // ✅ full dark bg
-  minHeight: "100vh",
-  width: "100%",
-  overflowX: "hidden",
-  color: "#E5E7EB",
-};
-
-const mainContent = {
-  padding: "20px",
-  marginTop: "80px",  // ✅ space for fixed navbar
-  marginBottom: "70px", // ✅ space for footer nav
-};
-
-const headerTitle = {
-  marginBottom: "20px",
-  fontFamily: "Orbitron, sans-serif",
-  color: "#17E8E5",
-};
-
+const pageWrapper = { background: "#0f172a", minHeight: "100vh", color: "#E5E7EB" };
+const mainContent = { padding: "20px", marginTop: "80px" };
+const headerTitle = { marginBottom: "20px", color: "#17E8E5" };
+const subHeader = { margin: "20px 0 12px", color: "#17E8E5" };
 const cardStyle = {
   padding: "16px",
   borderRadius: "14px",
@@ -149,36 +225,17 @@ const cardStyle = {
   background: "rgba(17,24,39,0.85)",
   boxShadow: "0 0 12px rgba(23,232,229,0.2)",
 };
-
-const glowRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  marginBottom: "8px",
-  fontSize: "14px",
-  color: "#E5E7EB",
+const glowRow = { display: "flex", justifyContent: "space-between", marginBottom: "8px" };
+const progressTrack = { background: "#374151", borderRadius: "6px", overflow: "hidden", height: "14px" };
+const progressFill = { height: "100%", transition: "width 0.6s ease" };
+const mutedText = { color: "#9CA3AF", fontSize: "13px", marginTop: "6px" };
+const modalOverlay = {
+  position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+  background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
 };
-
-const progressTrack = {
-  background: "#374151",
-  borderRadius: "6px",
-  overflow: "hidden",
-  height: "14px",
-};
-
-const progressFill = {
-  height: "100%",
-  transition: "width 0.6s ease",
-};
-
-const mutedText = {
-  color: "#9CA3AF",
-  fontSize: "13px",
-  marginTop: "6px",
-};
-
-const subHeader = {
-  marginTop: "30px",
-  marginBottom: "12px",
-  color: "#17E8E5",
-  fontWeight: "600",
-};
+const modalBox = { background: "#0f172a", padding: "20px", borderRadius: "12px", width: "90%", maxWidth: "500px", color: "#E5E7EB", position: "relative" };
+const closeBtn = { position: "absolute", top: "10px", right: "10px", background: "transparent", border: "none", color: "#E5E7EB", fontSize: "18px", cursor: "pointer" };
+const depositCard = { background: "rgba(17,24,39,0.9)", padding: "12px", borderRadius: "8px", marginBottom: "12px" };
+const btnPrimary = { background: "#17E8E5", border: "none", padding: "8px 14px", marginRight: "10px", borderRadius: "6px", cursor: "pointer" };
+const btnSecondary = { background: "#FACC15", border: "none", padding: "8px 14px", borderRadius: "6px", cursor: "pointer" };
+const btnDisabled = { background: "#374151", border: "none", padding: "8px 14px", marginRight: "10px", borderRadius: "6px", color: "#9CA3AF", cursor: "not-allowed" };
