@@ -8,6 +8,10 @@ from models.user_model import User
 from models.withdrawal_model import Investment
 from models.associate_config_model import AssociateConfig
 from utils.auth_middleware import verify_token
+from models.referral_model import ReferralEarning
+from models.associate_config_model import AssociateConfig
+
+
 
 router = APIRouter(prefix="/associate", tags=["Associate"])
 
@@ -273,3 +277,41 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 
     db.commit()
     return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}
+
+
+
+
+@router.get("/associate/referral-packages")
+def get_referral_packages(
+    db: Session = Depends(get_db),
+    token_user=Depends(verify_token)
+):
+    email = token_user["email"]
+
+    assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.updated_at.desc()).first()
+    lock_days = assoc_cfg.lock_days if assoc_cfg else 30
+
+    earnings = (
+        db.query(ReferralEarning)
+        .filter(ReferralEarning.referrer_email == email)
+        .all()
+    )
+
+    packages = []
+    for e in earnings:
+        invested_at = e.timestamp
+        matured_at = invested_at + timedelta(days=lock_days)
+        status = "Locked" if matured_at > invested_at else "Matured"
+
+        packages.append({
+            "referee_email": e.referred_email,
+            "investment_amount": float(e.investment_amount),
+            "commission_amount": float(e.commission_amount),
+            "percentage": float(e.percentage),
+            "timestamp": invested_at,
+            "lock_days": lock_days,
+            "matured_at": matured_at,
+            "status": status
+        })
+
+    return {"packages": packages}
