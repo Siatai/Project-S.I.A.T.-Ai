@@ -284,13 +284,19 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 @router.get("/associate/referral-packages")
 def get_referral_packages(
     db: Session = Depends(get_db),
-    token_user=Depends(verify_token)
+    token_user=Depends(verify_token)   # ✅ replaces get_current_user
 ):
+    """
+    Return all referral commission packages for the logged-in associate.
+    Each package = one referral investment that generated commission.
+    """
     email = token_user["email"]
 
+    # ✅ get latest associate config (lock days)
     assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.updated_at.desc()).first()
     lock_days = assoc_cfg.lock_days if assoc_cfg else 30
 
+    # ✅ fetch referral earnings for this user
     earnings = (
         db.query(ReferralEarning)
         .filter(ReferralEarning.referrer_email == email)
