@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
@@ -281,19 +281,19 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 
 
 
-@router.get("/referral-packages")
+@router.get("/associate/referral-packages")
 def get_referral_packages(
     db: Session = Depends(get_db),
-    token_user=Depends(verify_token)
+    token_user=Depends(verify_token),
+    email: str = Query(None)  # optional filter
 ):
     """
-    Return ALL referral commission packages for the logged-in associate.
-    Each package corresponds to each investment made by referred users.
-    Amounts are pulled directly from the Investment table.
+    If ?email is passed → return packages for that referee only.
+    Otherwise → return all packages for the associate.
     """
-    email = token_user["email"]
+    associate_email = token_user["email"]
 
-    # ✅ get latest associate config (lock days)
+    # latest lock days config
     assoc_cfg = (
         db.query(AssociateConfig)
         .order_by(AssociateConfig.updated_at.desc())
@@ -301,19 +301,17 @@ def get_referral_packages(
     )
     lock_days = assoc_cfg.lock_days if assoc_cfg else 30
 
-    # ✅ fetch referral earnings for this associate
-    earnings = (
-        db.query(ReferralEarning)
-        .filter(ReferralEarning.referrer_email == email)
-        .all()
-    )
+    # fetch earnings for this associate
+    q = db.query(ReferralEarning).filter(ReferralEarning.referrer_email == associate_email)
+    if email:  # filter if specific referee requested
+        q = q.filter(ReferralEarning.referred_email == email)
 
+    earnings = q.all()
     if not earnings:
         return {"packages": []}
 
     packages = []
     for e in earnings:
-        # 🔹 Fetch ALL investments of this referred user
         investments = (
             db.query(Investment)
             .filter(Investment.user_email == e.referred_email)
