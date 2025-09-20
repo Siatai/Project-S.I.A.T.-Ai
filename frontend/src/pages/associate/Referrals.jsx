@@ -7,7 +7,6 @@ export default function Referrals() {
   const [loading, setLoading] = useState(true);
   const [selectedReferee, setSelectedReferee] = useState(null); // { name, email }
   const [packages, setPackages] = useState([]);
-  const [investments, setInvestments] = useState([]); // ✅ store investment table
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
@@ -37,19 +36,6 @@ export default function Referrals() {
       }
     };
     if (token) fetchData();
-  }, [token, headers]);
-
-  // ✅ Load investments table
-  useEffect(() => {
-    const fetchInvestments = async () => {
-      try {
-        const res = await axios.get(`${API}/investments`, { headers });
-        setInvestments(res.data || []);
-      } catch (err) {
-        console.error("Error fetching investments:", err);
-      }
-    };
-    if (token) fetchInvestments();
   }, [token, headers]);
 
   // ✅ Load referral packages for popup
@@ -193,31 +179,23 @@ export default function Referrals() {
                     0,
                     Math.ceil((maturedAt - now) / (1000 * 60 * 60 * 24))
                   );
-                  const daysPassed = totalDays - daysLeft;
-                  const percent = Math.min(
+                  const percentLeft = Math.min(
                     100,
-                    Math.max(0, (daysPassed / totalDays) * 100)
+                    Math.max(0, (daysLeft / totalDays) * 100)
                   );
 
-                  // ✅ Color gradient: Red (>20 days left), Yellow (10-20 days), Green (<10 days)
-                  let barColor = "#EF4444"; // red
-                  if (daysLeft <= 20 && daysLeft > 10) barColor = "#FACC15"; // yellow
-                  if (daysLeft <= 10) barColor = "#22C55E"; // green
-
-                  // ✅ Get correct investment amount from table
-                  const inv = investments.find(
-                    (inv) => inv.user_email === pkg.referee_email
-                  );
-                  const amount = inv ? inv.amount : 0;
-                  const commission = pkg.commission_amount || 0;
+                  // ✅ Gradient color based on days left
+                  const ratio = daysLeft / totalDays; // 1 → 0
+                  let barColor;
+                  if (ratio > 0.66) barColor = "#EF4444"; // red
+                  else if (ratio > 0.33) barColor = "#FACC15"; // yellow
+                  else barColor = "#22C55E"; // green
 
                   return (
                     <div key={i} style={depositCard}>
                       <p>
-                        <strong>Investment:</strong> {amount} USDT
-                      </p>
-                      <p>
-                        <strong>Commission:</strong> {commission} USDT
+                        <strong>Package (Deposit):</strong>{" "}
+                        {pkg.investment_amount} USDT
                       </p>
                       <p>
                         <strong>Status:</strong>{" "}
@@ -227,8 +205,9 @@ export default function Referrals() {
                         <div
                           style={{
                             ...progressFill,
-                            width: `${percent}%`,
+                            width: `${percentLeft}%`,
                             background: barColor,
+                            float: "right", // ✅ deplete from right → left
                           }}
                         />
                       </div>
@@ -285,6 +264,7 @@ const progressTrack = {
   overflow: "hidden",
   height: "14px",
   marginTop: "6px",
+  position: "relative",
 };
 const progressFill = { height: "100%", transition: "width 0.6s ease" };
 const mutedText = { color: "#9CA3AF", fontSize: "13px", marginTop: "6px" };

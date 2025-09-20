@@ -289,6 +289,7 @@ def get_referral_packages(
     """
     Return all referral commission packages for the logged-in associate.
     Each package corresponds to a referral investment that generated commission.
+    Amount is always pulled from the Investment table against the referred user.
     """
     email = token_user["email"]
 
@@ -300,7 +301,7 @@ def get_referral_packages(
     )
     lock_days = assoc_cfg.lock_days if assoc_cfg else 30
 
-    # ✅ fetch referral earnings for this user
+    # ✅ fetch referral earnings for this associate
     earnings = (
         db.query(ReferralEarning)
         .filter(ReferralEarning.referrer_email == email)
@@ -312,7 +313,7 @@ def get_referral_packages(
 
     packages = []
     for e in earnings:
-        # 🔹 Fetch the investment that triggered this earning
+        # 🔹 Fetch the latest investment of this referred user
         inv = (
             db.query(Investment)
             .filter(Investment.user_email == e.referred_email)
@@ -329,12 +330,12 @@ def get_referral_packages(
 
         packages.append({
             "referee_email": e.referred_email,
-            "amount": float(inv.amount),                 # ✅ from Investment table
+            "amount": float(inv.amount),                  # ✅ from Investment table
             "commission_amount": float(e.commission_amount),
             "percentage": float(e.percentage),
-            "timestamp": invested_at,
+            "timestamp": invested_at.isoformat(),
             "lock_days": lock_days,
-            "matured_at": matured_at,
+            "matured_at": matured_at.isoformat(),
             "status": status
         })
 
