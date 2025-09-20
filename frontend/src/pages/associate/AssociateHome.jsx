@@ -6,6 +6,7 @@ import AssociateNavbar from "./AssociateNavbar"; // ✅ Fixed Navbar
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(0); // ✅ wallet balance state
   const [myDeposits, setMyDeposits] = useState([]);
   const [teamDeposits, setTeamDeposits] = useState([]);
   const [totalReceivable, setTotalReceivable] = useState(0);
@@ -27,9 +28,15 @@ export default function AssociateHome() {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
+        // ✅ Fetch user
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
+        // ✅ Fetch wallet balance
+        const walletRes = await axios.get(`${API}/wallet/summary`, { headers });
+        setWalletBalance(walletRes.data.wallet_balance || 0);
+
+        // ✅ Investor deposits (exclude top ADMIN_EMAIL)
         if (res.data?.email && res.data.email !== ADMIN_EMAIL) {
           const investorRes = await axios.get(`${API}/investor-roi-status`, {
             headers,
@@ -37,6 +44,7 @@ export default function AssociateHome() {
           setMyDeposits(investorRes.data.deposits || []);
         }
 
+        // ✅ Team deposits & commission
         const teamRes = await axios.get(`${API}/associate-roi-status`, {
           headers,
         });
@@ -44,6 +52,7 @@ export default function AssociateHome() {
         setTotalReceivable(teamRes.data.total_commission_left || 0);
         setCommissionPct(teamRes.data.commission_percent || 0);
 
+        // ✅ Direct commission %
         const commRes = await axios.get(`${API}/commission-percent`, {
           headers,
         });
@@ -66,6 +75,7 @@ export default function AssociateHome() {
 
   if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
 
+  // ✅ Calculations
   const totalSelf = myDeposits.reduce((s, d) => s + d.capital, 0);
   const roiReceivedSelf = myDeposits.reduce((s, d) => s + d.roi_received, 0);
   const maxSelf = myDeposits.reduce((s, d) => s + d.max_return, 0);
@@ -94,9 +104,7 @@ export default function AssociateHome() {
             </div>
             <div>
               <p style={walletLabel}>Wallet Balance</p>
-              <h3 style={walletValue}>
-                {user.wallet_balance?.toFixed(2) || "0.00"} USDT
-              </h3>
+              <h3 style={walletValue}>{walletBalance.toFixed(2)} USDT</h3>
             </div>
           </div>
 

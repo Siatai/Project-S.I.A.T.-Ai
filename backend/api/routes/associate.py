@@ -284,16 +284,20 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 @router.get("/referral-packages")
 def get_referral_packages(
     db: Session = Depends(get_db),
-    token_user=Depends(verify_token)   # ✅ replaces get_current_user
+    token_user=Depends(verify_token)
 ):
     """
     Return all referral commission packages for the logged-in associate.
-    Each package = one referral investment that generated commission.
+    Each package corresponds to a referral investment that generated commission.
     """
     email = token_user["email"]
 
     # ✅ get latest associate config (lock days)
-    assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.updated_at.desc()).first()
+    assoc_cfg = (
+        db.query(AssociateConfig)
+        .order_by(AssociateConfig.updated_at.desc())
+        .first()
+    )
     lock_days = assoc_cfg.lock_days if assoc_cfg else 30
 
     # ✅ fetch referral earnings for this user
@@ -303,15 +307,29 @@ def get_referral_packages(
         .all()
     )
 
+    if not earnings:
+        return {"packages": []}
+
     packages = []
     for e in earnings:
-        invested_at = e.timestamp
+        # 🔹 Fetch the investment that triggered this earning
+        inv = (
+            db.query(Investment)
+            .filter(Investment.user_email == e.referred_email)
+            .order_by(Investment.timestamp.desc())
+            .first()
+        )
+
+        if not inv:
+            continue  # skip if no investment found
+
+        invested_at = inv.timestamp
         matured_at = invested_at + timedelta(days=lock_days)
         status = "Locked" if matured_at > invested_at else "Matured"
 
         packages.append({
             "referee_email": e.referred_email,
-            "investment_amount": float(e.investment_amount),
+            "amount": float(inv.amount),                 # ✅ from Investment table
             "commission_amount": float(e.commission_amount),
             "percentage": float(e.percentage),
             "timestamp": invested_at,
