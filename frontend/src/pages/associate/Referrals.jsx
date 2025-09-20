@@ -38,15 +38,14 @@ export default function Referrals() {
     if (token) fetchData();
   }, [token, headers]);
 
-  // ✅ Load referral packages for popup
+  // ✅ Load referral packages for popup (API returns only this referee’s packages)
   const fetchReferralPackages = async (refEmail) => {
     try {
-      const res = await axios.get(`${API}/associate/referral-packages`, {
-        headers,
-      });
-      const all = res.data.packages || [];
-      const filtered = all.filter((p) => p.referee_email === refEmail);
-      setPackages(filtered);
+      const res = await axios.get(
+        `${API}/associate/referral-packages?email=${refEmail}`,
+        { headers }
+      );
+      setPackages(res.data.packages || []);
     } catch (err) {
       console.error("Error fetching referral packages:", err);
     }
@@ -174,28 +173,25 @@ export default function Referrals() {
                 {packages.map((pkg, i) => {
                   const now = new Date();
                   const maturedAt = new Date(pkg.matured_at);
+                  const investedAt = new Date(pkg.timestamp);
                   const totalDays = pkg.lock_days || 30;
                   const daysLeft = Math.max(
                     0,
                     Math.ceil((maturedAt - now) / (1000 * 60 * 60 * 24))
                   );
-                  const percentLeft = Math.min(
+                  const percentDone = Math.min(
                     100,
-                    Math.max(0, (daysLeft / totalDays) * 100)
+                    Math.max(0, ((totalDays - daysLeft) / totalDays) * 100)
                   );
 
-                  // ✅ Gradient color based on days left
-                  const ratio = daysLeft / totalDays; // 1 → 0
-                  let barColor;
-                  if (ratio > 0.66) barColor = "#EF4444"; // red
-                  else if (ratio > 0.33) barColor = "#FACC15"; // yellow
-                  else barColor = "#22C55E"; // green
-
                   return (
-                    <div key={i} style={depositCard}>
+                    <div key={pkg.id || i} style={depositCard}>
                       <p>
-                        <strong>Package (Deposit):</strong>{" "}
-                        {pkg.investment_amount} USDT
+                        <strong>Package (Deposit):</strong> {pkg.amount} USDT
+                      </p>
+                      <p>
+                        <strong>Start Date:</strong>{" "}
+                        {investedAt.toLocaleDateString()}
                       </p>
                       <p>
                         <strong>Status:</strong>{" "}
@@ -205,9 +201,8 @@ export default function Referrals() {
                         <div
                           style={{
                             ...progressFill,
-                            width: `${percentLeft}%`,
-                            background: barColor,
-                            float: "right", // ✅ deplete from right → left
+                            width: `${percentDone}%`,
+                            background: "#22C55E",
                           }}
                         />
                       </div>

@@ -287,9 +287,9 @@ def get_referral_packages(
     token_user=Depends(verify_token)
 ):
     """
-    Return all referral commission packages for the logged-in associate.
-    Each package corresponds to a referral investment that generated commission.
-    Amount is always pulled from the Investment table against the referred user.
+    Return ALL referral commission packages for the logged-in associate.
+    Each package corresponds to each investment made by referred users.
+    Amounts are pulled directly from the Investment table.
     """
     email = token_user["email"]
 
@@ -313,30 +313,29 @@ def get_referral_packages(
 
     packages = []
     for e in earnings:
-        # 🔹 Fetch the latest investment of this referred user
-        inv = (
+        # 🔹 Fetch ALL investments of this referred user
+        investments = (
             db.query(Investment)
             .filter(Investment.user_email == e.referred_email)
             .order_by(Investment.timestamp.desc())
-            .first()
+            .all()
         )
 
-        if not inv:
-            continue  # skip if no investment found
+        for inv in investments:
+            invested_at = inv.timestamp
+            matured_at = invested_at + timedelta(days=lock_days)
+            status = "Locked" if matured_at > invested_at else "Matured"
 
-        invested_at = inv.timestamp
-        matured_at = invested_at + timedelta(days=lock_days)
-        status = "Locked" if matured_at > invested_at else "Matured"
-
-        packages.append({
-            "referee_email": e.referred_email,
-            "amount": float(inv.amount),                  # ✅ from Investment table
-            "commission_amount": float(e.commission_amount),
-            "percentage": float(e.percentage),
-            "timestamp": invested_at.isoformat(),
-            "lock_days": lock_days,
-            "matured_at": matured_at.isoformat(),
-            "status": status
-        })
+            packages.append({
+                "id": inv.id,
+                "referee_email": e.referred_email,
+                "amount": float(inv.amount),
+                "commission_amount": float(e.commission_amount),
+                "percentage": float(e.percentage),
+                "timestamp": invested_at.isoformat(),
+                "lock_days": lock_days,
+                "matured_at": matured_at.isoformat(),
+                "status": status
+            })
 
     return {"packages": packages}
