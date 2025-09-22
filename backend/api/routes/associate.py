@@ -258,12 +258,12 @@ def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_tok
 
 @router.post("/admin/backfill-associates")
 def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Backfill referral-based associate deposits."""
+    """Backfill referral-based associate deposits using original investment timestamp."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
         raise HTTPException(status_code=400, detail="No associate config set")
 
-    referral_percent = config.referral_percent
+    referral_percent = float(config.referral_percent)
     lock_days = config.lock_days
     created_count = 0
 
@@ -288,17 +288,19 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
         if exists:
             continue
 
-        assoc_amount = round(inv.amount * (float(referral_percent) / 100), 2)
+        assoc_amount = round(inv.amount * (referral_percent / 100), 2)
         assoc_dep = Investment(
             user_email=referrer.email,
             amount=assoc_amount,
             is_associate=True,
             source_investor=db_user.email,
             lock_days=lock_days,
-            matured_at=datetime.utcnow() + timedelta(days=lock_days)
+            timestamp=inv.timestamp,  # 👈 same as referred user investment date
+            matured_at=inv.timestamp + timedelta(days=lock_days)  # 👈 lock counted from that date
         )
         db.add(assoc_dep)
         created_count += 1
 
     db.commit()
     return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}
+

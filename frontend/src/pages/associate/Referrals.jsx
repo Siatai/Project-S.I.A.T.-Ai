@@ -7,14 +7,14 @@ export default function Referrals() {
   const [loading, setLoading] = useState(true);
   const [selectedReferee, setSelectedReferee] = useState(null); // { name, email }
   const [packages, setPackages] = useState([]);
-  const [actionLoading, setActionLoading] = useState(null); // track button actions
+  const [actionLoading, setActionLoading] = useState(null);
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
   const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
-  // Global styles
+  // ✅ Global styles
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -22,7 +22,7 @@ export default function Referrals() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // Load associate ROI summary
+  // ✅ Load summary (top bar + per-referee totals)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,11 +38,11 @@ export default function Referrals() {
     if (token) fetchData();
   }, [token, headers]);
 
-  // Load referral packages (direct bonuses) for popup
+  // ✅ Load referral packages (direct bonuses)
   const fetchReferralPackages = async (refEmail) => {
     try {
       const res = await axios.get(
-        `${API}/associate/associate/referral-packages?email=${refEmail}`,
+        `${API}/associate/referral-packages?email=${refEmail}`,
         { headers }
       );
       const sorted = (res.data.packages || []).sort(
@@ -54,14 +54,13 @@ export default function Referrals() {
     }
   };
 
-  // Handle withdraw / reinvest
+  // ✅ Handle withdraw/reinvest
   const handleAction = async (pkgId, action) => {
     try {
       setActionLoading(pkgId + action);
       const url = `${API}/associate/direct-bonuses/${pkgId}/${action}`;
       const res = await axios.post(url, {}, { headers });
       alert(res.data.message || "Action successful");
-      // Refresh popup list
       if (selectedReferee) fetchReferralPackages(selectedReferee.email);
     } catch (err) {
       console.error("Error:", err);
@@ -73,7 +72,7 @@ export default function Referrals() {
 
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
 
-  // Group by referee
+  // ✅ Group by referee
   const grouped = teamDeposits.reduce((acc, d) => {
     const name = d.referee_name || "Unknown User";
     const email = d.referee_email || "unknown@email";
