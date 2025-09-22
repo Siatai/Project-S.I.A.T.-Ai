@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import AssociateNavbar from "./AssociateNavbar"; // ✅ Navbar
+import AssociateNavbar from "./AssociateNavbar";
 
 export default function Referrals() {
   const [teamDeposits, setTeamDeposits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReferee, setSelectedReferee] = useState(null); // { name, email }
   const [packages, setPackages] = useState([]);
+  const [actionLoading, setActionLoading] = useState(null); // track button actions
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // ✅ Memoized headers
   const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
-  // ✅ Global bg
+  // Global styles
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -22,7 +22,7 @@ export default function Referrals() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // ✅ Load ROI summary
+  // Load associate ROI summary
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,28 +38,42 @@ export default function Referrals() {
     if (token) fetchData();
   }, [token, headers]);
 
-  // ✅ Load referral packages for popup
+  // Load referral packages (direct bonuses) for popup
   const fetchReferralPackages = async (refEmail) => {
     try {
       const res = await axios.get(
         `${API}/associate/associate/referral-packages?email=${refEmail}`,
         { headers }
       );
-
-      // ✅ sort oldest → newest by timestamp
       const sorted = (res.data.packages || []).sort(
         (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
       );
-
       setPackages(sorted);
     } catch (err) {
       console.error("Error fetching referral packages:", err);
     }
   };
 
+  // Handle withdraw / reinvest
+  const handleAction = async (pkgId, action) => {
+    try {
+      setActionLoading(pkgId + action);
+      const url = `${API}/associate/direct-bonuses/${pkgId}/${action}`;
+      const res = await axios.post(url, {}, { headers });
+      alert(res.data.message || "Action successful");
+      // Refresh popup list
+      if (selectedReferee) fetchReferralPackages(selectedReferee.email);
+    } catch (err) {
+      console.error("Error:", err);
+      alert(err.response?.data?.detail || "Failed");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
 
-  // ✅ Group by referee
+  // Group by referee
   const grouped = teamDeposits.reduce((acc, d) => {
     const name = d.referee_name || "Unknown User";
     const email = d.referee_email || "unknown@email";
@@ -168,11 +182,11 @@ export default function Referrals() {
                 </button>
               </div>
               <h3 style={{ color: "#17E8E5", marginBottom: "10px" }}>
-                {selectedReferee.name} – Packages
+                {selectedReferee.name} – Bonuses
               </h3>
 
               {packages.length === 0 && (
-                <p style={{ color: "#9CA3AF" }}>No packages yet</p>
+                <p style={{ color: "#9CA3AF" }}>No bonuses yet</p>
               )}
 
               <div style={{ maxHeight: "80vh", overflowY: "auto" }}>
@@ -193,15 +207,17 @@ export default function Referrals() {
                   return (
                     <div key={pkg.id || i} style={depositCard}>
                       <p>
-                        <strong>Package (Deposit):</strong> {pkg.amount} USDT
+                        <strong>Bonus Amount:</strong> {pkg.bonus_amount} USDT
+                      </p>
+                      <p>
+                        <strong>From Deposit:</strong> {pkg.amount} USDT
                       </p>
                       <p>
                         <strong>Start Date:</strong>{" "}
                         {investedAt.toLocaleDateString()}
                       </p>
                       <p>
-                        <strong>Status:</strong>{" "}
-                        {daysLeft > 0 ? "Locked" : "Matured"}
+                        <strong>Status:</strong> {pkg.status}
                       </p>
                       <div style={progressTrack}>
                         <div
@@ -222,16 +238,30 @@ export default function Referrals() {
                       </p>
                       <div style={{ marginTop: "10px" }}>
                         <button
-                          style={daysLeft > 0 ? btnDisabled : btnPrimary}
-                          disabled={daysLeft > 0}
+                          style={
+                            pkg.status !== "Matured" || actionLoading
+                              ? btnDisabled
+                              : btnPrimary
+                          }
+                          disabled={pkg.status !== "Matured" || actionLoading}
+                          onClick={() => handleAction(pkg.id, "withdraw")}
                         >
-                          Withdraw
+                          {actionLoading === pkg.id + "withdraw"
+                            ? "Processing..."
+                            : "Withdraw"}
                         </button>
                         <button
-                          style={daysLeft > 0 ? btnDisabled : btnSecondary}
-                          disabled={daysLeft > 0}
+                          style={
+                            pkg.status !== "Matured" || actionLoading
+                              ? btnDisabled
+                              : btnSecondary
+                          }
+                          disabled={pkg.status !== "Matured" || actionLoading}
+                          onClick={() => handleAction(pkg.id, "reinvest")}
                         >
-                          Re-stake
+                          {actionLoading === pkg.id + "reinvest"
+                            ? "Processing..."
+                            : "Re-stake"}
                         </button>
                       </div>
                     </div>

@@ -433,3 +433,68 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 
     db.commit()
     return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}
+
+@router.post("/admin/backfill-direct-bonuses")
+def backfill_direct_referral_bonuses(
+    db: Session = Depends(get_db),
+    user=Depends(verify_token)
+):
+    """
+    Retro entry: Create missing DirectReferralBonus rows 
+    from past ReferralEarnings + Investments.
+    """
+
+    config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+    lock_days = config.lock_days if config else 30
+
+    created_count = 0
+    skipped_count = 0
+
+    # Loop through all referral earnings
+    earnings = db.query(ReferralEarning).all()
+    for e in earnings:
+        # Find the investment that triggered this earning
+        inv = (
+            db.query(Investment)
+            .filter(Investment.user_email == e.referred_email)
+            .order_by(Investment.timestamp.asc())  # oldest first
+            .first()
+        )
+        if not inv:
+            skipped_count += 1
+            continue
+
+        # Check if a DirectReferralBonus already exists
+        exists = db.query(DirectReferralBonus).filter_by(
+            referrer_email=e.referrer_email,
+            referee_email=e.referred_email,
+            tx_hash=inv.tx_hash
+        ).first()
+
+        if exists:
+            skipped_count += 1
+            continue
+
+        # Create new DirectReferralBonus
+        bonus = DirectReferralBonus(
+            referrer_email=e.referrer_email,
+            referee_email=e.referred_email,
+            amount=inv.amount,
+            percentage=e.percentage,
+            bonus_amount=e.commission_amount,
+            tx_hash=inv.tx_hash,
+            timestamp=inv.timestamp,
+            lock_days=lock_days,
+            matured_at=inv.timestamp + timedelta(days=lock_days),
+            flushed=False
+        )
+        db.add(bonus)
+        created_count += 1
+
+    db.commit()
+
+    return {
+        "message": f"Backfill complete ✅",
+        "created": created_count,
+        "skipped_existing": skipped_count
+    }
