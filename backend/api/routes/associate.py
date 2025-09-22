@@ -440,34 +440,34 @@ def backfill_direct_referral_bonuses(
     user=Depends(verify_token)
 ):
     """
-    Retro entry: Create missing DirectReferralBonus rows 
-    from past ReferralEarnings + Investments.
+    🔄 Retro entry:
+    Create missing DirectReferralBonus rows from past ReferralEarnings + Investments.
+    Skips duplicates (safe to run multiple times).
     """
 
+    # get latest config for lock_days
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     lock_days = config.lock_days if config else 30
 
     created_count = 0
     skipped_count = 0
 
-    # Loop through all referral earnings
+    # loop through all referral earnings
     earnings = db.query(ReferralEarning).all()
     for e in earnings:
-        # Find the investment that triggered this earning
+        # find the investment that triggered this earning (oldest first)
         inv = (
             db.query(Investment)
             .filter(Investment.user_email == e.referred_email)
-            .order_by(Investment.timestamp.asc())  # oldest first
+            .order_by(Investment.timestamp.asc())
             .first()
         )
         if not inv:
             skipped_count += 1
             continue
 
-        # Check if a DirectReferralBonus already exists
+        # check if a DirectReferralBonus already exists for this tx_hash
         exists = db.query(DirectReferralBonus).filter_by(
-            referrer_email=e.referrer_email,
-            referee_email=e.referred_email,
             tx_hash=inv.tx_hash
         ).first()
 
@@ -475,7 +475,7 @@ def backfill_direct_referral_bonuses(
             skipped_count += 1
             continue
 
-        # Create new DirectReferralBonus
+        # create new DirectReferralBonus entry
         bonus = DirectReferralBonus(
             referrer_email=e.referrer_email,
             referee_email=e.referred_email,
@@ -494,7 +494,7 @@ def backfill_direct_referral_bonuses(
     db.commit()
 
     return {
-        "message": f"Backfill complete ✅",
+        "message": "Backfill complete ✅",
         "created": created_count,
         "skipped_existing": skipped_count
     }
