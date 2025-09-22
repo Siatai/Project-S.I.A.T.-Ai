@@ -45,10 +45,13 @@ export default function Referrals() {
         `${API}/associate/associate/referral-packages?email=${refEmail}`,
         { headers }
       );
-      // API may still return multiple referees, so filter by source_investor
-      const all = res.data.packages || [];
-      const filtered = all.filter((pkg) => pkg.source_investor === refEmail);
-      setPackages(filtered);
+
+      // ✅ sort oldest → newest by timestamp
+      const sorted = (res.data.packages || []).sort(
+        (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+      );
+
+      setPackages(sorted);
     } catch (err) {
       console.error("Error fetching referral packages:", err);
     }

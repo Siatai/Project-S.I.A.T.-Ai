@@ -16,6 +16,7 @@ from utils.email_sender import send_email_otp
 from utils.user_logic import store_otp, verify_otp, calculate_investor_roi
 from utils.roi_creditor import credit_daily_roi, force_credit_daily_roi
 from utils.roi_tracker import get_roi_status
+from models.DirectReferralBonus import DirectReferralBonus
 router = APIRouter()
 
 # ────────────────────────────────
@@ -180,6 +181,22 @@ def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
                 db.flush()  # get assoc_dep.id before commit
                 associate_deposit_created = True
                 associate_deposit_id = assoc_dep.id
+
+            # ───── NEW Direct Referral Bonus Transaction ─────
+            
+            if assoc_cfg:
+                bonus_tx_hash = f"{referrer.email}-{user.email}-{data.tx_hash}"
+                direct_bonus = DirectReferralBonus(
+                    referrer_email=referrer.email,
+                    referee_email=user.email,
+                    amount=data.amount,
+                    percentage=percentage,
+                    bonus_amount=commission_amount,
+                    tx_hash=bonus_tx_hash,
+                    lock_days=assoc_cfg.lock_days,
+                    matured_at=datetime.utcnow() + timedelta(days=assoc_cfg.lock_days),
+                )
+                db.add(direct_bonus)
 
     try:
         db.commit()

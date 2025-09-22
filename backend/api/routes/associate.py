@@ -9,9 +9,7 @@ from models.withdrawal_model import Investment
 from models.associate_config_model import AssociateConfig
 from utils.auth_middleware import verify_token
 from models.referral_model import ReferralEarning
-from models.associate_config_model import AssociateConfig
-
-
+from models.DirectReferralBonus import DirectReferralBonus
 
 router = APIRouter(prefix="/associate", tags=["Associate"])
 
@@ -34,12 +32,12 @@ class ActionResponse(BaseModel):
 
 
 # ────────────────────────────────
-# 📌 ROUTES
+# 📌 OLD ASSOCIATE DEPOSIT APIS
 # ────────────────────────────────
 
 @router.get("/deposits")
 def get_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """List all deposits credited to associate."""
+    """List all deposits credited to associate (old system)."""
     deposits = (
         db.query(Investment)
         .filter(Investment.user_email == user.email, Investment.is_associate == True)
@@ -68,7 +66,7 @@ def get_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_to
 
 @router.post("/deposits/{deposit_id}/withdraw", response_model=ActionResponse)
 def withdraw_associate_deposit(deposit_id: int, db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Withdraw matured associate deposit + ROI."""
+    """Withdraw matured associate deposit + ROI (old system)."""
     dep = db.query(Investment).filter(
         Investment.id == deposit_id,
         Investment.user_email == user.email,
@@ -97,7 +95,7 @@ def withdraw_associate_deposit(deposit_id: int, db: Session = Depends(get_db), u
 
 @router.post("/deposits/{deposit_id}/reinvest", response_model=ActionResponse)
 def reinvest_associate_deposit(deposit_id: int, db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Reinvest matured associate deposit into a new cycle."""
+    """Reinvest matured associate deposit into a new cycle (old system)."""
     dep = db.query(Investment).filter(
         Investment.id == deposit_id,
         Investment.user_email == user.email,
@@ -138,29 +136,9 @@ def reinvest_associate_deposit(deposit_id: int, db: Session = Depends(get_db), u
     )
 
 
-@router.put("/config", response_model=ConfigPayload)
-def update_associate_config(
-    payload: ConfigPayload, 
-    db: Session = Depends(get_db), 
-    user=Depends(verify_token)
-):
-    """Update referral percent and lock days (now open)."""
-    config = AssociateConfig(
-        referral_percent=payload.referral_percent,
-        lock_days=payload.lock_days
-    )
-    db.add(config)
-    db.commit()
-    db.refresh(config)
-
-    return ConfigPayload(
-        referral_percent=config.referral_percent,
-        lock_days=config.lock_days
-    )
-
-
 @router.get("/my-deposits")
 def get_my_associate_deposits(user=Depends(verify_token), db: Session = Depends(get_db)):
+    """List all associate deposits for logged-in user (old system)."""
     db_user = db.query(User).filter_by(email=user["email"]).first()
     if not db_user or not db_user.is_associate:
         raise HTTPException(status_code=403, detail="Associate access required")
@@ -196,9 +174,187 @@ def get_my_associate_deposits(user=Depends(verify_token), db: Session = Depends(
     return result
 
 
+# ────────────────────────────────
+# 📌 DIRECT REFERRAL BONUS APIS (NEW)
+# ────────────────────────────────
+
+@router.get("/direct-bonuses")
+def get_direct_bonuses(
+    db: Session = Depends(get_db),
+    token_user=Depends(verify_token)
+):
+    """List all direct referral bonuses for the logged-in associate."""
+    email = token_user["email"]
+
+    bonuses = db.query(DirectReferralBonus).filter(
+        DirectReferralBonus.referrer_email == email
+    ).order_by(DirectReferralBonus.timestamp.desc()).all()
+
+    result = []
+    now = datetime.utcnow()
+    for b in bonuses:
+        status = "Withdrawn" if b.flushed else (
+            "Matured" if now >= b.matured_at else "Locked"
+        )
+        result.append({
+            "id": b.id,
+            "referee_email": b.referee_email,
+            "amount": b.amount,
+            "percentage": b.percentage,
+            "bonus_amount": b.bonus_amount,
+            "timestamp": b.timestamp,
+            "lock_days": b.lock_days,
+            "matured_at": b.matured_at,
+            "status": status,
+        })
+    return {"bonuses": result}
+
+
+@router.post("/direct-bonuses/{bonus_id}/withdraw", response_model=ActionResponse)
+def withdraw_direct_bonus(
+    bonus_id: int,
+    db: Session = Depends(get_db),
+    token_user=Depends(verify_token)
+):
+    """Withdraw a matured referral bonus."""
+    email = token_user["email"]
+    bonus = db.query(DirectReferralBonus).filter(
+        DirectReferralBonus.id == bonus_id,
+        DirectReferralBonus.referrer_email == email
+    ).first()
+
+    if not bonus:
+        raise HTTPException(status_code=404, detail="Bonus not found")
+
+    if bonus.flushed:
+        raise HTTPException(status_code=400, detail="Already withdrawn or reinvested")
+
+    if datetime.utcnow() < bonus.matured_at:
+        raise HTTPException(status_code=400, detail="Bonus still locked")
+
+    payout_amount = bonus.bonus_amount
+    bonus.flushed = True
+    db.commit()
+
+    return ActionResponse(
+        message=f"Bonus {bonus_id} withdrawn successfully",
+        amount=payout_amount
+    )
+
+
+@router.post("/direct-bonuses/{bonus_id}/reinvest", response_model=ActionResponse)
+def reinvest_direct_bonus(
+    bonus_id: int,
+    db: Session = Depends(get_db),
+    token_user=Depends(verify_token)
+):
+    """Reinvest a matured referral bonus into a new associate deposit."""
+    email = token_user["email"]
+    bonus = db.query(DirectReferralBonus).filter(
+        DirectReferralBonus.id == bonus_id,
+        DirectReferralBonus.referrer_email == email
+    ).first()
+
+    if not bonus:
+        raise HTTPException(status_code=404, detail="Bonus not found")
+
+    if bonus.flushed:
+        raise HTTPException(status_code=400, detail="Already withdrawn or reinvested")
+
+    if datetime.utcnow() < bonus.matured_at:
+        raise HTTPException(status_code=400, detail="Bonus still locked")
+
+    # Create a new Investment for reinvestment
+    new_dep = Investment(
+        user_email=email,
+        amount=bonus.bonus_amount,
+        is_associate=True,
+        source_investor=bonus.referee_email,
+        lock_days=bonus.lock_days,
+        matured_at=datetime.utcnow() + timedelta(days=bonus.lock_days)
+    )
+    db.add(new_dep)
+
+    bonus.flushed = True
+    db.commit()
+    db.refresh(new_dep)
+
+    return ActionResponse(
+        message=f"Bonus {bonus_id} reinvested successfully",
+        amount=bonus.bonus_amount,
+        new_investment_id=new_dep.id
+    )
+
+
+@router.get("/associate/referral-packages")
+def get_referral_packages(
+    db: Session = Depends(get_db),
+    token_user=Depends(verify_token),
+    email: str = Query(None)  # optional filter
+):
+    """
+    If ?email is passed → return bonuses for that referee only.
+    Otherwise → return all bonuses for the associate.
+    """
+    associate_email = token_user["email"]
+
+    q = db.query(DirectReferralBonus).filter(
+        DirectReferralBonus.referrer_email == associate_email
+    )
+    if email:
+        q = q.filter(DirectReferralBonus.referee_email == email)
+
+    bonuses = q.order_by(DirectReferralBonus.timestamp.asc()).all()
+    now = datetime.utcnow()
+
+    packages = []
+    for b in bonuses:
+        status = "Withdrawn" if b.flushed else (
+            "Matured" if now >= b.matured_at else "Locked"
+        )
+        packages.append({
+            "id": b.id,
+            "referee_email": b.referee_email,
+            "amount": float(b.amount),
+            "bonus_amount": float(b.bonus_amount),
+            "percentage": float(b.percentage),
+            "timestamp": b.timestamp.isoformat(),
+            "lock_days": b.lock_days,
+            "matured_at": b.matured_at.isoformat(),
+            "status": status
+        })
+
+    return {"packages": packages}
+
+
+# ────────────────────────────────
+# 📌 ADMIN CONFIG APIS
+# ────────────────────────────────
+
+@router.put("/config", response_model=ConfigPayload)
+def update_associate_config(
+    payload: ConfigPayload,
+    db: Session = Depends(get_db),
+    user=Depends(verify_token)
+):
+    """Update referral percent and lock days."""
+    config = AssociateConfig(
+        referral_percent=payload.referral_percent,
+        lock_days=payload.lock_days
+    )
+    db.add(config)
+    db.commit()
+    db.refresh(config)
+
+    return ConfigPayload(
+        referral_percent=config.referral_percent,
+        lock_days=config.lock_days
+    )
+
+
 @router.get("/admin/config")
 def get_associate_config(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Fetch latest associate config (no admin restriction)."""
+    """Fetch latest associate config."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
         return {"referral_percent": 0, "lock_days": 0}
@@ -212,7 +368,7 @@ def get_associate_config(db: Session = Depends(get_db), user=Depends(verify_toke
 
 @router.get("/admin/summary")
 def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Fetch associate deposit summary (no admin restriction)."""
+    """Fetch associate deposit summary (old system)."""
     total = db.query(func.sum(Investment.amount)).filter(Investment.is_associate == True).scalar() or 0
     matured = db.query(func.sum(Investment.amount)).filter(
         Investment.is_associate == True,
@@ -233,7 +389,7 @@ def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_tok
 
 @router.post("/admin/backfill-associates")
 def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Backfill referral-based associate deposits (no admin restriction)."""
+    """Backfill referral-based associate deposits (old system)."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
         raise HTTPException(status_code=400, detail="No associate config set")
@@ -277,66 +433,3 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 
     db.commit()
     return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}
-
-
-
-
-@router.get("/associate/referral-packages")
-def get_referral_packages(
-    db: Session = Depends(get_db),
-    token_user=Depends(verify_token),
-    email: str = Query(None)  # optional filter
-):
-    """
-    If ?email is passed → return packages for that referee only.
-    Otherwise → return all packages for the associate.
-    """
-    associate_email = token_user["email"]
-
-    # latest lock days config
-    assoc_cfg = (
-        db.query(AssociateConfig)
-        .order_by(AssociateConfig.updated_at.desc())
-        .first()
-    )
-    lock_days = assoc_cfg.lock_days if assoc_cfg else 30
-
-    # fetch earnings for this associate
-    q = db.query(ReferralEarning).filter(
-        ReferralEarning.referrer_email == associate_email
-    )
-    if email:  # filter if specific referee requested
-        q = q.filter(ReferralEarning.referred_email == email)
-
-    earnings = q.all()
-    if not earnings:
-        return {"packages": []}
-
-    packages = []
-    for e in earnings:
-        investments = (
-            db.query(Investment)
-            .filter(Investment.user_email == e.referred_email)
-            .order_by(Investment.timestamp.desc())
-            .all()
-        )
-
-        for inv in investments:
-            invested_at = inv.timestamp
-            matured_at = invested_at + timedelta(days=lock_days)
-            status = "Locked" if matured_at > datetime.utcnow() else "Matured"
-
-            packages.append({
-                "id": inv.id,
-                "referee_email": e.referred_email,      # referee under associate
-                "source_investor": inv.source_investor, # 👈 added field
-                "amount": float(inv.amount),
-                "commission_amount": float(e.commission_amount),
-                "percentage": float(e.percentage),
-                "timestamp": invested_at.isoformat(),
-                "lock_days": lock_days,
-                "matured_at": matured_at.isoformat(),
-                "status": status
-            })
-
-    return {"packages": packages}
