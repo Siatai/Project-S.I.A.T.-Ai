@@ -38,14 +38,17 @@ export default function Referrals() {
     if (token) fetchData();
   }, [token, headers]);
 
-  // ✅ Load referral packages for popup (API returns only this referee’s packages)
+  // ✅ Load referral packages for popup
   const fetchReferralPackages = async (refEmail) => {
     try {
       const res = await axios.get(
-        `${API}/associate/referral-packages?email=${refEmail}`,
+        `${API}/associate/associate/referral-packages?email=${refEmail}`,
         { headers }
       );
-      setPackages(res.data.packages || []);
+      // API may still return multiple referees, so filter by source_investor
+      const all = res.data.packages || [];
+      const filtered = all.filter((pkg) => pkg.source_investor === refEmail);
+      setPackages(filtered);
     } catch (err) {
       console.error("Error fetching referral packages:", err);
     }

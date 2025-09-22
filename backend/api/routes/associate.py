@@ -302,7 +302,9 @@ def get_referral_packages(
     lock_days = assoc_cfg.lock_days if assoc_cfg else 30
 
     # fetch earnings for this associate
-    q = db.query(ReferralEarning).filter(ReferralEarning.referrer_email == associate_email)
+    q = db.query(ReferralEarning).filter(
+        ReferralEarning.referrer_email == associate_email
+    )
     if email:  # filter if specific referee requested
         q = q.filter(ReferralEarning.referred_email == email)
 
@@ -322,11 +324,12 @@ def get_referral_packages(
         for inv in investments:
             invested_at = inv.timestamp
             matured_at = invested_at + timedelta(days=lock_days)
-            status = "Locked" if matured_at > invested_at else "Matured"
+            status = "Locked" if matured_at > datetime.utcnow() else "Matured"
 
             packages.append({
                 "id": inv.id,
-                "referee_email": e.referred_email,
+                "referee_email": e.referred_email,      # referee under associate
+                "source_investor": inv.source_investor, # 👈 added field
                 "amount": float(inv.amount),
                 "commission_amount": float(e.commission_amount),
                 "percentage": float(e.percentage),
