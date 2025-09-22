@@ -8,8 +8,6 @@ from models.user_model import User
 from models.withdrawal_model import Investment
 from models.associate_config_model import AssociateConfig
 from utils.auth_middleware import verify_token
-from models.referral_model import ReferralEarning
-from models.DirectReferralBonus import DirectReferralBonus
 
 router = APIRouter(prefix="/associate", tags=["Associate"])
 
@@ -32,150 +30,7 @@ class ActionResponse(BaseModel):
 
 
 # ────────────────────────────────
-# 📌 OLD ASSOCIATE DEPOSIT APIS
-# ────────────────────────────────
-
-@router.get("/deposits")
-def get_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """List all deposits credited to associate (old system)."""
-    deposits = (
-        db.query(Investment)
-        .filter(Investment.user_email == user.email, Investment.is_associate == True)
-        .all()
-    )
-
-    result = []
-    for dep in deposits:
-        status = "Locked"
-        if dep.matured_at and datetime.utcnow() >= dep.matured_at:
-            status = "Matured"
-        if dep.flushed:
-            status = "Withdrawn"
-        result.append({
-            "id": dep.id,
-            "amount": dep.amount,
-            "timestamp": dep.timestamp,
-            "source_investor": dep.source_investor,
-            "lock_days": dep.lock_days,
-            "matured_at": dep.matured_at,
-            "roi_received": dep.roi_received,
-            "status": status
-        })
-    return result
-
-
-@router.post("/deposits/{deposit_id}/withdraw", response_model=ActionResponse)
-def withdraw_associate_deposit(deposit_id: int, db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Withdraw matured associate deposit + ROI (old system)."""
-    dep = db.query(Investment).filter(
-        Investment.id == deposit_id,
-        Investment.user_email == user.email,
-        Investment.is_associate == True
-    ).first()
-
-    if not dep:
-        raise HTTPException(status_code=404, detail="Deposit not found")
-
-    if not dep.matured_at or datetime.utcnow() < dep.matured_at:
-        raise HTTPException(status_code=400, detail="Deposit not yet matured")
-
-    if dep.flushed:
-        raise HTTPException(status_code=400, detail="Already withdrawn or reinvested")
-
-    payout_amount = dep.amount + dep.roi_received
-    dep.flushed = True
-    db.commit()
-
-    return ActionResponse(
-        message="Deposit withdrawn successfully",
-        amount=payout_amount,
-        wallet=user.wallet if hasattr(user, "wallet") else None
-    )
-
-
-@router.post("/deposits/{deposit_id}/reinvest", response_model=ActionResponse)
-def reinvest_associate_deposit(deposit_id: int, db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Reinvest matured associate deposit into a new cycle (old system)."""
-    dep = db.query(Investment).filter(
-        Investment.id == deposit_id,
-        Investment.user_email == user.email,
-        Investment.is_associate == True
-    ).first()
-
-    if not dep:
-        raise HTTPException(status_code=404, detail="Deposit not found")
-
-    if not dep.matured_at or datetime.utcnow() < dep.matured_at:
-        raise HTTPException(status_code=400, detail="Deposit not yet matured")
-
-    if dep.flushed:
-        raise HTTPException(status_code=400, detail="Already withdrawn or reinvested")
-
-    reinvest_amount = dep.amount + dep.roi_received
-    config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
-    lock_days = config.lock_days if config else 30
-
-    new_dep = Investment(
-        user_email=user.email,
-        amount=reinvest_amount,
-        is_associate=True,
-        source_investor=dep.source_investor,
-        lock_days=lock_days,
-        matured_at=datetime.utcnow() + timedelta(days=lock_days)
-    )
-
-    dep.flushed = True
-    db.add(new_dep)
-    db.commit()
-    db.refresh(new_dep)
-
-    return ActionResponse(
-        message="Deposit reinvested successfully",
-        amount=reinvest_amount,
-        new_investment_id=new_dep.id
-    )
-
-
-@router.get("/my-deposits")
-def get_my_associate_deposits(user=Depends(verify_token), db: Session = Depends(get_db)):
-    """List all associate deposits for logged-in user (old system)."""
-    db_user = db.query(User).filter_by(email=user["email"]).first()
-    if not db_user or not db_user.is_associate:
-        raise HTTPException(status_code=403, detail="Associate access required")
-
-    deposits = (
-        db.query(Investment)
-        .filter(Investment.user_email == db_user.email, Investment.is_associate == True)
-        .order_by(Investment.timestamp.desc())
-        .all()
-    )
-
-    result = []
-    now = datetime.utcnow()
-    for dep in deposits:
-        if dep.flushed:
-            status = "Withdrawn"
-        elif dep.matured_at and now >= dep.matured_at:
-            status = "Matured"
-        else:
-            status = "Locked"
-
-        result.append({
-            "id": dep.id,
-            "amount": dep.amount,
-            "source_investor": dep.source_investor,
-            "timestamp": dep.timestamp,
-            "lock_days": dep.lock_days,
-            "matured_at": dep.matured_at,
-            "roi_received": dep.roi_received,
-            "status": status
-        })
-
-    return result
-
-
-# ────────────────────────────────
-# 📌 DIRECT REFERRAL BONUS APIS (NEW)
+# 📌 DIRECT REFERRAL BONUS (associate deposits)
 # ────────────────────────────────
 
 @router.get("/direct-bonuses")
@@ -186,27 +41,32 @@ def get_direct_bonuses(
     """List all direct referral bonuses for the logged-in associate."""
     email = token_user["email"]
 
-    bonuses = db.query(DirectReferralBonus).filter(
-        DirectReferralBonus.referrer_email == email
-    ).order_by(DirectReferralBonus.timestamp.desc()).all()
+    bonuses = db.query(Investment).filter(
+        Investment.user_email == email,
+        Investment.is_associate == True
+    ).order_by(Investment.timestamp.desc()).all()
 
     result = []
     now = datetime.utcnow()
     for b in bonuses:
-        status = "Withdrawn" if b.flushed else (
-            "Matured" if now >= b.matured_at else "Locked"
-        )
+        if b.flushed:
+            status = "Withdrawn"
+        elif b.matured_at and now >= b.matured_at:
+            status = "Matured"
+        else:
+            status = "Locked"
+
         result.append({
             "id": b.id,
-            "referee_email": b.referee_email,
+            "referee_email": b.source_investor,
             "amount": b.amount,
-            "percentage": b.percentage,
-            "bonus_amount": b.bonus_amount,
             "timestamp": b.timestamp,
             "lock_days": b.lock_days,
             "matured_at": b.matured_at,
+            "roi_received": b.roi_received,
             "status": status,
         })
+
     return {"bonuses": result}
 
 
@@ -218,9 +78,10 @@ def withdraw_direct_bonus(
 ):
     """Withdraw a matured referral bonus."""
     email = token_user["email"]
-    bonus = db.query(DirectReferralBonus).filter(
-        DirectReferralBonus.id == bonus_id,
-        DirectReferralBonus.referrer_email == email
+    bonus = db.query(Investment).filter(
+        Investment.id == bonus_id,
+        Investment.user_email == email,
+        Investment.is_associate == True
     ).first()
 
     if not bonus:
@@ -229,16 +90,17 @@ def withdraw_direct_bonus(
     if bonus.flushed:
         raise HTTPException(status_code=400, detail="Already withdrawn or reinvested")
 
-    if datetime.utcnow() < bonus.matured_at:
+    if not bonus.matured_at or datetime.utcnow() < bonus.matured_at:
         raise HTTPException(status_code=400, detail="Bonus still locked")
 
-    payout_amount = bonus.bonus_amount
+    payout_amount = bonus.amount + (bonus.roi_received or 0)
     bonus.flushed = True
     db.commit()
 
     return ActionResponse(
         message=f"Bonus {bonus_id} withdrawn successfully",
-        amount=payout_amount
+        amount=payout_amount,
+        wallet=getattr(token_user, "wallet", None)
     )
 
 
@@ -250,9 +112,10 @@ def reinvest_direct_bonus(
 ):
     """Reinvest a matured referral bonus into a new associate deposit."""
     email = token_user["email"]
-    bonus = db.query(DirectReferralBonus).filter(
-        DirectReferralBonus.id == bonus_id,
-        DirectReferralBonus.referrer_email == email
+    bonus = db.query(Investment).filter(
+        Investment.id == bonus_id,
+        Investment.user_email == email,
+        Investment.is_associate == True
     ).first()
 
     if not bonus:
@@ -261,32 +124,35 @@ def reinvest_direct_bonus(
     if bonus.flushed:
         raise HTTPException(status_code=400, detail="Already withdrawn or reinvested")
 
-    if datetime.utcnow() < bonus.matured_at:
+    if not bonus.matured_at or datetime.utcnow() < bonus.matured_at:
         raise HTTPException(status_code=400, detail="Bonus still locked")
 
-    # Create a new Investment for reinvestment
+    reinvest_amount = bonus.amount + (bonus.roi_received or 0)
+    config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+    lock_days = config.lock_days if config else 30
+
     new_dep = Investment(
         user_email=email,
-        amount=bonus.bonus_amount,
+        amount=reinvest_amount,
         is_associate=True,
-        source_investor=bonus.referee_email,
-        lock_days=bonus.lock_days,
-        matured_at=datetime.utcnow() + timedelta(days=bonus.lock_days)
+        source_investor=bonus.source_investor,
+        lock_days=lock_days,
+        matured_at=datetime.utcnow() + timedelta(days=lock_days)
     )
-    db.add(new_dep)
 
     bonus.flushed = True
+    db.add(new_dep)
     db.commit()
     db.refresh(new_dep)
 
     return ActionResponse(
         message=f"Bonus {bonus_id} reinvested successfully",
-        amount=bonus.bonus_amount,
+        amount=reinvest_amount,
         new_investment_id=new_dep.id
     )
 
 
-@router.get("/associate/referral-packages")
+@router.get("/referral-packages")
 def get_referral_packages(
     db: Session = Depends(get_db),
     token_user=Depends(verify_token),
@@ -298,29 +164,32 @@ def get_referral_packages(
     """
     associate_email = token_user["email"]
 
-    q = db.query(DirectReferralBonus).filter(
-        DirectReferralBonus.referrer_email == associate_email
+    q = db.query(Investment).filter(
+        Investment.user_email == associate_email,
+        Investment.is_associate == True
     )
     if email:
-        q = q.filter(DirectReferralBonus.referee_email == email)
+        q = q.filter(Investment.source_investor == email)
 
-    bonuses = q.order_by(DirectReferralBonus.timestamp.asc()).all()
+    bonuses = q.order_by(Investment.timestamp.asc()).all()
     now = datetime.utcnow()
 
     packages = []
     for b in bonuses:
-        status = "Withdrawn" if b.flushed else (
-            "Matured" if now >= b.matured_at else "Locked"
-        )
+        if b.flushed:
+            status = "Withdrawn"
+        elif b.matured_at and now >= b.matured_at:
+            status = "Matured"
+        else:
+            status = "Locked"
+
         packages.append({
             "id": b.id,
-            "referee_email": b.referee_email,
+            "referee_email": b.source_investor,
             "amount": float(b.amount),
-            "bonus_amount": float(b.bonus_amount),
-            "percentage": float(b.percentage),
             "timestamp": b.timestamp.isoformat(),
             "lock_days": b.lock_days,
-            "matured_at": b.matured_at.isoformat(),
+            "matured_at": b.matured_at.isoformat() if b.matured_at else None,
             "status": status
         })
 
@@ -368,7 +237,7 @@ def get_associate_config(db: Session = Depends(get_db), user=Depends(verify_toke
 
 @router.get("/admin/summary")
 def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Fetch associate deposit summary (old system)."""
+    """Fetch associate deposit summary."""
     total = db.query(func.sum(Investment.amount)).filter(Investment.is_associate == True).scalar() or 0
     matured = db.query(func.sum(Investment.amount)).filter(
         Investment.is_associate == True,
@@ -389,7 +258,7 @@ def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_tok
 
 @router.post("/admin/backfill-associates")
 def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
-    """Backfill referral-based associate deposits (old system)."""
+    """Backfill referral-based associate deposits."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
         raise HTTPException(status_code=400, detail="No associate config set")
@@ -433,68 +302,3 @@ def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(veri
 
     db.commit()
     return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}
-
-@router.post("/admin/backfill-direct-bonuses")
-def backfill_direct_referral_bonuses(
-    db: Session = Depends(get_db),
-    user=Depends(verify_token)
-):
-    """
-    🔄 Retro entry:
-    Create missing DirectReferralBonus rows from past ReferralEarnings + Investments.
-    Skips duplicates (safe to run multiple times).
-    """
-
-    # get latest config for lock_days
-    config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
-    lock_days = config.lock_days if config else 30
-
-    created_count = 0
-    skipped_count = 0
-
-    # loop through all referral earnings
-    earnings = db.query(ReferralEarning).all()
-    for e in earnings:
-        # find the investment that triggered this earning (oldest first)
-        inv = (
-            db.query(Investment)
-            .filter(Investment.user_email == e.referred_email)
-            .order_by(Investment.timestamp.asc())
-            .first()
-        )
-        if not inv:
-            skipped_count += 1
-            continue
-
-        # check if a DirectReferralBonus already exists for this tx_hash
-        exists = db.query(DirectReferralBonus).filter_by(
-            tx_hash=inv.tx_hash
-        ).first()
-
-        if exists:
-            skipped_count += 1
-            continue
-
-        # create new DirectReferralBonus entry
-        bonus = DirectReferralBonus(
-            referrer_email=e.referrer_email,
-            referee_email=e.referred_email,
-            amount=inv.amount,
-            percentage=e.percentage,
-            bonus_amount=e.commission_amount,
-            tx_hash=inv.tx_hash,
-            timestamp=inv.timestamp,
-            lock_days=lock_days,
-            matured_at=inv.timestamp + timedelta(days=lock_days),
-            flushed=False
-        )
-        db.add(bonus)
-        created_count += 1
-
-    db.commit()
-
-    return {
-        "message": "Backfill complete ✅",
-        "created": created_count,
-        "skipped_existing": skipped_count
-    }
