@@ -154,13 +154,8 @@ def reinvest_direct_bonus(
 @router.get("/referrals")
 def get_referrals(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)  # verify_token returns dict
+    current_user: dict = Depends(verify_token)  # ✅ dict use karo
 ):
-    """
-    Get all direct referrals of the logged-in associate.
-    Includes users even if they have no investments.
-    """
-
     if not current_user or "referral_code" not in current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -174,9 +169,9 @@ def get_referrals(
             "id": r.id,
             "name": r.name or "Unnamed User",
             "email": r.email,
-            "created_at": str(r.created_at) if r.created_at else None,
             "wallet": r.wallet,
             "balance": float(r.wallet_balance or 0),
+            "created_at": str(r.created_at) if r.created_at else None,
         })
 
     return {

@@ -11,7 +11,11 @@ export default function Referrals() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
-  const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
+
+  // ✅ build headers safely
+  const headers = useMemo(() => {
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }, [token]);
 
   // ✅ Global styles
   useEffect(() => {
@@ -24,6 +28,12 @@ export default function Referrals() {
   // ✅ Load referrals + deposits together
   useEffect(() => {
     const fetchData = async () => {
+      if (!token) {
+        console.warn("⚠️ No token found in localStorage");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
 
@@ -32,7 +42,7 @@ export default function Referrals() {
         const depositData = roiRes.data.details || [];
 
         // 2. All referrals (invested or not)
-        const refRes = await axios.get(`${API}/api/v1/associate/referrals`, { headers });
+        const refRes = await axios.get(`${API}/associate/referrals`, { headers });
         const refereesList = refRes.data.referrals || [];
 
         // 3. Merge ROI + referrals
@@ -52,13 +62,14 @@ export default function Referrals() {
 
         setReferees(merged);
       } catch (err) {
-        console.error("Error fetching referrals:", err);
+        console.error("Error fetching referrals:", err.response?.data || err.message);
+        alert(err.response?.data?.detail || "Failed to load referrals. Please login again.");
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) fetchData();
+    fetchData();
   }, [token, headers]);
 
   // ✅ Load referral packages (direct bonuses)
@@ -73,7 +84,7 @@ export default function Referrals() {
       );
       setPackages(sorted);
     } catch (err) {
-      console.error("Error fetching referral packages:", err);
+      console.error("Error fetching referral packages:", err.response?.data || err.message);
     }
   };
 
@@ -86,7 +97,7 @@ export default function Referrals() {
       alert(res.data.message || "Action successful");
       if (selectedReferee) fetchReferralPackages(selectedReferee.email);
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Error:", err.response?.data || err.message);
       alert(err.response?.data?.detail || "Failed");
     } finally {
       setActionLoading(null);
