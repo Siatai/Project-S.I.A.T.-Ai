@@ -154,20 +154,20 @@ def reinvest_direct_bonus(
 @router.get("/referrals")
 def get_referrals(
     db: Session = Depends(get_db),
-    current_user: User = Depends(verify_token)
+    current_user: dict = Depends(verify_token)  # ✅ dict aa raha hai
 ):
     """
     Get all direct referrals of the logged-in associate.
     Includes users even if they have no investments.
     """
 
-    if not current_user:
+    if not current_user or "referral_code" not in current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     # ✅ All users whose "referred_by" matches my referral_code
     referrals = (
         db.query(User)
-        .filter(User.referred_by == current_user.referral_code)
+        .filter(User.referred_by == current_user["referral_code"])
         .all()
     )
 
