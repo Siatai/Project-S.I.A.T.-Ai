@@ -172,15 +172,15 @@ def get_referrals(
     for r in referrals:
         results.append({
             "id": r.id,
-            "name": r.full_name or "Unnamed User",
+            "name": r.name or "Unnamed User",
             "email": r.email,
             "created_at": str(r.created_at) if r.created_at else None,
             "wallet": r.wallet,
-            "balance": float(r.balance or 0),
+            "balance": float(r.wallet_balance or 0),
         })
 
     return {
-        "associate_email": current_user.get("email"),
+        "associate_email": current_user["email"],
         "referral_code": my_code,
         "total_referrals": len(results),
         "referrals": results
