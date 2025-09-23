@@ -27,20 +27,21 @@ export default function Referrals() {
       try {
         setLoading(true);
 
-        // ROI status (commission earned/left)
+        // 1. ROI commissions
         const roiRes = await axios.get(`${API}/associate-roi-status`, { headers });
         const depositData = roiRes.data.details || [];
 
-        // All referrals (invested or not)
-        const refRes = await axios.get(`${API}/associate/referrals`, { headers });
+        // 2. All referrals (invested or not)
+        const refRes = await axios.get(`${API}/api/v1/associate/referrals`, { headers });
         const refereesList = refRes.data.referrals || [];
 
-        // Merge both
+        // 3. Merge ROI + referrals
         const merged = refereesList.map((r) => {
           const dep = depositData.filter((d) => d.referee_email === r.email);
           const earned = dep.reduce((s, d) => s + (d.commission_earned || 0), 0);
           const left = dep.reduce((s, d) => s + (d.commission_left || 0), 0);
           return {
+            id: r.id,
             name: r.name || "Unknown User",
             email: r.email,
             earned,
@@ -56,6 +57,7 @@ export default function Referrals() {
         setLoading(false);
       }
     };
+
     if (token) fetchData();
   }, [token, headers]);
 
@@ -93,6 +95,7 @@ export default function Referrals() {
 
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
 
+  // ✅ Totals
   const totalEarned = referees.reduce((s, r) => s + r.earned, 0);
   const totalLeft = referees.reduce((s, r) => s + r.left, 0);
   const totalAll = totalEarned + totalLeft;

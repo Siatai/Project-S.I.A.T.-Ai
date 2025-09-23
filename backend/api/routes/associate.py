@@ -157,8 +157,10 @@ def get_referrals(
     current_user: dict = Depends(verify_token)  # verify_token returns dict
 ):
     """
-    Return all direct referrals of logged-in associate
+    Get all direct referrals of the logged-in associate.
+    Includes users even if they have no investments.
     """
+
     if not current_user or "referral_code" not in current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
