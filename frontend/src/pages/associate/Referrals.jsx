@@ -32,7 +32,7 @@ export default function Referrals() {
         const depositData = roiRes.data.details || [];
 
         // All referrals (invested or not)
-        const refRes = await axios.get(`${API}/associate/referrals`, { headers });
+        const refRes = await axios.get(`${API}/associate/associate/referrals`, { headers });
         const refereesList = refRes.data.referrals || [];
 
         // Merge both
