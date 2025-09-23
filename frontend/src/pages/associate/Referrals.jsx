@@ -3,7 +3,7 @@ import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar";
 
 export default function Referrals() {
-  const [teamDeposits, setTeamDeposits] = useState([]);
+  const [referees, setReferees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReferee, setSelectedReferee] = useState(null); // { name, email }
   const [packages, setPackages] = useState([]);
@@ -11,7 +11,6 @@ export default function Referrals() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
-
   const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
   // ✅ Global styles
@@ -22,13 +21,35 @@ export default function Referrals() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // ✅ Load summary (top bar + per-referee totals)
+  // ✅ Load referrals + deposits together
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API}/associate-roi-status`, { headers });
-        setTeamDeposits(res.data.details || []);
+
+        // ROI status (commission earned/left)
+        const roiRes = await axios.get(`${API}/associate-roi-status`, { headers });
+        const depositData = roiRes.data.details || [];
+
+        // All referrals (invested or not)
+        const refRes = await axios.get(`${API}/associate/referrals`, { headers });
+        const refereesList = refRes.data.referrals || [];
+
+        // Merge both
+        const merged = refereesList.map((r) => {
+          const dep = depositData.filter((d) => d.referee_email === r.email);
+          const earned = dep.reduce((s, d) => s + (d.commission_earned || 0), 0);
+          const left = dep.reduce((s, d) => s + (d.commission_left || 0), 0);
+          return {
+            name: r.name || "Unknown User",
+            email: r.email,
+            earned,
+            left,
+            total: earned + left,
+          };
+        });
+
+        setReferees(merged);
       } catch (err) {
         console.error("Error fetching referrals:", err);
       } finally {
@@ -71,24 +92,6 @@ export default function Referrals() {
   };
 
   if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
-
-  // ✅ Group by referee
-  const grouped = teamDeposits.reduce((acc, d) => {
-    const name = d.referee_name || "Unknown User";
-    const email = d.referee_email || "unknown@email";
-    if (!acc[email]) acc[email] = { name, email, earned: 0, left: 0 };
-    acc[email].earned += d.commission_earned || 0;
-    acc[email].left += d.commission_left || 0;
-    return acc;
-  }, {});
-
-  const referees = Object.values(grouped).map((r) => ({
-    name: r.name,
-    email: r.email,
-    earned: r.earned,
-    left: r.left,
-    total: r.earned + r.left,
-  }));
 
   const totalEarned = referees.reduce((s, r) => s + r.earned, 0);
   const totalLeft = referees.reduce((s, r) => s + r.left, 0);
