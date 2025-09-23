@@ -158,16 +158,16 @@ def get_referrals(
 ):
     """
     Get all direct referrals of the logged-in associate.
-    Includes users even if they have not invested.
+    Includes users even if they have no investments.
     """
 
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    # All users whose referrer_code matches my referral_code
+    # ✅ All users whose "referred_by" matches my referral_code
     referrals = (
         db.query(User)
-        .filter(User.referrer_code == current_user.referral_code)
+        .filter(User.referred_by == current_user.referral_code)
         .all()
     )
 
@@ -177,7 +177,7 @@ def get_referrals(
             "id": r.id,
             "name": r.full_name or "Unnamed User",
             "email": r.email,
-            "created_at": str(r.created_at),
+            "created_at": str(r.created_at) if r.created_at else None,
             "wallet": r.wallet,
             "balance": float(r.balance or 0),
         })
