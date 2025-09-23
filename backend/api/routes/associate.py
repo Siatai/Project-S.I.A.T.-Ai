@@ -36,10 +36,10 @@ class ActionResponse(BaseModel):
 @router.get("/direct-bonuses")
 def get_direct_bonuses(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
+    token_user=Depends(verify_token)
 ):
     """List all direct referral bonuses for the logged-in associate."""
-    email = current_user["email"]
+    email = token_user["email"]
 
     bonuses = db.query(Investment).filter(
         Investment.user_email == email,
@@ -74,10 +74,10 @@ def get_direct_bonuses(
 def withdraw_direct_bonus(
     bonus_id: int,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
+    token_user=Depends(verify_token)
 ):
     """Withdraw a matured referral bonus."""
-    email = current_user["email"]
+    email = token_user["email"]
     bonus = db.query(Investment).filter(
         Investment.id == bonus_id,
         Investment.user_email == email,
@@ -100,7 +100,7 @@ def withdraw_direct_bonus(
     return ActionResponse(
         message=f"Bonus {bonus_id} withdrawn successfully",
         amount=payout_amount,
-        wallet=current_user.get("wallet")
+        wallet=getattr(token_user, "wallet", None)
     )
 
 
@@ -108,10 +108,10 @@ def withdraw_direct_bonus(
 def reinvest_direct_bonus(
     bonus_id: int,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
+    token_user=Depends(verify_token)
 ):
     """Reinvest a matured referral bonus into a new associate deposit."""
-    email = current_user["email"]
+    email = token_user["email"]
     bonus = db.query(Investment).filter(
         Investment.id == bonus_id,
         Investment.user_email == email,
@@ -148,19 +148,13 @@ def reinvest_direct_bonus(
     return ActionResponse(
         message=f"Bonus {bonus_id} reinvested successfully",
         amount=reinvest_amount,
-        new_investment_id=new_dep.id,
-        wallet=current_user.get("wallet")
+        new_investment_id=new_dep.id
     )
-
-
-# ────────────────────────────────
-# 📌 REFERRALS
-# ────────────────────────────────
 
 @router.get("/referrals")
 def get_referrals(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
+    current_user: dict = Depends(verify_token)  # ✅ dict use karo
 ):
     if not current_user or "referral_code" not in current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -187,18 +181,17 @@ def get_referrals(
         "referrals": results
     }
 
-
 @router.get("/referral-packages")
 def get_referral_packages(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token),
-    email: str = Query(None)
+    token_user=Depends(verify_token),
+    email: str = Query(None)  # optional filter
 ):
     """
     If ?email is passed → return bonuses for that referee only.
     Otherwise → return all bonuses for the associate.
     """
-    associate_email = current_user["email"]
+    associate_email = token_user["email"]
 
     q = db.query(Investment).filter(
         Investment.user_email == associate_email,
@@ -240,7 +233,7 @@ def get_referral_packages(
 def update_associate_config(
     payload: ConfigPayload,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
+    user=Depends(verify_token)
 ):
     """Update referral percent and lock days."""
     config = AssociateConfig(
@@ -258,10 +251,7 @@ def update_associate_config(
 
 
 @router.get("/admin/config")
-def get_associate_config(
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
-):
+def get_associate_config(db: Session = Depends(get_db), user=Depends(verify_token)):
     """Fetch latest associate config."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
@@ -275,10 +265,7 @@ def get_associate_config(
 
 
 @router.get("/admin/summary")
-def get_associate_summary(
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
-):
+def get_associate_summary(db: Session = Depends(get_db), user=Depends(verify_token)):
     """Fetch associate deposit summary."""
     total = db.query(func.sum(Investment.amount)).filter(Investment.is_associate == True).scalar() or 0
     matured = db.query(func.sum(Investment.amount)).filter(
@@ -299,10 +286,7 @@ def get_associate_summary(
 
 
 @router.post("/admin/backfill-associates")
-def backfill_associate_deposits(
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)
-):
+def backfill_associate_deposits(db: Session = Depends(get_db), user=Depends(verify_token)):
     """Backfill referral-based associate deposits using original investment timestamp."""
     config = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
     if not config:
@@ -340,11 +324,12 @@ def backfill_associate_deposits(
             is_associate=True,
             source_investor=db_user.email,
             lock_days=lock_days,
-            timestamp=inv.timestamp,
-            matured_at=inv.timestamp + timedelta(days=lock_days)
+            timestamp=inv.timestamp,  # 👈 same as referred user investment date
+            matured_at=inv.timestamp + timedelta(days=lock_days)  # 👈 lock counted from that date
         )
         db.add(assoc_dep)
         created_count += 1
 
     db.commit()
     return {"message": f"✅ Backfill complete. Created {created_count} associate deposits."}
+
