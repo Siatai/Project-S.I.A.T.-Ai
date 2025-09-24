@@ -47,10 +47,10 @@ def poll_deposit_auto():
             if not referrer or not config or not assoc_cfg:
                 continue
 
-            # ✅ Safe casting for Decimal values
-            inv_amount = float(inv.amount)
-            percentage_val = float(config.percentage)
-            assoc_percent = float(assoc_cfg.referral_percent)
+            # ✅ Safe numeric conversions (Decimal → float)
+            inv_amount = float(inv.amount or 0)
+            percentage_val = float(config.percentage or 0)
+            assoc_percent = float(assoc_cfg.referral_percent or 0)
 
             # Commission calc
             commission_amount = round(inv_amount * (percentage_val / 100), 2)
