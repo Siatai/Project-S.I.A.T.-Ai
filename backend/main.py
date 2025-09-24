@@ -11,12 +11,12 @@ from api.routes.investment_router import router as investment_router
 from api.routes.associate import router as associate_router
 
 # ✅ Import models
-from backend.models.user_model import User
-from backend.models.withdrawal_model import Investment
-from backend.models.referral_model import ReferralEarning
-from backend.models.associate_config_model import AssociateConfig
-from backend.models.commission_model import CommissionConfig
-from backend.models.DirectReferralBonus import DirectReferralBonus
+from models.user_model import User
+from models.withdrawal_model import Investment
+from models.referral_model import ReferralEarning
+from models.associate_config_model import AssociateConfig
+from models.commission_model import CommissionConfig
+from models.DirectReferralBonus import DirectReferralBonus
 
 # ✅ Import blockchain checker
 from utils.usdt_checker import check_for_trc20_deposit
