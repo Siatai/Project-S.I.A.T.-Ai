@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 from random import randint
 from sqlalchemy import func
+import logging
 from db import get_db
 from models.user_model import User
 from models.withdrawal_model import Investment, Withdrawal
@@ -120,115 +121,130 @@ def get_user_info(email: str, db: Session = Depends(get_db)):
 @router.post("/commit-investment")
 def commit_investment(data: CommitPayload):
     return {"message": f"🧾 Committed to invest {data.amount} USDT. Awaiting blockchain confirmation."}
-
+logger = logging.getLogger("uvicorn")
 
 @router.post("/poll-deposits")
 def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
+    logger.info(f"🚀 Poll-deposit triggered | Wallet={data.wallet}, Tx={data.tx_hash}, Amount={data.amount}")
+
+    # 1. Find user by wallet
     user = db.query(User).filter_by(wallet=data.wallet).first()
     if not user:
+        logger.warning(f"❌ No user with wallet {data.wallet}")
         raise HTTPException(status_code=404, detail="No user with this wallet")
 
-    # Avoid duplicate tx
+    # 2. Prevent duplicate tx
     existing = db.query(Investment).filter_by(tx_hash=data.tx_hash).first()
     if existing:
+        logger.info(f"⚠️ Tx {data.tx_hash} already recorded for {user.email}")
         return {"message": "Transaction already recorded."}
 
+    # 3. Create investor investment
     timestamp = datetime.utcnow()
     inv = Investment(
         user_email=user.email,
         amount=data.amount,
         timestamp=timestamp,
-        tx_hash=data.tx_hash
+        tx_hash=data.tx_hash,
+        is_associate=False
     )
     db.add(inv)
 
     associate_deposit_created = False
     associate_deposit_id = None
 
-    # ───── Handle Referral + Associate Bonus ─────
+    # ───── Referral + Associate Bonus Logic ─────
     def process_referral_logic(investment_user: User, investment: Investment):
         nonlocal associate_deposit_created, associate_deposit_id
 
-        if investment_user.referred_by:
-            referrer = db.query(User).filter_by(referral_code=investment_user.referred_by).first()
-            config = db.query(CommissionConfig).first()
+        if not investment_user.referred_by:
+            return
 
-            if referrer and config:
-                percentage = config.percentage
-                commission_amount = round(investment.amount * (percentage / 100), 2)
+        referrer = db.query(User).filter_by(referral_code=investment_user.referred_by).first()
+        config = db.query(CommissionConfig).first()
 
-                earning = ReferralEarning(
-                    referrer_email=referrer.email,
-                    referred_email=investment_user.email,
-                    investment_amount=investment.amount,
-                    percentage=percentage,
-                    commission_amount=commission_amount,
-                    timestamp=timestamp,
+        if not (referrer and config):
+            return
+
+        percentage = float(config.percentage)
+        commission_amount = round(investment.amount * (percentage / 100), 2)
+
+        # ✅ Create referral earning row
+        earning = ReferralEarning(
+            referrer_email=referrer.email,
+            referred_email=investment_user.email,
+            investment_amount=investment.amount,
+            percentage=percentage,
+            commission_amount=commission_amount,
+            timestamp=timestamp,
+        )
+        db.add(earning)
+
+        # ✅ Create associate deposit
+        assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+        if assoc_cfg:
+            exists = db.query(Investment).filter(
+                Investment.is_associate == True,
+                Investment.source_investor == investment_user.email,
+                Investment.tx_hash == investment.tx_hash
+            ).first()
+
+            if not exists:
+                assoc_amount = round(investment.amount * (assoc_cfg.referral_percent / 100), 2)
+                assoc_dep = Investment(
+                    user_email=referrer.email,
+                    amount=assoc_amount,
+                    is_associate=True,
+                    source_investor=investment_user.email,
+                    lock_days=assoc_cfg.lock_days,
+                    tx_hash=investment.tx_hash,
+                    matured_at=timestamp + timedelta(days=assoc_cfg.lock_days)
                 )
-                db.add(earning)
+                db.add(assoc_dep)
+                db.flush()  # get assoc_dep.id before commit
+                associate_deposit_created = True
+                associate_deposit_id = assoc_dep.id
 
-                # Associate config
-                assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
-                if assoc_cfg:
-                    # check if associate dep already exists
-                    exists = db.query(Investment).filter(
-                        Investment.is_associate == True,
-                        Investment.source_investor == investment_user.email,
-                        Investment.tx_hash == investment.tx_hash
-                    ).first()
-                    if not exists:
-                        assoc_amount = round(investment.amount * (assoc_cfg.referral_percent / 100), 2)
-                        assoc_dep = Investment(
-                            user_email=referrer.email,
-                            amount=assoc_amount,
-                            is_associate=True,
-                            source_investor=investment_user.email,
-                            lock_days=assoc_cfg.lock_days,
-                            tx_hash=investment.tx_hash,
-                            matured_at=timestamp + timedelta(days=assoc_cfg.lock_days)
-                        )
-                        db.add(assoc_dep)
-                        db.flush()
-                        associate_deposit_created = True
-                        associate_deposit_id = assoc_dep.id
+            # ✅ Create direct referral bonus
+            bonus_tx_hash = f"{referrer.email}-{investment_user.email}-{investment.tx_hash}"
+            exists_bonus = db.query(DirectReferralBonus).filter_by(tx_hash=bonus_tx_hash).first()
+            if not exists_bonus:
+                direct_bonus = DirectReferralBonus(
+                    referrer_email=referrer.email,
+                    referee_email=investment_user.email,
+                    amount=investment.amount,
+                    percentage=percentage,
+                    bonus_amount=commission_amount,
+                    tx_hash=bonus_tx_hash,
+                    lock_days=assoc_cfg.lock_days,
+                    matured_at=timestamp + timedelta(days=assoc_cfg.lock_days),
+                )
+                db.add(direct_bonus)
 
-                    # Direct Bonus
-                    bonus_tx_hash = f"{referrer.email}-{investment_user.email}-{investment.tx_hash}"
-                    exists_bonus = db.query(DirectReferralBonus).filter_by(tx_hash=bonus_tx_hash).first()
-                    if not exists_bonus:
-                        direct_bonus = DirectReferralBonus(
-                            referrer_email=referrer.email,
-                            referee_email=investment_user.email,
-                            amount=investment.amount,
-                            percentage=percentage,
-                            bonus_amount=commission_amount,
-                            tx_hash=bonus_tx_hash,
-                            lock_days=assoc_cfg.lock_days,
-                            matured_at=timestamp + timedelta(days=assoc_cfg.lock_days),
-                        )
-                        db.add(direct_bonus)
-
-    # Run referral logic for this new investment
+    # 4. Run logic for this new investment
     process_referral_logic(user, inv)
 
-    # ───── Backfill Missing Associate Deposits (manual insert case) ─────
+    # 5. Backfill for existing manual investments
     all_investments = db.query(Investment).filter_by(is_associate=False).all()
     for inv_row in all_investments:
         inv_user = db.query(User).filter_by(email=inv_row.user_email).first()
         if inv_user:
             process_referral_logic(inv_user, inv_row)
 
+    # 6. Commit transaction
     try:
         db.commit()
+        logger.info(f"✅ Investment saved for {user.email} | Tx={data.tx_hash}")
         return {
-            "message": f"Investment recorded for {user.email}",
+            "message": f"✅ Investment recorded for {user.email}",
             "associate_deposit_created": associate_deposit_created,
             "associate_deposit_id": associate_deposit_id
         }
     except IntegrityError:
         db.rollback()
+        logger.error(f"❌ IntegrityError for {data.tx_hash} (duplicate?)")
         raise HTTPException(status_code=400, detail="Duplicate transaction hash")
-
+    
 @router.get("/check-deposit")
 def check_deposit(email: str, db: Session = Depends(get_db)):
     inv = (
