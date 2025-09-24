@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
 from sqlalchemy.orm import Session
-from db import SessionLocal
+from datetime import datetime, timedelta
+from sqlalchemy.exc import IntegrityError
 
 # ✅ Import routers
 from api.routes.auth_routes import router as auth_router
@@ -11,6 +12,7 @@ from api.routes.investment_router import router as investment_router
 from api.routes.associate import router as associate_router
 
 # ✅ Import models
+from db import SessionLocal
 from models.user_model import User
 from models.withdrawal_model import Investment
 from models.referral_model import ReferralEarning
@@ -20,9 +22,6 @@ from models.DirectReferralBonus import DirectReferralBonus
 
 # ✅ Import blockchain checker
 from utils.usdt_checker import check_for_trc20_deposit
-
-from datetime import datetime, timedelta
-from sqlalchemy.exc import IntegrityError
 
 
 # ────────────────────────────────
@@ -166,12 +165,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router, )
-
+# ✅ Register routers
+app.include_router(auth_router)
 app.include_router(investment_router)
-
 app.include_router(associate_router)
-
 
 
 # ✅ Root endpoint
