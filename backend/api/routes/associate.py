@@ -173,7 +173,7 @@ def get_referrals(
             "email": r.email,
             "wallet": r.wallet,
             "balance": float(r.wallet_balance or 0),
-            "created_at": str(r.created_at) if r.created_at else None,
+            
         })
 
     return {
