@@ -154,12 +154,14 @@ def reinvest_direct_bonus(
 @router.get("/referrals")
 def get_referrals(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(verify_token)  # ✅ dict use karo
+    token_user: dict = Depends(verify_token)
 ):
-    if not current_user or "referral_code" not in current_user:
+    # verify_token me referral_code nahi aa raha → DB fetch
+    db_user = db.query(User).filter(User.email == token_user["email"]).first()
+    if not db_user or not db_user.referral_code:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    my_code = current_user["referral_code"]
+    my_code = db_user.referral_code
 
     referrals = db.query(User).filter(User.referred_by == my_code).all()
 
@@ -175,11 +177,12 @@ def get_referrals(
         })
 
     return {
-        "associate_email": current_user["email"],
+        "associate_email": db_user.email,
         "referral_code": my_code,
         "total_referrals": len(results),
         "referrals": results
     }
+
 
 @router.get("/referral-packages")
 def get_referral_packages(
