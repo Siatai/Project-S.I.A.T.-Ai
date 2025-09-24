@@ -16,6 +16,7 @@ from utils.email_sender import send_email_otp
 from utils.user_logic import store_otp, verify_otp, calculate_investor_roi
 from utils.roi_creditor import credit_daily_roi, force_credit_daily_roi
 from utils.roi_tracker import get_roi_status
+from models.associate_config_model import AssociateConfig
 from models.DirectReferralBonus import DirectReferralBonus
 router = APIRouter()
 
@@ -127,6 +128,7 @@ def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="No user with this wallet")
 
+    # Avoid duplicate tx
     existing = db.query(Investment).filter_by(tx_hash=data.tx_hash).first()
     if existing:
         return {"message": "Transaction already recorded."}
@@ -140,63 +142,81 @@ def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
     )
     db.add(inv)
 
-    # Track if associate deposit was created
     associate_deposit_created = False
     associate_deposit_id = None
 
-    # ───── Existing One-Level Commission Logic (KEEP) ─────
-    if user.referred_by:
-        referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
-        config = db.query(CommissionConfig).first()
+    # ───── Handle Referral + Associate Bonus ─────
+    def process_referral_logic(investment_user: User, investment: Investment):
+        nonlocal associate_deposit_created, associate_deposit_id
 
-        if referrer and config:
-            percentage = config.percentage
-            commission_amount = round(data.amount * (percentage / 100), 2)
+        if investment_user.referred_by:
+            referrer = db.query(User).filter_by(referral_code=investment_user.referred_by).first()
+            config = db.query(CommissionConfig).first()
 
-            earning = ReferralEarning(
-                referrer_email=referrer.email,
-                referred_email=user.email,
-                investment_amount=data.amount,
-                percentage=percentage,
-                commission_amount=commission_amount,
-                timestamp=timestamp,
-            )
-            db.add(earning)
+            if referrer and config:
+                percentage = config.percentage
+                commission_amount = round(investment.amount * (percentage / 100), 2)
 
-            # ───── NEW Associate Deposit Add-on ─────
-            from models.associate_config_model import AssociateConfig
-            assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
-
-            if assoc_cfg:
-                assoc_amount = round(data.amount * (assoc_cfg.referral_percent / 100), 2)
-                assoc_dep = Investment(
-                    user_email=referrer.email,
-                    amount=assoc_amount,
-                    is_associate=True,
-                    source_investor=user.email,
-                    lock_days=assoc_cfg.lock_days,
-                    matured_at=datetime.utcnow() + timedelta(days=assoc_cfg.lock_days)
-                )
-                db.add(assoc_dep)
-                db.flush()  # get assoc_dep.id before commit
-                associate_deposit_created = True
-                associate_deposit_id = assoc_dep.id
-
-            # ───── NEW Direct Referral Bonus Transaction ─────
-            
-            if assoc_cfg:
-                bonus_tx_hash = f"{referrer.email}-{user.email}-{data.tx_hash}"
-                direct_bonus = DirectReferralBonus(
+                earning = ReferralEarning(
                     referrer_email=referrer.email,
-                    referee_email=user.email,
-                    amount=data.amount,
+                    referred_email=investment_user.email,
+                    investment_amount=investment.amount,
                     percentage=percentage,
-                    bonus_amount=commission_amount,
-                    tx_hash=bonus_tx_hash,
-                    lock_days=assoc_cfg.lock_days,
-                    matured_at=datetime.utcnow() + timedelta(days=assoc_cfg.lock_days),
+                    commission_amount=commission_amount,
+                    timestamp=timestamp,
                 )
-                db.add(direct_bonus)
+                db.add(earning)
+
+                # Associate config
+                assoc_cfg = db.query(AssociateConfig).order_by(AssociateConfig.id.desc()).first()
+                if assoc_cfg:
+                    # check if associate dep already exists
+                    exists = db.query(Investment).filter(
+                        Investment.is_associate == True,
+                        Investment.source_investor == investment_user.email,
+                        Investment.tx_hash == investment.tx_hash
+                    ).first()
+                    if not exists:
+                        assoc_amount = round(investment.amount * (assoc_cfg.referral_percent / 100), 2)
+                        assoc_dep = Investment(
+                            user_email=referrer.email,
+                            amount=assoc_amount,
+                            is_associate=True,
+                            source_investor=investment_user.email,
+                            lock_days=assoc_cfg.lock_days,
+                            tx_hash=investment.tx_hash,
+                            matured_at=timestamp + timedelta(days=assoc_cfg.lock_days)
+                        )
+                        db.add(assoc_dep)
+                        db.flush()
+                        associate_deposit_created = True
+                        associate_deposit_id = assoc_dep.id
+
+                    # Direct Bonus
+                    bonus_tx_hash = f"{referrer.email}-{investment_user.email}-{investment.tx_hash}"
+                    exists_bonus = db.query(DirectReferralBonus).filter_by(tx_hash=bonus_tx_hash).first()
+                    if not exists_bonus:
+                        direct_bonus = DirectReferralBonus(
+                            referrer_email=referrer.email,
+                            referee_email=investment_user.email,
+                            amount=investment.amount,
+                            percentage=percentage,
+                            bonus_amount=commission_amount,
+                            tx_hash=bonus_tx_hash,
+                            lock_days=assoc_cfg.lock_days,
+                            matured_at=timestamp + timedelta(days=assoc_cfg.lock_days),
+                        )
+                        db.add(direct_bonus)
+
+    # Run referral logic for this new investment
+    process_referral_logic(user, inv)
+
+    # ───── Backfill Missing Associate Deposits (manual insert case) ─────
+    all_investments = db.query(Investment).filter_by(is_associate=False).all()
+    for inv_row in all_investments:
+        inv_user = db.query(User).filter_by(email=inv_row.user_email).first()
+        if inv_user:
+            process_referral_logic(inv_user, inv_row)
 
     try:
         db.commit()
@@ -208,8 +228,6 @@ def poll_deposit(data: AutoDeposit, db: Session = Depends(get_db)):
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Duplicate transaction hash")
-
-
 
 @router.get("/check-deposit")
 def check_deposit(email: str, db: Session = Depends(get_db)):
