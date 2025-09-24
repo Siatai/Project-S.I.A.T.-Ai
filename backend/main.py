@@ -32,7 +32,7 @@ def poll_deposit_auto():
     timestamp = datetime.utcnow()
 
     try:
-        # Fetch all investor deposits (non-associate)
+        # Fetch all investor deposits (non-associate only)
         all_investments = db.query(Investment).filter_by(is_associate=False).all()
 
         for inv in all_investments:
@@ -47,7 +47,7 @@ def poll_deposit_auto():
             if not referrer or not config or not assoc_cfg:
                 continue
 
-            # ✅ Safe numeric conversions (Decimal → float)
+            # ✅ Safe numeric conversions
             inv_amount = float(inv.amount or 0)
             percentage_val = float(config.percentage or 0)
             assoc_percent = float(assoc_cfg.referral_percent or 0)
@@ -55,7 +55,7 @@ def poll_deposit_auto():
             # Commission calc
             commission_amount = round(inv_amount * (percentage_val / 100), 2)
 
-            # Referral earning (if not exists)
+            # Referral earning (ledger) → prevent duplicate
             exists_ref = db.query(ReferralEarning).filter_by(
                 referrer_email=referrer.email,
                 referred_email=user.email,
@@ -72,7 +72,7 @@ def poll_deposit_auto():
                 )
                 db.add(earning)
 
-            # Associate deposit (if not exists)
+            # Associate deposit → prevent duplicate
             exists_assoc = db.query(Investment).filter(
                 Investment.is_associate == True,
                 Investment.source_investor == user.email,
@@ -91,7 +91,7 @@ def poll_deposit_auto():
                 )
                 db.add(assoc_dep)
 
-            # Direct referral bonus (if not exists)
+            # Direct referral bonus → prevent duplicate
             bonus_tx_hash = f"{referrer.email}-{user.email}-{inv.tx_hash}"
             exists_bonus = db.query(DirectReferralBonus).filter_by(tx_hash=bonus_tx_hash).first()
             if not exists_bonus:
@@ -132,18 +132,18 @@ async def lifespan(app: FastAPI):
     async def poller():
         while True:
             try:
-                # 1. Check blockchain (TRC20 deposits)
+                # 1. Blockchain deposits
                 print("🔎 Checking TRC20 deposits...")
                 check_for_trc20_deposit()
 
-                # 2. Process referral/associate bonuses
+                # 2. DB → referral/associate logic
                 print("🔄 Running poll_deposit_auto...")
                 poll_deposit_auto()
 
             except Exception as e:
                 print(f"⚠️ Poller crash: {e}")
 
-            await asyncio.sleep(10)  # run every 10 sec
+            await asyncio.sleep(10)  # every 10 sec
 
     asyncio.create_task(poller())
 
@@ -163,7 +163,7 @@ app = FastAPI(
 # ✅ Allow frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ⚠️ change to frontend domain in prod
+    allow_origins=["*"],  # ⚠️ restrict in prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
