@@ -47,9 +47,13 @@ def poll_deposit_auto():
             if not referrer or not config or not assoc_cfg:
                 continue
 
+            # ✅ Safe casting for Decimal values
+            inv_amount = float(inv.amount)
+            percentage_val = float(config.percentage)
+            assoc_percent = float(assoc_cfg.referral_percent)
+
             # Commission calc
-            percentage = config.percentage
-            commission_amount = round(inv.amount * (percentage / 100), 2)
+            commission_amount = round(inv_amount * (percentage_val / 100), 2)
 
             # Referral earning (if not exists)
             exists_ref = db.query(ReferralEarning).filter_by(
@@ -61,8 +65,8 @@ def poll_deposit_auto():
                 earning = ReferralEarning(
                     referrer_email=referrer.email,
                     referred_email=user.email,
-                    investment_amount=inv.amount,
-                    percentage=percentage,
+                    investment_amount=inv_amount,
+                    percentage=percentage_val,
                     commission_amount=commission_amount,
                     timestamp=timestamp,
                 )
@@ -75,7 +79,7 @@ def poll_deposit_auto():
                 Investment.tx_hash == inv.tx_hash
             ).first()
             if not exists_assoc:
-                assoc_amount = round(inv.amount * (assoc_cfg.referral_percent / 100), 2)
+                assoc_amount = round(inv_amount * (assoc_percent / 100), 2)
                 assoc_dep = Investment(
                     user_email=referrer.email,
                     amount=assoc_amount,
@@ -94,8 +98,8 @@ def poll_deposit_auto():
                 direct_bonus = DirectReferralBonus(
                     referrer_email=referrer.email,
                     referee_email=user.email,
-                    amount=inv.amount,
-                    percentage=percentage,
+                    amount=inv_amount,
+                    percentage=percentage_val,
                     bonus_amount=commission_amount,
                     tx_hash=bonus_tx_hash,
                     lock_days=assoc_cfg.lock_days,
