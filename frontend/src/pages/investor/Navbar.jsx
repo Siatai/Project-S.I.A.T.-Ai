@@ -34,7 +34,8 @@ export default function InvestorNavbar() {
   };
 
   const handleSupport = () => {
-    window.location.href = "mailto:support@algomcube.com";
+    // ✅ Safe mailto – no canceled request in network
+    window.open("mailto:support@algomcube.com", "_blank", "noreferrer");
   };
 
   return (
@@ -56,8 +57,6 @@ export default function InvestorNavbar() {
         {/* Right: Profile only */}
         <div style={rightHeader}>
           <span style={panelText}>Investor Panel</span>
-
-          {/* ✅ Avatar */}
           <img
             src={avatar}
             alt="Profile"

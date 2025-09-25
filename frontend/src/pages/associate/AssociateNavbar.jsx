@@ -34,7 +34,8 @@ export default function AssociateNavbar() {
   };
 
   const handleSupport = () => {
-    window.location.href = "mailto:support@algomcube.com";
+    // ✅ Safe mailto, no "canceled request" in Network tab
+    window.open("mailto:support@algomcube.com", "_blank", "noreferrer");
   };
 
   return (
