@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
@@ -6,12 +6,36 @@ import {
   FaHistory,
   FaMoneyBillWave,
   FaChartLine,
-  FaBars,
 } from "react-icons/fa";
-import logo from "../../Components/logo.png";
+import { logo, avatar } from "../../Components"; // ✅ barrel import
 
 export default function InvestorNavbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // 🔹 Fetch user info
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    fetch("https://project-s-i-a-t-ai.onrender.com/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.error("User fetch error:", err));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/");
+  };
+
+  const handleSupport = () => {
+    window.location.href = "mailto:support@algomcube.com";
+  };
 
   return (
     <>
@@ -29,10 +53,17 @@ export default function InvestorNavbar() {
           AlgoM<sup style={{ fontSize: "12px" }}>3</sup> Ai
         </h2>
 
-        {/* Right: Panel name + Menu */}
+        {/* Right: Profile only */}
         <div style={rightHeader}>
           <span style={panelText}>Investor Panel</span>
-          <FaBars style={menuIcon} />
+
+          {/* ✅ Avatar */}
+          <img
+            src={avatar}
+            alt="Profile"
+            onClick={() => setShowProfilePopup(true)}
+            style={profileIcon}
+          />
         </div>
       </header>
 
@@ -69,6 +100,33 @@ export default function InvestorNavbar() {
           to="/investor/earn"
         />
       </footer>
+
+      {/* ✅ Profile Popup */}
+      {showProfilePopup && (
+        <div style={popupOverlay}>
+          <div style={popupBox}>
+            <button style={closeBtn} onClick={() => setShowProfilePopup(false)}>
+              ❌ Close
+            </button>
+            <h3 style={{ color: "#17E8E5", marginBottom: "15px" }}>
+              Profile Options
+            </h3>
+            <p style={{ color: "#E5E7EB", margin: "5px 0" }}>
+              <strong>Name:</strong> {user?.name || "Loading..."}
+            </p>
+            <p style={{ color: "#E5E7EB", margin: "5px 0" }}>
+              <strong>Email:</strong> {user?.email || "Loading..."}
+            </p>
+            <hr style={{ margin: "15px 0", borderColor: "#1E293B" }} />
+            <button style={popupBtn} onClick={handleSupport}>
+              Raise a Request
+            </button>
+            <button style={popupBtn} onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -76,19 +134,14 @@ export default function InvestorNavbar() {
 /* Footer Button */
 function FooterBtn({ icon, label, active, to }) {
   const navigate = useNavigate();
-  const handleClick = () => {
-    if (to) navigate(to);
-  };
-
   return (
     <button
       style={{
         ...footerBtn,
         color: active ? "#17E8E5" : "#9CA3AF",
       }}
-      onClick={handleClick}
+      onClick={() => navigate(to)}
     >
-      {/* ✅ Neon top line */}
       <div
         style={{
           height: "4px",
@@ -110,10 +163,10 @@ const headerStyle = {
   left: 0,
   right: 0,
   height: "60px",
-  background: "rgba(18,26,43,0.95)", // frosted dark
+  background: "rgba(18,26,43,0.95)",
   backdropFilter: "blur(6px)",
-  padding: "14px 20px calc(env(safe-area-inset-top) + 14px)",
-  borderBottom: "1px solid rgba(23,232,166,0.2)", // neon line
+  padding: "14px 20px",
+  borderBottom: "1px solid rgba(23,232,166,0.2)",
   zIndex: 1000,
   display: "flex",
   alignItems: "center",
@@ -143,10 +196,7 @@ const logoBox = {
   background: "rgba(15,23,42,0.7)",
 };
 
-const logoStyle = {
-  height: "32px",
-  objectFit: "contain",
-};
+const logoStyle = { height: "32px", objectFit: "contain" };
 
 const brandText = {
   margin: "0",
@@ -159,22 +209,17 @@ const brandText = {
   textAlign: "center",
 };
 
-const rightHeader = {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-};
+const rightHeader = { display: "flex", alignItems: "center", gap: "12px" };
 
-const panelText = {
-  color: "#E5E7EB",
-  fontSize: "14px",
-  fontWeight: "500",
-};
+const panelText = { color: "#E5E7EB", fontSize: "14px", fontWeight: "500" };
 
-const menuIcon = {
-  color: "#17E8E5",
-  fontSize: "18px",
+const profileIcon = {
+  width: "36px",
+  height: "36px",
+  borderRadius: "50%",
+  border: "2px solid #17E8E5",
   cursor: "pointer",
+  background: "#fff",
 };
 
 const footerStyle = {
@@ -183,13 +228,13 @@ const footerStyle = {
   left: 0,
   right: 0,
   height: "50px",
-  background: "rgba(18,26,43,0.95)", // frosted dark
+  background: "rgba(18,26,43,0.95)",
   backdropFilter: "blur(6px)",
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
-  padding: "8px 0 calc(env(safe-area-inset-bottom) + 8px)",
-  borderTop: "1px solid rgba(23,232,166,0.2)", // neon line
+  padding: "8px 0",
+  borderTop: "1px solid rgba(23,232,166,0.2)",
   zIndex: 1000,
 };
 
@@ -201,5 +246,50 @@ const footerBtn = {
   background: "transparent",
   border: "none",
   fontSize: "16px",
+  cursor: "pointer",
+};
+
+/* === Popup Styles === */
+const popupOverlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.7)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 5000,
+};
+
+const popupBox = {
+  background: "rgba(18,26,43,0.95)",
+  border: "1px solid rgba(23,232,166,0.3)",
+  borderRadius: "12px",
+  padding: "20px",
+  width: "300px",
+  textAlign: "center",
+  boxShadow: "0 0 20px rgba(23,232,229,0.5)",
+};
+
+const closeBtn = {
+  background: "transparent",
+  border: "none",
+  color: "#E5E7EB",
+  fontSize: "14px",
+  cursor: "pointer",
+  marginBottom: "10px",
+};
+
+const popupBtn = {
+  width: "100%",
+  padding: "10px",
+  margin: "8px 0",
+  borderRadius: "8px",
+  border: "none",
+  background: "#17E8E5",
+  color: "#0f172a",
+  fontWeight: "600",
   cursor: "pointer",
 };
