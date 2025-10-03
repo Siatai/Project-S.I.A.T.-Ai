@@ -75,7 +75,7 @@ from db import get_db
 from models.user_model import User
 from utils.auth_middleware import verify_token
 
-router = APIRouter()
+
 
 
 @router.post("/save-wallet")
@@ -306,7 +306,7 @@ from db import get_db
 from models.roi_model import ROIConfig
 from utils.auth_middleware import verify_token
 
-router = APIRouter()
+
 
 # 🔹 Public GET (sab users dekh sakte hain)
 @router.get("/roi")
