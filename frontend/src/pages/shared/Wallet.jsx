@@ -6,62 +6,88 @@ export default function Wallet() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [popupMessage, setPopupMessage] = useState(null);
+  const [email, setEmail] = useState(null); // ✅ fetched from /me
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // ✅ Fetch wallet only
+  // ✅ Fetch user email + wallet summary together
   useEffect(() => {
-    const fetchWalletSummary = async () => {
+    const fetchUserAndWallet = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const res = await axios.get(`${API}/wallet/summary`, { headers });
 
-        if (res.data.wallet) {
-          setWallet(res.data.wallet);
+        // 🔹 Step 1: Fetch user info (email)
+        const meRes = await axios.get(`${API}/me`, { headers });
+        const fetchedEmail = meRes.data?.email;
+        if (fetchedEmail) {
+          setEmail(fetchedEmail);
+          localStorage.setItem("email", fetchedEmail); // optional caching
+        }
+
+        // 🔹 Step 2: Fetch wallet summary
+        const walletRes = await axios.get(`${API}/wallet/summary`, { headers });
+        if (walletRes.data.wallet) {
+          setWallet(walletRes.data.wallet);
           setSaved(true);
         }
       } catch (err) {
-        console.error("Error fetching wallet summary:", err);
+        console.error("Error fetching user or wallet:", err);
         setPopupMessage({
           type: "error",
-          text: "❌ Failed to fetch wallet info.",
+          text: "❌ Failed to load wallet info. Please log in again.",
         });
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) fetchWalletSummary();
+    if (token) fetchUserAndWallet();
   }, [token]);
 
   // ✅ Save wallet
   const saveWallet = async () => {
-    if (!wallet.trim()) {
+    if (!email) {
       setPopupMessage({
         type: "error",
-        text: "⚠️ Please enter a valid TRC20 address.",
+        text: "⚠️ Email not found — please re-login before saving wallet.",
       });
       return;
     }
+
+    if (!wallet.trim() || !/^T[a-zA-Z0-9]{33}$/.test(wallet.trim())) {
+      setPopupMessage({
+        type: "error",
+        text: "⚠️ Invalid TronLink wallet. It must start with 'T' and be 34 chars long.",
+      });
+      return;
+    }
+
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      await axios.post(
-        `${API}/save-wallet`,
-        { wallet }, // ✅ backend uses token for user
-        { headers }
-      );
-      setSaved(true);
-      setPopupMessage({
-        type: "success",
-        text: "✅ Wallet saved successfully!",
-      });
+      const body = { email, wallet };
+
+      console.log("📤 Sending wallet payload:", body);
+
+      const res = await axios.post(`${API}/save-wallet`, body, { headers });
+
+      if (res.data.message?.toLowerCase().includes("success")) {
+        setSaved(true);
+        setPopupMessage({
+          type: "success",
+          text: "✅ Wallet saved successfully!",
+        });
+      } else {
+        setPopupMessage({
+          type: "error",
+          text: res.data.message || "❌ Unknown server response.",
+        });
+      }
     } catch (err) {
       console.error("Error saving wallet:", err);
-      if (
-        err?.response?.data?.detail &&
-        err.response.data.detail.toLowerCase().includes("bound")
-      ) {
+      const detail = err?.response?.data?.detail;
+
+      if (typeof detail === "string" && detail.toLowerCase().includes("bound")) {
         setPopupMessage({
           type: "error",
           text: "⚠️ This wallet is already bound to another account.",
@@ -69,13 +95,17 @@ export default function Wallet() {
       } else {
         setPopupMessage({
           type: "error",
-          text: err?.response?.data?.detail || "❌ Failed to save wallet.",
+          text:
+            typeof detail === "string"
+              ? detail
+              : "❌ Failed to save wallet. Try again later.",
         });
       }
     }
   };
 
-  if (loading) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
+  if (loading)
+    return <p style={{ color: "#E5E7EB", textAlign: "center" }}>Loading...</p>;
 
   return (
     <div style={{ color: "#E5E7EB", padding: "20px" }}>
@@ -90,7 +120,7 @@ export default function Wallet() {
       </h2>
       <div style={glowLine} />
 
-      {/* ✅ Inline popup message */}
+      {/* ✅ Popup message */}
       {popupMessage && (
         <div
           style={{
@@ -116,22 +146,23 @@ export default function Wallet() {
       {saved ? (
         <div style={cardStyle}>
           <p style={{ marginBottom: "10px", fontWeight: "600" }}>
-            Bound TRC20 Wallet:
+            Bound TronLink Wallet:
           </p>
           <p style={walletBox}>{wallet}</p>
 
           <div style={glowLine} />
-          <div style={warningBox}>
-            <p>⚠️ Only <b>one wallet</b> can be bound per account.</p>
-            <p>⚠️ A wallet address cannot be used for <b>multiple accounts</b>.</p>
-            <p>⚠️ Once saved, this wallet <b>cannot be changed</b>.</p>
+          <div style={policyBox}>
+            <p>🔹 We only accept <b>TronLink wallets</b> (no gas fees needed!).</p>
+            <p>🔹 You can link only <b>one wallet</b> to your account.</p>
+            <p>🔹 The same wallet can’t be used on more than one account.</p>
+            <p>🔹 Once connected, you can’t change or remove it — double-check before confirming!</p>
           </div>
         </div>
       ) : (
         <div style={cardStyle}>
           <input
             type="text"
-            placeholder="Enter your TRC20 wallet address"
+            placeholder="Enter your TronLink wallet address"
             value={wallet}
             onChange={(e) => setWallet(e.target.value)}
             style={inputStyle}
@@ -139,10 +170,12 @@ export default function Wallet() {
           <button onClick={saveWallet} style={btnTeal}>
             Save Wallet
           </button>
-          <div style={{ ...warningBox, marginTop: "15px" }}>
-            <p>⚠️ You can bind only one wallet to your account.</p>
-            <p>⚠️ Duplicate wallets across accounts will not be saved.</p>
-            <p>⚠️ Once saved, wallet cannot be changed.</p>
+
+          <div style={{ ...policyBox, marginTop: "15px" }}>
+            <p>🔹 We only accept <b>TronLink wallets</b> (no gas fees needed!).</p>
+            <p>🔹 You can link only <b>one wallet</b> to your account.</p>
+            <p>🔹 The same wallet can’t be used on more than one account.</p>
+            <p>🔹 Once connected, you can’t change or remove it — double-check before confirming!</p>
           </div>
         </div>
       )}
@@ -158,7 +191,9 @@ const cardStyle = {
   backdropFilter: "blur(8px)",
   maxWidth: "420px",
   boxShadow: "0 0 15px rgba(23,232,229,0.2)",
+  margin: "0 auto",
 };
+
 const walletBox = {
   padding: "12px",
   background: "rgba(31,41,55,0.8)",
@@ -169,6 +204,7 @@ const walletBox = {
   marginBottom: "10px",
   boxShadow: "0 0 8px rgba(23,232,229,0.3)",
 };
+
 const inputStyle = {
   width: "100%",
   maxWidth: "380px",
@@ -181,6 +217,7 @@ const inputStyle = {
   fontSize: "14px",
   boxSizing: "border-box",
 };
+
 const btnTeal = {
   padding: "12px 20px",
   border: "none",
@@ -193,19 +230,22 @@ const btnTeal = {
   width: "100%",
   maxWidth: "380px",
 };
+
 const glowLine = {
   height: "2px",
   background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
   boxShadow: "0 0 10px #17E8E5",
   margin: "8px 0 20px 0",
 };
-const warningBox = {
-  background: "rgba(239,68,68,0.1)",
-  border: "1px solid rgba(239,68,68,0.4)",
+
+const policyBox = {
+  background: "rgba(15,23,42,0.8)",
+  border: "1px solid #17E8E5",
   borderRadius: "8px",
   padding: "12px",
-  fontSize: "7px",
-  color: "#F87171",
+  fontSize: "13px",
+  color: "#E5E7EB",
   textAlign: "left",
-  lineHeight: "1.5",
+  lineHeight: "1.6",
+  boxShadow: "0 0 10px rgba(23,232,229,0.2)",
 };
