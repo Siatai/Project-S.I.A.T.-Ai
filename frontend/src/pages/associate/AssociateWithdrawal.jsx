@@ -67,15 +67,16 @@ export default function AssociateWithdrawal() {
     if (token) fetchSummary();
   }, [token, fetchSummary]);
 
-  // 🔹 Request OTP
+  // 🔹 Request OTP (Sat, Sun, and hidden Monday allowed)
   const requestOtp = async () => {
-    const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
-    if (today !== 0 && today !== 6) {
+    const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, 6 = Saturday
+    if (today !== 0 && today !== 1 && today !== 6) {
       return setMessage({
         type: "error",
         text: "Withdrawals are allowed only on Saturday and Sunday.",
       });
     }
+
     if (summary.withdrawable < 20) {
       return setMessage({ type: "error", text: "Minimum withdrawal is $20." });
     }
@@ -230,7 +231,7 @@ export default function AssociateWithdrawal() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "#0f172a", // ✅ Dark bg covers full page
+  background: "#0f172a",
   minHeight: "100vh",
   width: "100%",
   overflowX: "hidden",
@@ -262,7 +263,6 @@ const mainCard = {
 const cardTitle = { fontSize: "15px", color: "#94A3AF", marginBottom: "10px" };
 const bigValue = { fontSize: "28px", fontWeight: "700", color: "#E5E7EB" };
 const bigValueTeal = { fontSize: "26px", fontWeight: "700", color: "#17E8E5" };
-
 const miniRows = { marginTop: "15px", textAlign: "left" };
 const miniRow = {
   display: "flex",
@@ -271,7 +271,6 @@ const miniRow = {
   fontSize: "14px",
   color: "#E5E7EB",
 };
-
 const btnTeal = {
   marginTop: "15px",
   padding: "12px",
