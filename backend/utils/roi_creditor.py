@@ -33,7 +33,7 @@ def force_credit_daily_roi(db: Session):
 
 
 # ────────────────────────────────
-# 📌 Core Logic
+# 📌 Core ROI + Commission Logic
 # ────────────────────────────────
 def _process_roi_and_commissions(db: Session, force: bool = False):
     now = datetime.utcnow()
@@ -46,16 +46,16 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
 
     monthly_roi_percentage = roi_config.percentage
     daily_roi_percentage = monthly_roi_percentage / 30  # % per day
-    max_multiplier = roi_config.max_roi_multiplier if hasattr(roi_config, "max_roi_multiplier") else 2.0
+    max_multiplier = getattr(roi_config, "max_roi_multiplier", 2.0)
 
-    # COMMISSION CONFIG (for ROI commissions, not associate deposits)
+    # COMMISSION CONFIG (for ROI commissions)
     commission_config = db.query(CommissionConfig).first()
     commission_percentage = commission_config.percentage if commission_config else 0.0
 
     credited = []
     referral_earnings = []
 
-    # ✅ Loop through ALL investments (normal + associate)
+    # ✅ Loop through ALL investments (investor + associate)
     investments = db.query(Investment).all()
     for inv in investments:
         user = db.query(User).filter_by(email=inv.user_email).first()
@@ -69,22 +69,22 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
         if days_to_credit <= 0:
             continue  # nothing new to credit
 
-        # ✅ Flush logic: max ROI = 2× (or config multiplier)
+        # ✅ Flush logic: stop ROI at 2× cap (or configured multiplier)
         max_return = inv.amount * max_multiplier
         roi_received = inv.roi_received or 0.0
         remaining_cap = max_return - roi_received
         if remaining_cap <= 0:
             continue  # already flushed
 
-        # Daily ROI
+        # ✅ Calculate ROI
         daily_profit = inv.amount * (daily_roi_percentage / 100)
         total_profit = daily_profit * days_to_credit
 
-        # Ensure we don’t exceed 2× cap
+        # Cap ROI if exceeding limit
         if total_profit > remaining_cap:
             total_profit = remaining_cap
 
-        # Update wallet + investment ROI
+        # ✅ Update user's wallet and investment record
         user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
         inv.roi_received = roi_received + total_profit
         inv.last_roi_date = today
@@ -101,10 +101,10 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
             "is_associate": inv.is_associate
         })
 
-        # ✅ Referral Commission (ONLY for normal investor deposits, not associate ones)
-        if not inv.is_associate and user.referred_by and total_profit > 0:
+        # ✅ Referral Commission (investors trigger commission to associate)
+        if user.referred_by and total_profit > 0:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
-            if referrer:
+            if referrer and not inv.is_associate:  # commission only if investor ROI
                 commission_amount = total_profit * (commission_percentage / 100)
                 referrer.wallet_balance = (referrer.wallet_balance or 0.0) + commission_amount
 
@@ -119,6 +119,7 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
                     )
                 )
 
+    # ✅ Bulk insert referral earnings
     if referral_earnings:
         db.add_all(referral_earnings)
 
