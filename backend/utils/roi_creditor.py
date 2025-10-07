@@ -88,6 +88,8 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
         user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
         inv.roi_received = roi_received + total_profit
         inv.last_roi_date = today
+        db.add(user)  # ensure user update is tracked
+        db.add(inv)
 
         credited.append({
             "email": user.email,
@@ -101,12 +103,15 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
             "is_associate": inv.is_associate
         })
 
-        # ✅ Referral Commission (investors trigger commission to associate)
+        # ✅ Referral Commission (only investor ROI triggers commission to associate)
         if user.referred_by and total_profit > 0:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
-            if referrer and not inv.is_associate:  # commission only if investor ROI
+            if referrer and not inv.is_associate:
                 commission_amount = total_profit * (commission_percentage / 100)
                 referrer.wallet_balance = (referrer.wallet_balance or 0.0) + commission_amount
+
+                # ✅ Ensure SQLAlchemy tracks update
+                db.add(referrer)
 
                 referral_earnings.append(
                     ReferralEarning(
@@ -119,11 +124,20 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
                     )
                 )
 
+                # Optional: print for debugging (remove later)
+                print(
+                    f"[COMMISSION] {referrer.email} +{commission_amount:.2f} "
+                    f"from {user.email} ({inv.amount}$, ROI {total_profit:.2f})"
+                )
+
     # ✅ Bulk insert referral earnings
     if referral_earnings:
         db.add_all(referral_earnings)
 
+    # ✅ Commit all changes
     db.commit()
+
+    print(f"✅ ROI + Commissions credited: {len(credited)} users")
 
     return {
         "message": "✅ ROI + Commissions credited successfully",
