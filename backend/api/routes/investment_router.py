@@ -841,7 +841,8 @@ def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_d
     }
 
     
-    from sqlalchemy.orm import Session
+    
+@router.post("/admin/backfill-commission-wallets")
 
 def backfill_commissions_to_wallet(db: Session):
     """
