@@ -841,3 +841,30 @@ def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_d
     }
 
     
+    from sqlalchemy.orm import Session
+
+def backfill_commissions_to_wallet(db: Session):
+    """
+    ✅ One-time backfill: Adds all ReferralEarning commissions to corresponding referrer wallet balances.
+    Skips any already applied amounts (if double-adding is a risk).
+    """
+
+    total_credited = 0
+    all_earnings = db.query(ReferralEarning).all()
+
+    for e in all_earnings:
+        referrer = db.query(User).filter_by(email=e.referrer_email).first()
+        if not referrer:
+            continue
+
+        # ✅ Add commission to wallet
+        referrer.wallet_balance = (referrer.wallet_balance or 0.0) + float(e.commission_amount)
+        db.add(referrer)
+        total_credited += float(e.commission_amount)
+
+    db.commit()
+
+    return {
+        "message": f"✅ Backfill complete. Added {round(total_credited, 2)} USDT in total to wallets.",
+        "entries_processed": len(all_earnings)
+    }
