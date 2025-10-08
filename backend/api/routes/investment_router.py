@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from random import randint
 from sqlalchemy import func
 import logging
+from typing import Dict, Any
 from db import get_db
 from models.user_model import User
 from models.withdrawal_model import Investment, Withdrawal
@@ -842,30 +843,101 @@ def associate_roi_status(user=Depends(verify_token), db: Session = Depends(get_d
 
     
     
-@router.post("/admin/backfill-commission-wallets")
-
-def backfill_commissions_to_wallet(db: Session):
+@router.post("/backfill/commissions-to-wallets")
+def backfill_commissions_to_wallets(commit: bool = False, db: Session = Depends(get_db)) -> Dict[str, Any]:
     """
-    ✅ One-time backfill: Adds all ReferralEarning commissions to corresponding referrer wallet balances.
-    Skips any already applied amounts (if double-adding is a risk).
+    Backfill commissions from ReferralEarning -> User.wallet_balance.
+
+    - commit=False : dry-run preview only, does not write to DB.
+    - commit=True  : actually updates wallets and commits.
+    NOTE: No admin protection (per request). Use carefully.
     """
+    # Aggregate referral earnings by referrer_email
+    earnings = db.query(ReferralEarning).all()
 
-    total_credited = 0
-    all_earnings = db.query(ReferralEarning).all()
+    # map: referrer_email -> total_commission_from_table
+    totals_by_referrer = {}
+    for e in earnings:
+        if not e.referrer_email:
+            continue
+        totals_by_referrer.setdefault(e.referrer_email, 0.0)
+        totals_by_referrer[e.referrer_email] += float(e.commission_amount or 0.0)
 
-    for e in all_earnings:
-        referrer = db.query(User).filter_by(email=e.referrer_email).first()
-        if not referrer:
+    preview = []
+    missing_users = []
+    apply_count = 0
+    total_to_apply = 0.0
+
+    for ref_email, total_comm in totals_by_referrer.items():
+        user = db.query(User).filter_by(email=ref_email).first()
+        if not user:
+            missing_users.append(ref_email)
+            preview.append({
+                "referrer": ref_email,
+                "found": False,
+                "current_wallet": None,
+                "commission_sum": round(total_comm, 2),
+                "new_wallet_if_applied": None
+            })
             continue
 
-        # ✅ Add commission to wallet
-        referrer.wallet_balance = (referrer.wallet_balance or 0.0) + float(e.commission_amount)
-        db.add(referrer)
-        total_credited += float(e.commission_amount)
+        current_wallet = float(user.wallet_balance or 0.0)
+        new_wallet = current_wallet + total_comm
 
+        preview.append({
+            "referrer": ref_email,
+            "found": True,
+            "current_wallet": round(current_wallet, 2),
+            "commission_sum": round(total_comm, 2),
+            "new_wallet_if_applied": round(new_wallet, 2)
+        })
+
+        total_to_apply += total_comm
+        apply_count += 1
+
+    summary = {
+        "entries_in_referral_earning": len(earnings),
+        "referrers_found": apply_count,
+        "missing_referrers_count": len(missing_users),
+        "total_commission_sum": round(total_to_apply, 2),
+        "commit": bool(commit),
+        "preview_count": len(preview)
+    }
+
+    # If not committing, just return preview & summary
+    if not commit:
+        return {"summary": summary, "preview": preview, "missing_referrers": missing_users}
+
+    # Commit mode: apply sums to each user.wallet_balance and persist
+    applied = []
+    for item in preview:
+        if not item["found"]:
+            continue
+        ref_email = item["referrer"]
+        commission_sum = float(item["commission_sum"])
+        if commission_sum <= 0:
+            continue
+
+        user = db.query(User).filter_by(email=ref_email).first()
+        if not user:
+            continue
+
+        user.wallet_balance = (user.wallet_balance or 0.0) + commission_sum
+        db.add(user)
+
+        applied.append({
+            "referrer": ref_email,
+            "applied_amount": round(commission_sum, 2),
+            "new_wallet_balance": round(user.wallet_balance, 2)
+        })
+
+    # Persist changes
     db.commit()
 
     return {
-        "message": f"✅ Backfill complete. Added {round(total_credited, 2)} USDT in total to wallets.",
-        "entries_processed": len(all_earnings)
+        "summary": summary,
+        "applied_count": len(applied),
+        "applied_total": round(sum(a["applied_amount"] for a in applied), 2),
+        "applied": applied,
+        "missing_referrers": missing_users
     }
