@@ -45,50 +45,47 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
         return {"message": "❌ No ROI config set"}
 
     monthly_roi_percentage = roi_config.percentage
-    daily_roi_percentage = monthly_roi_percentage / 30  # % per day
+    daily_roi_percentage = monthly_roi_percentage / 30.0
     max_multiplier = getattr(roi_config, "max_roi_multiplier", 2.0)
 
-    # COMMISSION CONFIG (for ROI commissions)
+    # COMMISSION CONFIG
     commission_config = db.query(CommissionConfig).first()
     commission_percentage = commission_config.percentage if commission_config else 0.0
 
     credited = []
     referral_earnings = []
 
-    # ✅ Loop through ALL investments (investor + associate)
+    # ✅ Loop through ALL investments
     investments = db.query(Investment).all()
     for inv in investments:
         user = db.query(User).filter_by(email=inv.user_email).first()
         if not user:
             continue
 
-        # Determine last credited date
+        # Determine days since last credit
         last_date = inv.last_roi_date or inv.timestamp.date()
         days_to_credit = (today - last_date).days
-
         if days_to_credit <= 0:
-            continue  # nothing new to credit
+            continue
 
-        # ✅ Flush logic: stop ROI at 2× cap (or configured multiplier)
+        # ✅ Flush protection
         max_return = inv.amount * max_multiplier
         roi_received = inv.roi_received or 0.0
         remaining_cap = max_return - roi_received
         if remaining_cap <= 0:
-            continue  # already flushed
+            continue
 
-        # ✅ Calculate ROI
-        daily_profit = inv.amount * (daily_roi_percentage / 100)
+        # ROI calculation
+        daily_profit = inv.amount * (daily_roi_percentage / 100.0)
         total_profit = daily_profit * days_to_credit
-
-        # Cap ROI if exceeding limit
         if total_profit > remaining_cap:
             total_profit = remaining_cap
 
-        # ✅ Update user's wallet and investment record
+        # ✅ Update investor wallet + investment record
         user.wallet_balance = (user.wallet_balance or 0.0) + total_profit
         inv.roi_received = roi_received + total_profit
         inv.last_roi_date = today
-        db.add(user)  # ensure user update is tracked
+        db.add(user)
         db.add(inv)
 
         credited.append({
@@ -103,16 +100,21 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
             "is_associate": inv.is_associate
         })
 
-        # ✅ Referral Commission (only investor ROI triggers commission to associate)
-        if user.referred_by and total_profit > 0:
+        # ────────────────────────────────
+        # 📌 Referral Commission credit
+        # ────────────────────────────────
+        if user.referred_by and total_profit > 0 and not inv.is_associate:
             referrer = db.query(User).filter_by(referral_code=user.referred_by).first()
-            if referrer and not inv.is_associate:
-                commission_amount = total_profit * (commission_percentage / 100)
-                referrer.wallet_balance = (referrer.wallet_balance or 0.0) + commission_amount
+            if referrer and commission_percentage > 0:
+                commission_amount = total_profit * (commission_percentage / 100.0)
 
-                # ✅ Ensure SQLAlchemy tracks update
-                db.add(referrer)
+                # ⚡ Direct SQL update to avoid ORM edge cases
+                db.query(User).filter(User.id == referrer.id).update(
+                    {User.wallet_balance: User.wallet_balance + commission_amount},
+                    synchronize_session=False
+                )
 
+                # Record the earning
                 referral_earnings.append(
                     ReferralEarning(
                         referrer_email=referrer.email,
@@ -124,20 +126,21 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
                     )
                 )
 
-                # Optional: print for debugging (remove later)
+                db.flush()  # ensure DB state is current
+
                 print(
-                    f"[COMMISSION] {referrer.email} +{commission_amount:.2f} "
-                    f"from {user.email} ({inv.amount}$, ROI {total_profit:.2f})"
+                    f"[COMMISSION][OK] {referrer.email} +{commission_amount:.4f} "
+                    f"from {user.email} (ROI {total_profit:.4f})"
                 )
 
-    # ✅ Bulk insert referral earnings
+    # ✅ Save all referral earnings
     if referral_earnings:
         db.add_all(referral_earnings)
 
-    # ✅ Commit all changes
+    # ✅ Commit transaction
     db.commit()
 
-    print(f"✅ ROI + Commissions credited: {len(credited)} users")
+    print(f"✅ ROI + Commissions credited for {len(credited)} users")
 
     return {
         "message": "✅ ROI + Commissions credited successfully",
