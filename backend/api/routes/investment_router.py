@@ -418,7 +418,7 @@ def send_withdrawal_otp(user=Depends(verify_token)):
 @router.post("/request-withdrawal")
 def request_withdrawal(data: WithdrawalRequestPayload, user=Depends(verify_token), db: Session = Depends(get_db)):
     today = datetime.utcnow().weekday()
-    if today not in [0, 5, 6]:
+    if today not in [0, 1 , 2 , 3 , 4 , 5, 6]:
         raise HTTPException(status_code=400, detail="Withdrawals allowed only on Saturday and Sunday")
 
     db_user = db.query(User).filter_by(email=user["email"]).first()
