@@ -73,7 +73,7 @@ export default function Withdrawal() {
       return setMessage({ type: "error", text: "Minimum withdrawal is $20." });
     }
     const today = new Date().getDay(); // 0=Sunday, 6=Saturday
-    if (today !== 0 && today !== 6 && today !== 2 ) {
+    if (today !== 0 && today !== 1 && today !== 2 && today !== 3 && today !== 4 && today !== 5 && today !== 6) {
       return setMessage({
         type: "error",
         text: "Withdrawals are allowed only on Saturday and Sunday.",
