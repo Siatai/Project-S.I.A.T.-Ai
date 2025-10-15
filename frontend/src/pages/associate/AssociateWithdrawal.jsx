@@ -70,7 +70,7 @@ export default function AssociateWithdrawal() {
   // 🔹 Request OTP (Sat, Sun, and hidden Monday allowed)
   const requestOtp = async () => {
     const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, 6 = Saturday
-    if (today !== 0 && today !== 1 && today !== 6) {
+    if (today !== 0 && today !== 1 && today !== 2 && today !== 3 && today !== 4 && today !== 5 && today !== 6) {
       return setMessage({
         type: "error",
         text: "Withdrawals are allowed only on Saturday and Sunday.",
