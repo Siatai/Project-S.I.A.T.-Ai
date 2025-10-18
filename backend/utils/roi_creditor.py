@@ -13,10 +13,10 @@ from models.commission_model import CommissionConfig
 def credit_daily_roi(db: Session):
     today = date.today()
 
-    # ✅ Safety: check if ROI already credited today
+    # ✅ Safety: check if any investment already credited today
     already_done = (
-        db.query(ReferralEarning)
-        .filter(ReferralEarning.timestamp >= datetime(today.year, today.month, today.day))
+        db.query(Investment)
+        .filter(Investment.last_roi_date == today)
         .first()
     )
     if already_done:
@@ -55,7 +55,7 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
     credited = []
     referral_earnings = []
 
-    # ✅ Loop through ALL investments
+    # ✅ Loop through ALL active investments
     investments = db.query(Investment).all()
     for inv in investments:
         user = db.query(User).filter_by(email=inv.user_email).first()
@@ -65,7 +65,7 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
         # Determine days since last credit
         last_date = inv.last_roi_date or inv.timestamp.date()
         days_to_credit = (today - last_date).days
-        if days_to_credit <= 0:
+        if days_to_credit <= 0 and not force:
             continue
 
         # ✅ Flush protection
@@ -77,7 +77,7 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
 
         # ROI calculation
         daily_profit = inv.amount * (daily_roi_percentage / 100.0)
-        total_profit = daily_profit * days_to_credit
+        total_profit = daily_profit * max(days_to_credit, 1)
         if total_profit > remaining_cap:
             total_profit = remaining_cap
 
@@ -108,34 +108,31 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
             if referrer and commission_percentage > 0:
                 commission_amount = total_profit * (commission_percentage / 100.0)
 
-                # ⚡ Direct SQL update to avoid ORM edge cases
-                db.query(User).filter(User.id == referrer.id).update(
-                    {User.wallet_balance: User.wallet_balance + commission_amount},
-                    synchronize_session=False
-                )
+                # ✅ Update referrer wallet safely
+                referrer.wallet_balance = (referrer.wallet_balance or 0.0) + commission_amount
+                db.add(referrer)
 
                 # Record the earning
-                referral_earnings.append(
-                    ReferralEarning(
-                        referrer_email=referrer.email,
-                        referred_email=user.email,
-                        investment_amount=inv.amount,
-                        percentage=commission_percentage,
-                        commission_amount=commission_amount,
-                        timestamp=now,
-                    )
+                earning = ReferralEarning(
+                    referrer_email=referrer.email,
+                    referred_email=user.email,
+                    investment_amount=inv.amount,
+                    percentage=commission_percentage,
+                    commission_amount=commission_amount,
+                    timestamp=now,
                 )
+                db.add(earning)
 
-                db.flush()  # ensure DB state is current
+                referral_earnings.append({
+                    "referrer": referrer.email,
+                    "from": user.email,
+                    "commission_amount": round(commission_amount, 2)
+                })
 
                 print(
                     f"[COMMISSION][OK] {referrer.email} +{commission_amount:.4f} "
                     f"from {user.email} (ROI {total_profit:.4f})"
                 )
-
-    # ✅ Save all referral earnings
-    if referral_earnings:
-        db.add_all(referral_earnings)
 
     # ✅ Commit transaction
     db.commit()
@@ -145,6 +142,7 @@ def _process_roi_and_commissions(db: Session, force: bool = False):
     return {
         "message": "✅ ROI + Commissions credited successfully",
         "credited": credited,
+        "referral_earnings": referral_earnings,
         "count": len(credited),
         "force_mode": force,
     }
