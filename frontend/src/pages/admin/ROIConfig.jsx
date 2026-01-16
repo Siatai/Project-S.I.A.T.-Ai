@@ -11,7 +11,7 @@ export default function AdminROI() {
     const fetchConfig = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API}/admin/roi`, {
+        const res = await axios.get(`${API}/roi`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPercentage(res.data.percentage || 0);
@@ -30,7 +30,7 @@ export default function AdminROI() {
       const token = localStorage.getItem("token");
 
       // First update ROI percentage
-      await axios.post(
+      await axios.put(
         `${API}/admin/roi`,
         { percentage: parseFloat(percentage) },
         { headers: { Authorization: `Bearer ${token}` } }
