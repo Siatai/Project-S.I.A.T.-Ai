@@ -257,7 +257,6 @@ const popupBtn = {
   padding: "10px",
   margin: "8px 0",
   borderRadius: "8px",
-  border: "none",
   background: "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
   color: "#05101b",
   fontWeight: "700",
