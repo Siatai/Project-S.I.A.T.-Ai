@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import TermsModal from "../../Components/TermsModal"; // ✅ popup
+import TermsModal from "../../Components/TermsModal"; // Popup
 
 export default function ReferralSignup() {
   const [email, setEmail] = useState("");
@@ -10,7 +10,7 @@ export default function ReferralSignup() {
   const [otp, setOtp] = useState("");
   const [agree, setAgree] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
-  const [sending, setSending] = useState(false); // 👈 new state
+  const [sending, setSending] = useState(false); // New state
   const [toast, setToast] = useState(null);
 
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export default function ReferralSignup() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // ✅ Axios instance with token handling
+  // Axios instance with token handling
   const api = axios.create({ baseURL: API });
 
   api.interceptors.request.use((config) => {
@@ -32,7 +32,7 @@ export default function ReferralSignup() {
   api.interceptors.response.use(
     (res) => res,
     (err) => {
-      if (err?.response?.status === 401) {
+      if (err.response.status === 401) {
         localStorage.removeItem("token");
         navigate("/signup");
       }
@@ -40,12 +40,12 @@ export default function ReferralSignup() {
     }
   );
 
-  // ✅ Fetch user (to confirm token works)
+  // Fetch user (to confirm token works)
   const fetchUser = useCallback(async () => {
     try {
       await api.get("/me");
     } catch (err) {
-      console.error("Fetch user failed:", err?.response?.data || err.message);
+      console.error("Fetch user failed:", err.response.data || err.message);
     }
   }, [api]);
 
@@ -70,14 +70,14 @@ export default function ReferralSignup() {
       return;
     }
     try {
-      setSending(true); // 👈 disable button
+      setSending(true); // Disable button
       await axios.post(`${API}/send-otp-signup`, { email, name, referrer });
       setOtpSent(true);
       setToast({ type: "success", message: "OTP sent to your email." });
     } catch (err) {
       console.error("Send OTP error:", err);
-      setToast({ type: "error", message: err?.response?.data?.detail || "Error sending OTP" });
-      setSending(false); // 👈 allow retry if failed
+      setToast({ type: "error", message: err.response.data.detail || "Error sending OTP" });
+      setSending(false); // Allow retry if failed
     }
   };
 
@@ -103,7 +103,7 @@ export default function ReferralSignup() {
       else navigate("/investor");
     } catch (err) {
       console.error("Verify OTP error:", err);
-      setToast({ type: "error", message: err?.response?.data?.detail || "Invalid OTP" });
+      setToast({ type: "error", message: err.response.data.detail || "Invalid OTP" });
     }
   };
 
@@ -139,7 +139,7 @@ export default function ReferralSignup() {
           <div
             style={{
               background: "var(--fx-card)",
-              border: "1px solid var(--fx-border)",
+              border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
               boxShadow: "var(--fx-shadow)",
               color: "var(--fx-ink)",
               padding: "14px 18px",
@@ -154,7 +154,7 @@ export default function ReferralSignup() {
           </div>
         </div>
       )}
-      {/* 🔹 Centered Logo */}
+      {/* Centered Logo */}
       <Link to="/" style={{ textDecoration: "none", marginBottom: "20px" }}>
         <img
           src="/logo.png"
@@ -168,7 +168,7 @@ export default function ReferralSignup() {
         />
       </Link>
 
-      {/* 🔹 Card */}
+      {/* Card */}
       <div
         style={{
           width: "100%",
@@ -176,11 +176,11 @@ export default function ReferralSignup() {
           background: "var(--fx-card)",
           padding: "30px",
           borderRadius: "16px",
-          border: "1px solid var(--fx-border)",
+          border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
           boxShadow: "var(--fx-shadow)",
         }}
       >
-        {/* ✅ Subtle neon welcome heading */}
+        {/* Subtle neon welcome heading */}
         <h1
           style={{
             textAlign: "center",
@@ -193,11 +193,11 @@ export default function ReferralSignup() {
           <span style={{ color: "var(--fx-ink)" }}>Welcome to </span>
           <span
             style={{
-              color: "var(--fx-accent-2)",
-              textShadow: "0 0 10px rgba(var(--fx-accent-2-rgb),0.7)",
+              color: "var(--fx-accent)",
+              textShadow: "0 0 10px rgba(var(--fx-accent-rgb),0.6)",
             }}
           >
-            AlgoM³
+            AlgoM3
           </span>
         </h1>
 
@@ -234,7 +234,7 @@ export default function ReferralSignup() {
               disabled
               style={{
                 ...inputStyle,
-                background: "rgba(8, 10, 20, 0.65)",
+                background: "rgba(6, 14, 28, 0.85)",
                 color: "var(--fx-muted)",
                 cursor: "not-allowed",
               }}
@@ -252,10 +252,10 @@ export default function ReferralSignup() {
                 <span
                   onClick={() => setShowTerms(true)}
                   style={{
-                    color: "var(--fx-accent-2)",
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
+                  color: "var(--fx-accent)",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
                 >
                   Terms & Conditions
                 </span>
@@ -269,7 +269,7 @@ export default function ReferralSignup() {
                 opacity: agree && !sending ? 1 : 0.6,
                 cursor: agree && !sending ? "pointer" : "not-allowed",
               }}
-              disabled={!agree || sending} // 👈 disable if not agreed or already sending
+              disabled={!agree || sending} // Disable if not agreed or already sending
             >
               {sending ? "Sending..." : "Send OTP"}
             </button>
@@ -290,10 +290,10 @@ export default function ReferralSignup() {
         )}
       </div>
 
-      {/* ✅ Reusable popup */}
+      {/* Reusable popup */}
       <TermsModal open={showTerms} onClose={() => setShowTerms(false)} />
 
-      {/* ✅ Background + responsive logo */}
+      {/* Background + responsive logo */}
       <style>{`
         html, body, #root {
           margin: 0;
@@ -323,9 +323,9 @@ const inputStyle = {
   width: "100%",
   padding: "12px 14px",
   marginBottom: "18px",
-  borderRadius: "10px",
-  border: "1px solid var(--fx-border)",
-  background: "rgba(8, 10, 20, 0.6)",
+  borderRadius: "8px",
+  border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
+  background: "rgba(6, 14, 28, 0.85)",
   color: "var(--fx-ink)",
   fontSize: "14px",
   boxSizing: "border-box",
@@ -334,12 +334,14 @@ const inputStyle = {
 const buttonStyleTeal = {
   width: "100%",
   padding: "12px",
-  border: "none",
-  borderRadius: "10px",
-  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
-  color: "var(--fx-bg)",
-  fontSize: "15px",
+  border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
+  borderRadius: "6px",
+  background: "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
+  color: "#05101b",
+  fontSize: "13px",
   fontWeight: "700",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
   cursor: "pointer",
   transition: "all 0.3s ease",
   boxShadow: "0 14px 28px rgba(var(--fx-accent-rgb),0.22)",

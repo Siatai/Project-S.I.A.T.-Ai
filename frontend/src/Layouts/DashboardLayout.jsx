@@ -12,14 +12,14 @@ export default function DashboardLayout() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // 🔹 Detect mobile resize
+  // Detect mobile resize
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 🔹 Logout
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -27,7 +27,7 @@ export default function DashboardLayout() {
     navigate("/");
   };
 
-  // 🔹 Fetch user + wallet balance
+  // Fetch user + wallet balance
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -113,17 +113,17 @@ export default function DashboardLayout() {
         <aside className="dashboard-sidebar">
           {isMobile && (
             <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>
-              ✖
+              X
             </button>
           )}
 
           <div style={{ flex: 1 }}>
             <h2 className="user-name">{user.name || "User"}</h2>
             <p className="user-balance">
-              Balance: ${user.withdrawable_balance?.toLocaleString() || "0"}
+              Balance: ${user.withdrawable_balance.toLocaleString() || "0"}
             </p>
 
-            {/* ✅ Glowy divider line */}
+            {/* Divider line */}
             <div className="glow-divider"></div>
 
             {sidebarItems[role.toLowerCase()].map((item) => {
@@ -142,7 +142,7 @@ export default function DashboardLayout() {
             })}
           </div>
 
-          {/* ✅ Raise a Request button */}
+          {/* Raise a Request button */}
           <a
             href="mailto:support@algomcube.com"
             className="request-btn"
@@ -169,10 +169,10 @@ export default function DashboardLayout() {
                 fontSize: "22px",
                 fontWeight: "bold",
                 color: "var(--fx-accent)",
-                textShadow: "0 0 10px var(--fx-accent), 0 0 20px var(--fx-bg)",
+                textShadow: "0 0 12px rgba(var(--fx-accent-rgb), 0.6)",
               }}
             >
-              AlgoM³ Ai
+              AlgoM3 AI
             </h1>
           </div>
 
@@ -181,7 +181,7 @@ export default function DashboardLayout() {
             <span className="panel">{role} Panel</span>
             {isMobile && (
               <button className="menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                ☰
+                Menu
               </button>
             )}
           </div>
@@ -217,16 +217,27 @@ export default function DashboardLayout() {
 
         .dashboard-sidebar {
           width: 250px;
-          background: var(--fx-surface-strong);
+          background: linear-gradient(145deg, rgba(6, 14, 30, 0.98), rgba(10, 22, 42, 0.96));
           backdrop-filter: blur(12px);
           padding: 25px 15px;
           display: flex;
           flex-direction: column;
-          border-right: 1px solid var(--fx-border);
-          box-shadow: 0 0 24px rgba(var(--fx-accent-rgb), 0.18);
+          border-right: 1px solid rgba(var(--fx-accent-rgb), 0.35);
+          box-shadow: 0 0 24px rgba(var(--fx-accent-rgb), 0.16);
           position: relative;
           overflow: hidden;
           flex-shrink: 0;
+        }
+
+        .dashboard-sidebar::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            linear-gradient(180deg, rgba(var(--fx-accent-rgb), 0.08), transparent 40%),
+            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 22px);
+          opacity: 0.6;
         }
 
         .close-sidebar {
@@ -258,7 +269,7 @@ export default function DashboardLayout() {
           font-weight: 600;
         }
 
-        /* ✅ Glowy divider line */
+        /* Divider line */
         .glow-divider {
           height: 2px;
           border-radius: 2px;
@@ -270,39 +281,45 @@ export default function DashboardLayout() {
         .sidebar-link {
           display: block;
           padding: 12px 15px;
-          border-radius: 10px;
+          border-radius: 8px;
           text-decoration: none;
           color: var(--fx-ink);
           transition: all 0.3s ease;
+          border: 1px solid transparent;
         }
         .sidebar-link.active {
-          background: linear-gradient(135deg, var(--fx-button), var(--fx-button-2));
-          color: var(--fx-bg);
-          font-weight: 600;
-          box-shadow: 0 0 18px rgba(var(--fx-accent-rgb), 0.5);
+          background: rgba(var(--fx-accent-rgb), 0.18);
+          color: var(--fx-accent);
+          font-weight: 700;
+          border-color: rgba(var(--fx-accent-rgb), 0.6);
+          box-shadow: 0 0 18px rgba(var(--fx-accent-rgb), 0.25);
         }
 
-        /* ✅ Raise a Request button */
+        /* Raise a Request button */
         .request-btn {
           display: block;
           padding: 12px 15px;
           margin: 15px 0;
-          border-radius: 10px;
+          border-radius: 6px;
           cursor: pointer;
           text-align: center;
-          font-weight: 600;
+          font-weight: 700;
           text-decoration: none;
-          color: var(--fx-bg);
-          background: linear-gradient(135deg, var(--fx-button), var(--fx-button-2));
-          box-shadow: 0 0 18px rgba(var(--fx-accent-rgb), 0.4);
+          color: #05101b;
+          background: linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65));
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.6);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          box-shadow: 0 0 18px rgba(var(--fx-accent-rgb), 0.3);
         }
 
         .logout-btn {
           padding: 12px 15px;
           margin: 10px 0 40px;
-          border-radius: 10px;
+          border-radius: 6px;
           cursor: pointer;
-          background: rgba(255,255,255,0.08);
+          background: rgba(7, 18, 34, 0.7);
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.3);
           text-align: center;
           font-weight: 600;
         }
@@ -316,14 +333,14 @@ export default function DashboardLayout() {
         }
 
         .dashboard-header {
-          height: 52px;
-          background: rgba(14, 18, 32, 0.9);
+          height: 56px;
+          background: linear-gradient(135deg, rgba(7, 15, 30, 0.96), rgba(11, 24, 44, 0.92));
           backdrop-filter: blur(10px);
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 0 15px;
-          border-bottom: 1px solid var(--fx-border);
+          border-bottom: 1px solid rgba(var(--fx-accent-rgb), 0.35);
           flex-shrink: 0;
         }
 
@@ -346,16 +363,21 @@ export default function DashboardLayout() {
           letter-spacing: 0.03em;
         }
         .panel {
-          font-size: 14px;
-          color: var(--fx-muted);
-          font-weight: 600;
+          font-size: 12px;
+          color: var(--fx-muted-2);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
           white-space: nowrap;
         }
         .menu-btn {
           background: transparent;
           border: none;
           color: var(--fx-accent);
-          font-size: 22px;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
           cursor: pointer;
         }
 

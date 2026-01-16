@@ -1,12 +1,11 @@
-// src/Components/ComingSoon.js
 import React from "react";
-import { FaChartLine, FaBolt, FaLayerGroup } from "react-icons/fa";
+import { FaChartLine, FaCrosshairs, FaRobot } from "react-icons/fa";
 
-export default function ComingSoon() {
-  const comingSoon = [
-    { icon: <FaChartLine />, desc: "Arbitrage Bot" },
-    { icon: <FaBolt />, desc: "MEV Bot" },
-    { icon: <FaLayerGroup />, desc: "Multi-Asset Smart Portfolio" },
+export default function LiveNow() {
+  const liveNow = [
+    { icon: <FaCrosshairs />, desc: "Sniper Bot" },
+    { icon: <FaChartLine />, desc: "Forex Trading Bot" },
+    { icon: <FaRobot />, desc: "Crypto Trading Bot" },
   ];
 
   return (
@@ -14,22 +13,21 @@ export default function ComingSoon() {
       style={{
         position: "relative",
         zIndex: 2,
-        padding: "60px 20px",
+        padding: "50px 20px 20px",
         textAlign: "center",
-        background: "rgba(5, 10, 18, 0.55)",
       }}
     >
       <h3
         style={{
-          fontSize: "22px",
+          fontSize: "18px",
           fontWeight: "700",
           color: "var(--fx-accent)",
-          marginBottom: "20px",
-          letterSpacing: "0.12em",
+          marginBottom: "16px",
+          letterSpacing: "0.14em",
           textTransform: "uppercase",
         }}
       >
-        Coming Soon
+        Live Now
       </h3>
 
       <div
@@ -47,50 +45,49 @@ export default function ComingSoon() {
             display: "flex",
             width: "max-content",
             gap: "18px",
-            animation: "marquee 22s linear infinite",
-            padding: "10px 0 20px",
+            animation: "marquee 18s linear infinite",
+            padding: "8px 0 16px",
           }}
         >
-          {/* Infinite carousel */}
-          {[...comingSoon, ...comingSoon, ...comingSoon].map((item, i) => (
+          {[...liveNow, ...liveNow, ...liveNow].map((item, i) => (
             <div
               key={i}
               style={{
-                flex: "0 0 250px",
+                flex: "0 0 230px",
                 margin: "0 4px",
                 background:
-                  "linear-gradient(135deg, rgba(10, 18, 34, 0.85), rgba(10, 26, 48, 0.9)) padding-box, linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.6), rgba(var(--fx-accent-2-rgb), 0.6)) border-box",
-                borderRadius: "16px",
-                padding: "32px 22px",
+                  "linear-gradient(135deg, rgba(8, 16, 30, 0.92), rgba(10, 24, 46, 0.92)) padding-box, linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.7), rgba(var(--fx-accent-2-rgb), 0.7)) border-box",
+                borderRadius: "14px",
+                padding: "24px 20px",
                 textAlign: "center",
                 border: "1px solid transparent",
-                boxShadow: "0 18px 32px rgba(2, 8, 18, 0.5)",
+                boxShadow: "0 16px 28px rgba(2, 8, 18, 0.5)",
                 position: "relative",
                 overflow: "hidden",
               }}
             >
               <div
                 style={{
-                  width: "56px",
-                  height: "56px",
-                  margin: "0 auto 14px",
-                  borderRadius: "16px",
+                  width: "52px",
+                  height: "52px",
+                  margin: "0 auto 12px",
+                  borderRadius: "14px",
                   display: "grid",
                   placeItems: "center",
-                  fontSize: "26px",
+                  fontSize: "24px",
                   color: "var(--fx-accent)",
                   background: "rgba(5, 16, 26, 0.7)",
                   border: "1px solid rgba(var(--fx-accent-rgb),0.4)",
-                  boxShadow: "0 0 18px rgba(var(--fx-accent-rgb),0.28)",
+                  boxShadow: "0 0 16px rgba(var(--fx-accent-rgb),0.28)",
                 }}
               >
                 {item.icon}
               </div>
               <p
                 style={{
-                  fontSize: "15px",
+                  fontSize: "14px",
                   color: "var(--fx-ink)",
-                  marginBottom: "8px",
+                  marginBottom: "10px",
                 }}
               >
                 {item.desc}
@@ -103,17 +100,17 @@ export default function ComingSoon() {
                   fontSize: "11px",
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
-                  color: "var(--fx-muted)",
+                  color: "var(--fx-accent-2)",
                 }}
               >
-                online soon
+                live
               </span>
               <div
                 style={{
                   position: "absolute",
                   inset: "0",
                   background:
-                    "linear-gradient(120deg, transparent 0%, rgba(var(--fx-accent-2-rgb),0.14) 50%, transparent 100%)",
+                    "linear-gradient(120deg, transparent 0%, rgba(var(--fx-accent-rgb),0.2) 50%, transparent 100%)",
                   opacity: 0.35,
                   transform: "translateX(-100%)",
                   animation: "scanline 6s linear infinite",
@@ -123,13 +120,6 @@ export default function ComingSoon() {
           ))}
         </div>
       </div>
-
-      <style>{`
-        @keyframes scanline {
-          0% { transform: translateX(-120%); }
-          100% { transform: translateX(120%); }
-        }
-      `}</style>
     </section>
   );
 }

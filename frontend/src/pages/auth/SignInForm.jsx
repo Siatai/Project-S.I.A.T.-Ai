@@ -6,7 +6,7 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const [sending, setSending] = useState(false); // 👈 new state
+  const [sending, setSending] = useState(false); // New state
   const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
@@ -18,14 +18,14 @@ export default function SignInForm() {
       return;
     }
     try {
-      setSending(true); // disable button
+      setSending(true); // Disable button
       await axios.post(`${API}/send-otp-signin`, { email });
       setOtpSent(true);
       setToast({ type: "success", message: "OTP sent to your email." });
     } catch (err) {
       console.error("Send OTP error:", err);
       setToast({ type: "error", message: err?.response?.data?.message || "Error sending OTP" });
-      setSending(false); // allow retry on error
+      setSending(false); // Allow retry on error
     }
   };
 
@@ -76,7 +76,7 @@ export default function SignInForm() {
           <div
             style={{
               background: "var(--fx-card)",
-              border: "1px solid var(--fx-border)",
+              border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
               boxShadow: "var(--fx-shadow)",
               color: "var(--fx-ink)",
               padding: "14px 18px",
@@ -107,7 +107,7 @@ export default function SignInForm() {
               opacity: sending ? 0.6 : 1,
               cursor: sending ? "not-allowed" : "pointer",
             }}
-            disabled={sending} // 👈 disable when sending
+            disabled={sending} // Disable while sending
           >
             {sending ? "Sending..." : "Send OTP"}
           </button>
@@ -134,9 +134,9 @@ const inputStyle = {
   width: "100%",
   padding: "12px 14px",
   marginBottom: "18px",
-  borderRadius: "10px",
-  border: "1px solid var(--fx-border)",
-  background: "rgba(8, 10, 20, 0.6)",
+  borderRadius: "6px",
+  border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
+  background: "rgba(6, 14, 28, 0.85)",
   color: "var(--fx-ink)",
   fontSize: "14px",
   boxSizing: "border-box",
@@ -145,12 +145,14 @@ const inputStyle = {
 const buttonStyleTeal = {
   width: "100%",
   padding: "12px",
-  border: "none",
-  borderRadius: "10px",
-  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
-  color: "var(--fx-bg)",
-  fontSize: "15px",
+  border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
+  borderRadius: "8px",
+  background: "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
+  color: "#05101b",
+  fontSize: "13px",
   fontWeight: "700",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
   cursor: "pointer",
   transition: "all 0.3s ease",
   boxShadow: "0 14px 28px rgba(var(--fx-accent-rgb),0.22)",

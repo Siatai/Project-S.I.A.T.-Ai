@@ -7,7 +7,7 @@ import {
   FaMoneyBillWave,
   FaChartLine,
 } from "react-icons/fa";
-import { avatar } from "../../Components"; // ✅ barrel import
+import { avatar } from "../../Components"; // Barrel import
 
 export default function InvestorNavbar() {
   const location = useLocation();
@@ -15,7 +15,7 @@ export default function InvestorNavbar() {
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [user, setUser] = useState(null);
 
-  // 🔹 Fetch user info
+  // Fetch user info
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -34,7 +34,7 @@ export default function InvestorNavbar() {
   };
 
   const handleSupport = () => {
-    // ✅ Safe mailto – no canceled request in network
+    // Safe mailto to avoid canceled request in network
     window.open("mailto:support@algomcube.com", "_blank", "noreferrer");
   };
 
@@ -44,7 +44,7 @@ export default function InvestorNavbar() {
       <header style={headerStyle}>
         {/* Center: Brand */}
         <h2 style={brandText}>
-          AlgoM<sup style={{ fontSize: "12px" }}>3</sup> Ai
+          AlgoM3 AI
         </h2>
 
         {/* Right: Profile only */}
@@ -93,12 +93,12 @@ export default function InvestorNavbar() {
         />
       </footer>
 
-      {/* ✅ Profile Popup */}
+      {/* Profile Popup */}
       {showProfilePopup && (
         <div style={popupOverlay}>
           <div style={popupBox}>
             <button style={closeBtn} onClick={() => setShowProfilePopup(false)}>
-              ❌ Close
+              Close
             </button>
             <h3 style={{ color: "var(--fx-accent)", marginBottom: "15px" }}>
               Profile Options
@@ -155,10 +155,10 @@ const headerStyle = {
   left: 0,
   right: 0,
   height: "60px",
-  background: "rgba(10, 12, 20, 0.82)",
-  backdropFilter: "blur(6px)",
+  background: "linear-gradient(135deg, rgba(7, 15, 30, 0.96), rgba(11, 24, 44, 0.92))",
+  backdropFilter: "blur(8px)",
   padding: "14px 20px",
-  borderBottom: "1px solid var(--fx-border)",
+  borderBottom: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
   zIndex: 1000,
   display: "flex",
   alignItems: "center",
@@ -167,18 +167,24 @@ const headerStyle = {
 
 const brandText = {
   margin: "0",
-  color: "var(--fx-accent-2)",
+  color: "var(--fx-accent)",
   fontWeight: "700",
   fontSize: "20px",
   fontFamily: "var(--fx-font-display)",
-  textShadow: "0 0 12px rgba(var(--fx-accent-2-rgb),0.7)",
+  textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.6)",
   flex: 1,
   textAlign: "center",
 };
 
 const rightHeader = { display: "flex", alignItems: "center", gap: "12px" };
 
-const panelText = { color: "var(--fx-muted)", fontSize: "14px", fontWeight: "600" };
+const panelText = {
+  color: "var(--fx-muted-2)",
+  fontSize: "12px",
+  fontWeight: "700",
+  textTransform: "uppercase",
+  letterSpacing: "0.14em",
+};
 
 const profileIcon = {
   width: "36px",
@@ -195,13 +201,13 @@ const footerStyle = {
   left: 0,
   right: 0,
   height: "50px",
-  background: "rgba(10, 12, 20, 0.82)",
-  backdropFilter: "blur(6px)",
+  background: "linear-gradient(135deg, rgba(7, 15, 30, 0.96), rgba(11, 24, 44, 0.92))",
+  backdropFilter: "blur(8px)",
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
   padding: "8px 0",
-  borderTop: "1px solid var(--fx-border)",
+  borderTop: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
   zIndex: 1000,
 };
 
@@ -232,7 +238,7 @@ const popupOverlay = {
 
 const popupBox = {
   background: "var(--fx-card)",
-  border: "1px solid var(--fx-border)",
+  border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
   borderRadius: "12px",
   padding: "20px",
   width: "300px",
@@ -255,8 +261,11 @@ const popupBtn = {
   margin: "8px 0",
   borderRadius: "8px",
   border: "none",
-  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
-  color: "var(--fx-bg)",
-  fontWeight: "600",
+  background: "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
+  color: "#05101b",
+  fontWeight: "700",
+  border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
   cursor: "pointer",
 };

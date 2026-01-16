@@ -1,6 +1,6 @@
 // src/Components/FlowSection.js
 import React from "react";
-import flowImg from "./flow-card.png"; // 👈 apni transparent PNG
+import flowImg from "./flow-card.png"; // Transparent PNG
 
 export default function FlowSection() {
   return (
@@ -32,13 +32,13 @@ export default function FlowSection() {
           style={{
             fontSize: "24px",
             fontWeight: "700",
-            color: "var(--fx-accent-2)",
+            color: "var(--fx-accent)",
             margin: 0,
             fontFamily: "var(--fx-font-display)",
-            textShadow: "0 0 12px rgba(var(--fx-accent-2-rgb),0.6)",
+            textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.6)",
           }}
         >
-          M³'s Algo
+          AlgoM3 Core
         </h2>
       </div>
 
@@ -59,7 +59,7 @@ export default function FlowSection() {
             inset: "-80px",
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(var(--fx-accent-rgb),0.5), rgba(var(--fx-accent-2-rgb),0.2), transparent 70%)",
+              "radial-gradient(circle, rgba(var(--fx-accent-rgb),0.5), rgba(var(--fx-accent-rgb),0.2), transparent 70%)",
             filter: "blur(60px)",
             zIndex: 0,
           }}

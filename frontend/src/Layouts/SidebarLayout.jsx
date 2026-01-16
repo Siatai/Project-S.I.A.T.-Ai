@@ -58,12 +58,12 @@ export default function SidebarLayout({
       <div
         style={{
           width: "260px",
-          background: "var(--fx-card)",
+          background: "linear-gradient(145deg, rgba(6, 14, 30, 0.98), rgba(10, 22, 42, 0.96))",
           padding: "20px 15px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          borderRight: "1px solid var(--fx-border)",
+          borderRight: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
           boxShadow: "var(--fx-shadow)",
         }}
       >
@@ -123,12 +123,12 @@ export default function SidebarLayout({
         <div
           style={{
             height: "60px",
-            background: "var(--fx-card)",
+            background: "linear-gradient(135deg, rgba(7, 15, 30, 0.96), rgba(11, 24, 44, 0.92))",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             padding: "0 20px",
-            borderBottom: "1px solid var(--fx-border)",
+            borderBottom: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
           }}
         >
           <h1
@@ -139,9 +139,9 @@ export default function SidebarLayout({
               fontSize: "20px",
             }}
           >
-            AlgoM³
+            AlgoM3
           </h1>
-          <span style={{ fontSize: "14px", color: "var(--fx-muted)", fontWeight: "600" }}>
+          <span style={{ fontSize: "12px", color: "var(--fx-muted-2)", fontWeight: "700", letterSpacing: "0.14em" }}>
             {role.toUpperCase()} PANEL
           </span>
         </div>

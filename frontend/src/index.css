@@ -5,40 +5,43 @@
   --fx-font-body: 'Space Grotesk', 'Syne', sans-serif;
   --fx-font-mono: 'JetBrains Mono', monospace;
 
-  --fx-bg: #050b14;
-  --fx-bg-2: #0a1222;
-  --fx-bg-3: #0f1b2f;
-  --fx-surface: rgba(10, 18, 34, 0.88);
-  --fx-surface-strong: rgba(14, 26, 44, 0.95);
-  --fx-glass: rgba(255, 255, 255, 0.06);
-  --fx-ink: #eaf7ff;
-  --fx-muted: #8fa7c6;
-  --fx-muted-2: #b6c5de;
-  --fx-accent: #22f2c7;
-  --fx-accent-2: #4cd7ff;
-  --fx-button: #22f2c7;
-  --fx-button-2: #2ab4ff;
+  --fx-bg: #040911;
+  --fx-bg-2: #091427;
+  --fx-bg-3: #0b1b33;
+  --fx-surface: rgba(8, 18, 36, 0.92);
+  --fx-surface-strong: rgba(10, 22, 42, 0.96);
+  --fx-glass: rgba(10, 26, 50, 0.45);
+  --fx-ink: #e6f2ff;
+  --fx-muted: #7f9abd;
+  --fx-muted-2: #adc2de;
+  --fx-accent: #1fd7ff;
+  --fx-accent-2: #ffd166;
+  --fx-button: #1fd7ff;
+  --fx-button-2: #14a6cc;
   --fx-gold: #ffd166;
-  --fx-gold-strong: #ffbf47;
+  --fx-gold-strong: #ffc04d;
   --fx-success: #3fe4a0;
   --fx-success-2: #6bf0c0;
   --fx-danger: #ff6b7a;
   --fx-danger-strong: #ff425a;
   --fx-info: #6aa7ff;
-  --fx-border: rgba(255, 255, 255, 0.12);
-  --fx-rail: rgba(255, 255, 255, 0.14);
-  --fx-accent-rgb: 34, 242, 199;
-  --fx-accent-2-rgb: 76, 215, 255;
-  --fx-button-rgb: 34, 242, 199;
+  --fx-border: rgba(47, 119, 170, 0.35);
+  --fx-rail: rgba(255, 255, 255, 0.12);
+  --fx-accent-rgb: 31, 215, 255;
+  --fx-accent-2-rgb: 255, 209, 102;
+  --fx-button-rgb: 31, 215, 255;
 
-  --fx-card: linear-gradient(140deg, rgba(10, 16, 30, 0.98), rgba(12, 24, 46, 0.9));
-  --fx-card-strong: linear-gradient(140deg, rgba(12, 22, 40, 0.98), rgba(12, 28, 52, 0.92));
-  --fx-hero: radial-gradient(1100px 600px at 6% -10%, rgba(34, 242, 199, 0.18), transparent 60%),
-    radial-gradient(900px 600px at 90% 0%, rgba(76, 215, 255, 0.16), transparent 55%),
-    linear-gradient(155deg, #050b14 0%, #0b162a 45%, #050b14 85%);
-  --fx-shadow: 0 14px 30px rgba(2, 8, 18, 0.45);
-  --fx-glow: 0 0 16px rgba(34, 242, 199, 0.18);
-  --fx-glow-hot: 0 0 16px rgba(76, 215, 255, 0.18);
+  --fx-card: linear-gradient(145deg, rgba(8, 18, 36, 0.98), rgba(12, 26, 46, 0.9));
+  --fx-card-strong: linear-gradient(145deg, rgba(10, 22, 42, 0.98), rgba(12, 30, 52, 0.94));
+  --fx-hero: radial-gradient(1200px 640px at 5% -10%, rgba(31, 215, 255, 0.2), transparent 60%),
+    radial-gradient(900px 600px at 92% 2%, rgba(255, 209, 102, 0.12), transparent 55%),
+    linear-gradient(160deg, #030810 0%, #0b1a34 45%, #050c18 85%);
+  --fx-shadow: 0 18px 34px rgba(2, 8, 18, 0.55);
+  --fx-glow: 0 0 18px rgba(31, 215, 255, 0.24);
+  --fx-glow-hot: 0 0 18px rgba(255, 209, 102, 0.2);
+  --fx-hud-line: rgba(31, 215, 255, 0.4);
+  --fx-hud-line-strong: rgba(31, 215, 255, 0.65);
+  --fx-hud-edge: rgba(255, 209, 102, 0.6);
 }
 
 * {
@@ -68,10 +71,10 @@ body::before {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 18% 18%, rgba(var(--fx-accent-rgb), 0.09), transparent 45%),
-    radial-gradient(circle at 88% 6%, rgba(var(--fx-accent-2-rgb), 0.08), transparent 55%),
-    radial-gradient(circle at 15% 85%, rgba(255, 255, 255, 0.04), transparent 40%);
-  opacity: 0.55;
+    radial-gradient(circle at 18% 18%, rgba(var(--fx-accent-rgb), 0.12), transparent 45%),
+    radial-gradient(circle at 88% 8%, rgba(var(--fx-accent-2-rgb), 0.1), transparent 55%),
+    radial-gradient(circle at 15% 85%, rgba(255, 255, 255, 0.05), transparent 40%);
+  opacity: 0.6;
   z-index: 0;
 }
 
@@ -81,10 +84,10 @@ body::after {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(transparent 0%, rgba(34, 242, 199, 0.05) 48%, transparent 100%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 60px),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 60px);
-  opacity: 0.35;
+    linear-gradient(transparent 0%, rgba(31, 215, 255, 0.08) 48%, transparent 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 80px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 80px);
+  opacity: 0.4;
   mix-blend-mode: screen;
   z-index: 0;
 }
@@ -142,8 +145,10 @@ code {
 .fx-card {
   background: var(--fx-card);
   border: 1px solid var(--fx-border);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: var(--fx-shadow);
+  position: relative;
+  overflow: hidden;
 }
 
 .fx-card--strong {
@@ -155,47 +160,90 @@ code {
   backdrop-filter: blur(12px);
 }
 
+.fx-hud-panel {
+  position: relative;
+  background: var(--fx-card);
+  border: 1px solid var(--fx-hud-line);
+  border-radius: 14px;
+  box-shadow: var(--fx-shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.fx-hud-panel::before,
+.fx-hud-panel::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--fx-hud-edge);
+  opacity: 0.8;
+}
+
+.fx-hud-panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.fx-hud-panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+.fx-hud-strip {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fx-hud-line-strong), transparent);
+  box-shadow: 0 0 10px rgba(var(--fx-accent-rgb), 0.35);
+}
+
 .fx-button {
-  border: none;
-  border-radius: 12px;
+  border: 1px solid rgba(var(--fx-accent-rgb), 0.6);
+  border-radius: 6px;
   padding: 12px 20px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  color: #0b0c12;
-  background: linear-gradient(135deg, var(--fx-button), var(--fx-button-2));
-  box-shadow: 0 10px 22px rgba(var(--fx-button-rgb), 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #05101b;
+  background: linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.9), rgba(var(--fx-accent-rgb), 0.65));
+  box-shadow: 0 10px 22px rgba(var(--fx-button-rgb), 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .fx-button:hover {
   transform: translateY(-1px) scale(1.01);
-  box-shadow: 0 14px 28px rgba(var(--fx-button-rgb), 0.24);
+  border-color: rgba(var(--fx-accent-rgb), 0.9);
+  box-shadow: 0 14px 28px rgba(var(--fx-button-rgb), 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .fx-button--ghost {
   background: transparent;
-  border: 1px solid var(--fx-border);
+  border: 1px solid var(--fx-hud-line);
   color: var(--fx-ink);
 }
 
 .fx-button--soft {
   background: rgba(var(--fx-accent-rgb), 0.12);
   color: var(--fx-accent);
-  border: 1px solid rgba(var(--fx-accent-rgb), 0.25);
+  border: 1px solid rgba(var(--fx-accent-rgb), 0.35);
 }
 
 .fx-input {
   width: 100%;
-  background: rgba(10, 13, 24, 0.75);
-  border: 1px solid var(--fx-border);
-  border-radius: 12px;
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid var(--fx-hud-line);
+  border-radius: 8px;
   padding: 10px 12px;
   color: var(--fx-ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .fx-input:focus {
   outline: none;
-  border-color: rgba(var(--fx-accent-rgb), 0.6);
+  border-color: rgba(var(--fx-accent-rgb), 0.8);
   box-shadow: 0 0 0 3px rgba(var(--fx-accent-rgb), 0.2);
 }
 
@@ -215,23 +263,24 @@ code {
   border-radius: 999px;
   background: rgba(var(--fx-accent-2-rgb), 0.12);
   color: var(--fx-accent-2);
-  border: 1px solid rgba(var(--fx-accent-2-rgb), 0.25);
+  border: 1px solid rgba(var(--fx-accent-2-rgb), 0.35);
   font-size: 12px;
 }
 
 .fx-table {
   width: 100%;
   border-collapse: collapse;
-  background: rgba(10, 13, 24, 0.65);
-  border-radius: 14px;
+  background: rgba(6, 14, 28, 0.78);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid var(--fx-border);
+  border: 1px solid var(--fx-hud-line);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .fx-table-wrap {
   background: var(--fx-card);
-  border: 1px solid var(--fx-border);
-  border-radius: 16px;
+  border: 1px solid var(--fx-hud-line);
+  border-radius: 14px;
   box-shadow: var(--fx-shadow);
   overflow: auto;
 }
@@ -242,13 +291,14 @@ code {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--fx-muted);
-  background: rgba(6, 16, 30, 0.9);
+  background: rgba(5, 12, 24, 0.95);
+  border-bottom: 1px solid rgba(var(--fx-accent-rgb), 0.35);
 }
 
 .fx-table th,
 .fx-table td {
   padding: 12px 14px;
-  border-bottom: 1px solid var(--fx-border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .fx-table tr:last-child td {
@@ -256,5 +306,5 @@ code {
 }
 
 .fx-table tbody tr:hover td {
-  background: rgba(8, 20, 34, 0.6);
+  background: rgba(8, 22, 40, 0.65);
 }
