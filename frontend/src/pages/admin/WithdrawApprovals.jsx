@@ -67,7 +67,7 @@ export default function WithdrawApprovals() {
   };
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={{ color: "var(--fx-ink)" }}>
       <h2 style={{ marginBottom: "20px" }}>Withdrawal Approvals</h2>
 
       {loading ? (
@@ -75,41 +75,41 @@ export default function WithdrawApprovals() {
       ) : withdrawals.length === 0 ? (
         <p>No withdrawal requests found.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="fx-table-wrap">
+          <table className="fx-table">
           <thead>
-            <tr style={{ background: "#1F2937", color: "#E5E7EB" }}>
-              <th style={{ padding: "10px", textAlign: "left" }}>User Email</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Wallet</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Amount</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Fee</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Final Amount</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Status</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Tx Hash</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Actions</th>
+            <tr>
+              <th>User Email</th>
+              <th>Wallet</th>
+              <th>Amount</th>
+              <th>Fee</th>
+              <th>Final Amount</th>
+              <th>Status</th>
+              <th>Tx Hash</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {withdrawals.map((w) => (
-              <tr key={w.id} style={{ borderBottom: "1px solid #374151" }}>
-                <td style={{ padding: "10px" }}>{w.email}</td>
-                <td style={{ padding: "10px" }}>{w.wallet}</td>
-                <td style={{ padding: "10px" }}>${w.amount}</td>
-                <td style={{ padding: "10px" }}>${w.fee}</td>
-                <td style={{ padding: "10px" }}>${w.final_amount}</td>
+              <tr key={w.id}>
+                <td>{w.email}</td>
+                <td>{w.wallet}</td>
+                <td>${w.amount}</td>
+                <td>${w.fee}</td>
+                <td>${w.final_amount}</td>
                 <td
                   style={{
-                    padding: "10px",
                     color:
                       w.status === "pending"
-                        ? "#FACC15"
+                        ? "var(--fx-gold)"
                         : w.status === "approved"
-                        ? "#22C55E"
-                        : "#EF4444",
+                        ? "var(--fx-success)"
+                        : "var(--fx-danger)",
                   }}
                 >
                   {w.status}
                 </td>
-                <td style={{ padding: "10px" }}>
+                <td>
                   {w.status === "pending" ? (
                     <input
                       type="text"
@@ -118,17 +118,16 @@ export default function WithdrawApprovals() {
                       onChange={(e) =>
                         setTxHash((prev) => ({ ...prev, [w.id]: e.target.value }))
                       }
+                      className="fx-input"
                       style={{
-                        width: "150px",
-                        padding: "5px",
-                        borderRadius: "4px",
+                        width: "180px",
                       }}
                     />
                   ) : (
                     w.tx_hash || "-"
                   )}
                 </td>
-                <td style={{ padding: "10px" }}>
+                <td>
                   {w.status === "pending" && (
                     <>
                       <button
@@ -137,8 +136,8 @@ export default function WithdrawApprovals() {
                           marginRight: "10px",
                           padding: "6px 12px",
                           border: "none",
-                          borderRadius: "4px",
-                          background: "#22C55E",
+                          borderRadius: "8px",
+                          background: "var(--fx-success)",
                           color: "#fff",
                           cursor: "pointer",
                         }}
@@ -150,8 +149,8 @@ export default function WithdrawApprovals() {
                         style={{
                           padding: "6px 12px",
                           border: "none",
-                          borderRadius: "4px",
-                          background: "#EF4444",
+                          borderRadius: "8px",
+                          background: "var(--fx-danger)",
                           color: "#fff",
                           cursor: "pointer",
                         }}
@@ -164,7 +163,8 @@ export default function WithdrawApprovals() {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       )}
     </div>
   );

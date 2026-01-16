@@ -11,6 +11,7 @@ export default function ReferralSignup() {
   const [agree, setAgree] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [sending, setSending] = useState(false); // 👈 new state
+  const [toast, setToast] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,25 +58,25 @@ export default function ReferralSignup() {
   // Step 1: Send OTP
   const sendOtp = async () => {
     if (!referrer.trim()) {
-      alert("⚠️ Referral code is required to sign up.");
+      setToast({ type: "error", message: "Referral code is required to sign up." });
       return;
     }
     if (!email.trim() || !name.trim()) {
-      alert("⚠️ Please enter name and email.");
+      setToast({ type: "error", message: "Please enter name and email." });
       return;
     }
     if (!agree) {
-      alert("⚠️ You must agree to the Terms & Conditions to continue.");
+      setToast({ type: "error", message: "You must agree to the Terms & Conditions." });
       return;
     }
     try {
       setSending(true); // 👈 disable button
       await axios.post(`${API}/send-otp-signup`, { email, name, referrer });
       setOtpSent(true);
-      alert("📧 OTP sent to your email.");
+      setToast({ type: "success", message: "OTP sent to your email." });
     } catch (err) {
       console.error("Send OTP error:", err);
-      alert(err?.response?.data?.detail || "Error sending OTP");
+      setToast({ type: "error", message: err?.response?.data?.detail || "Error sending OTP" });
       setSending(false); // 👈 allow retry if failed
     }
   };
@@ -94,7 +95,7 @@ export default function ReferralSignup() {
         : "investor";
       localStorage.setItem("role", role);
 
-      alert("✅ Signup successful!");
+      setToast({ type: "success", message: "Signup successful!" });
       fetchUser();
 
       if (role === "admin") navigate("/admin");
@@ -102,9 +103,15 @@ export default function ReferralSignup() {
       else navigate("/investor");
     } catch (err) {
       console.error("Verify OTP error:", err);
-      alert(err?.response?.data?.detail || "Invalid OTP");
+      setToast({ type: "error", message: err?.response?.data?.detail || "Invalid OTP" });
     }
   };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   return (
     <div
@@ -118,6 +125,35 @@ export default function ReferralSignup() {
         boxSizing: "border-box",
       }}
     >
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            display: "grid",
+            placeItems: "center",
+            zIndex: 3000,
+            pointerEvents: "none",
+          }}
+        >
+          <div
+            style={{
+              background: "var(--fx-card)",
+              border: "1px solid var(--fx-border)",
+              boxShadow: "var(--fx-shadow)",
+              color: "var(--fx-ink)",
+              padding: "14px 18px",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontWeight: "600",
+              textAlign: "center",
+              minWidth: "260px",
+            }}
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
       {/* 🔹 Centered Logo */}
       <Link to="/" style={{ textDecoration: "none", marginBottom: "20px" }}>
         <img
@@ -127,7 +163,7 @@ export default function ReferralSignup() {
           style={{
             height: "70px",
             cursor: "pointer",
-            filter: "drop-shadow(0 0 8px rgba(23,232,229,0.6))",
+            filter: "drop-shadow(0 0 8px rgba(var(--fx-accent-rgb),0.6))",
           }}
         />
       </Link>
@@ -137,28 +173,28 @@ export default function ReferralSignup() {
         style={{
           width: "100%",
           maxWidth: "420px",
-          background: "rgba(17,24,39,0.95)",
+          background: "var(--fx-card)",
           padding: "30px",
           borderRadius: "16px",
-          boxShadow: "0 6px 24px rgba(0,0,0,0.6)",
+          border: "1px solid var(--fx-border)",
+          boxShadow: "var(--fx-shadow)",
         }}
       >
         {/* ✅ Subtle neon welcome heading */}
         <h1
           style={{
             textAlign: "center",
-            fontFamily: "Orbitron, sans-serif",
+            fontFamily: "var(--fx-font-display)",
             fontSize: "28px",
             fontWeight: "700",
             marginBottom: "12px",
           }}
         >
-          <span style={{ color: "#ffffff" }}>Welcome to </span>
+          <span style={{ color: "var(--fx-ink)" }}>Welcome to </span>
           <span
             style={{
-              color: "#17E8E5",
-              textShadow:
-                "0 0 4px #17E8E5, 0 0 8px rgba(23,232,229,0.6), 0 0 12px rgba(23,232,229,0.4)",
+              color: "var(--fx-accent-2)",
+              textShadow: "0 0 10px rgba(var(--fx-accent-2-rgb),0.7)",
             }}
           >
             AlgoM³
@@ -169,8 +205,8 @@ export default function ReferralSignup() {
           style={{
             marginBottom: "20px",
             textAlign: "center",
-            fontFamily: "Orbitron, sans-serif",
-            color: "#17E8E5",
+            fontFamily: "var(--fx-font-display)",
+            color: "var(--fx-accent)",
           }}
         >
           Create Your Account
@@ -198,8 +234,8 @@ export default function ReferralSignup() {
               disabled
               style={{
                 ...inputStyle,
-                background: "rgba(31,41,55,0.8)",
-                color: "#9CA3AF",
+                background: "rgba(8, 10, 20, 0.65)",
+                color: "var(--fx-muted)",
                 cursor: "not-allowed",
               }}
             />
@@ -211,12 +247,12 @@ export default function ReferralSignup() {
                 onChange={() => setAgree(!agree)}
                 style={{ marginRight: "8px", cursor: "pointer" }}
               />
-              <span style={{ fontSize: "13px", color: "#CBD5E1" }}>
+              <span style={{ fontSize: "13px", color: "var(--fx-muted-2)" }}>
                 By checking this box, you agree to our{" "}
                 <span
                   onClick={() => setShowTerms(true)}
                   style={{
-                    color: "#17E8E5",
+                    color: "var(--fx-accent-2)",
                     textDecoration: "underline",
                     cursor: "pointer",
                   }}
@@ -264,7 +300,7 @@ export default function ReferralSignup() {
           padding: 0;
           height: 100%;
           width: 100%;
-          background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
+          background: var(--fx-hero);
           overflow-x: hidden;
         }
 
@@ -288,9 +324,9 @@ const inputStyle = {
   padding: "12px 14px",
   marginBottom: "18px",
   borderRadius: "10px",
-  border: "1px solid #1E293B",
-  background: "rgba(255,255,255,0.05)",
-  color: "#E5E7EB",
+  border: "1px solid var(--fx-border)",
+  background: "rgba(8, 10, 20, 0.6)",
+  color: "var(--fx-ink)",
   fontSize: "14px",
   boxSizing: "border-box",
 };
@@ -300,12 +336,13 @@ const buttonStyleTeal = {
   padding: "12px",
   border: "none",
   borderRadius: "10px",
-  background: "#17E8E5",
-  color: "#0B1220",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+  color: "var(--fx-bg)",
   fontSize: "15px",
   fontWeight: "700",
   cursor: "pointer",
   transition: "all 0.3s ease",
+  boxShadow: "0 14px 28px rgba(var(--fx-accent-rgb),0.22)",
 };
 
 const checkboxContainer = {

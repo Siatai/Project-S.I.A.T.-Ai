@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import logo from "../Components/logo.png"; // ✅ your logo
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -160,23 +159,7 @@ export default function DashboardLayout() {
       {/* Main Section */}
       <div className="dashboard-main">
         <header className="dashboard-header">
-          {/* Left: Logo */}
-          <div className="header-left">
-            <img
-              src={logo}
-              alt="AlgoM³ Logo"
-              style={{
-                height: "36px",
-                width: "36px",
-                borderRadius: "8px",
-                border: "2px solid #17E8E5",
-                background: "#0B1220",
-                padding: "3px",
-                boxShadow: "0 0 8px rgba(23,232,229,0.6)",
-              }}
-            />
-          </div>
-
+          <div className="header-left" />
           {/* Center: Branding */}
           <div className="header-center">
             <h1
@@ -185,8 +168,8 @@ export default function DashboardLayout() {
                 margin: 0,
                 fontSize: "22px",
                 fontWeight: "bold",
-                color: "#17E8E5",
-                textShadow: "0 0 10px #17E8E5, 0 0 20px #0B1220",
+                color: "var(--fx-accent)",
+                textShadow: "0 0 10px var(--fx-accent), 0 0 20px var(--fx-bg)",
               }}
             >
               AlgoM³ Ai
@@ -216,20 +199,31 @@ export default function DashboardLayout() {
           height: 100vh;
           width: 100%;
           overflow: hidden;
-          font-family: Inter, Arial, sans-serif;
-          color: #E5E7EB;
-          background: #0B1220;
+          font-family: var(--fx-font-body);
+          color: var(--fx-ink);
+          background: var(--fx-hero);
+        }
+
+        .loading-screen {
+          height: 100vh;
+          display: grid;
+          place-items: center;
+          color: var(--fx-muted);
+          background: var(--fx-hero);
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
 
         .dashboard-sidebar {
           width: 250px;
-          background: rgba(17, 24, 39, 0.95);
-          backdrop-filter: blur(10px);
+          background: var(--fx-surface-strong);
+          backdrop-filter: blur(12px);
           padding: 25px 15px;
           display: flex;
           flex-direction: column;
-          border-right: 1px solid rgba(23,232,166,0.2);
-          box-shadow: 0 0 20px rgba(23,232,229,0.15);
+          border-right: 1px solid var(--fx-border);
+          box-shadow: 0 0 24px rgba(var(--fx-accent-rgb), 0.18);
           position: relative;
           overflow: hidden;
           flex-shrink: 0;
@@ -242,7 +236,7 @@ export default function DashboardLayout() {
           background: transparent;
           border: none;
           font-size: 22px;
-          color: #17E8E5;
+          color: var(--fx-accent);
           cursor: pointer;
           transition: transform 0.2s ease;
         }
@@ -258,7 +252,7 @@ export default function DashboardLayout() {
         }
         .user-balance {
           font-size: 14px;
-          color: #17E8E5;
+          color: var(--fx-accent);
           text-align: center;
           margin-bottom: 15px;
           font-weight: 600;
@@ -269,8 +263,8 @@ export default function DashboardLayout() {
           height: 2px;
           border-radius: 2px;
           margin: 15px 0;
-          background: linear-gradient(90deg, transparent, #17E8E5, transparent);
-          box-shadow: 0 0 12px #17E8E5;
+          background: linear-gradient(90deg, transparent, var(--fx-accent), transparent);
+          box-shadow: var(--fx-glow);
         }
 
         .sidebar-link {
@@ -278,14 +272,14 @@ export default function DashboardLayout() {
           padding: 12px 15px;
           border-radius: 10px;
           text-decoration: none;
-          color: #E5E7EB;
+          color: var(--fx-ink);
           transition: all 0.3s ease;
         }
         .sidebar-link.active {
-          background: linear-gradient(135deg,#17E8E5,#14B8A6);
-          color: #0B1220;
+          background: linear-gradient(135deg, var(--fx-button), var(--fx-button-2));
+          color: var(--fx-bg);
           font-weight: 600;
-          box-shadow: 0 0 12px rgba(23,232,166,0.5);
+          box-shadow: 0 0 18px rgba(var(--fx-accent-rgb), 0.5);
         }
 
         /* ✅ Raise a Request button */
@@ -298,9 +292,9 @@ export default function DashboardLayout() {
           text-align: center;
           font-weight: 600;
           text-decoration: none;
-          color: #0B1220;
-          background: linear-gradient(135deg,#17E8E5,#14B8A6);
-          box-shadow: 0 0 12px rgba(23,232,166,0.5);
+          color: var(--fx-bg);
+          background: linear-gradient(135deg, var(--fx-button), var(--fx-button-2));
+          box-shadow: 0 0 18px rgba(var(--fx-accent-rgb), 0.4);
         }
 
         .logout-btn {
@@ -322,14 +316,14 @@ export default function DashboardLayout() {
         }
 
         .dashboard-header {
-          height: 45px;
-          background: rgba(18,26,43,0.95);
-          backdrop-filter: blur(6px); 
+          height: 52px;
+          background: rgba(14, 18, 32, 0.9);
+          backdrop-filter: blur(10px);
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 0 15px;
-          border-bottom: 1px solid rgba(23,232,166,0.2);
+          border-bottom: 1px solid var(--fx-border);
           flex-shrink: 0;
         }
 
@@ -348,18 +342,19 @@ export default function DashboardLayout() {
         }
 
         .brand {
-          font-family: Orbitron, sans-serif;
+          font-family: var(--fx-font-display);
+          letter-spacing: 0.03em;
         }
         .panel {
           font-size: 14px;
-          color: #94A3B8;
+          color: var(--fx-muted);
           font-weight: 600;
           white-space: nowrap;
         }
         .menu-btn {
           background: transparent;
           border: none;
-          color: #17E8E5;
+          color: var(--fx-accent);
           font-size: 22px;
           cursor: pointer;
         }
@@ -368,9 +363,9 @@ export default function DashboardLayout() {
           flex: 1;
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
-          background: linear-gradient(135deg,#0B1220,#0F2F2D,#000);
-          padding: 20px;
-          padding-bottom: 100px;
+          background: var(--fx-hero);
+          padding: 24px;
+          padding-bottom: 120px;
         }
 
         html, body, #root {
@@ -379,7 +374,7 @@ export default function DashboardLayout() {
           height: 100%;
           width: 100%;
           overflow: hidden;
-          background: #000;
+          background: var(--fx-bg);
         }
       `}</style>
     </div>

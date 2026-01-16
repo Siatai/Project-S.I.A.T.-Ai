@@ -53,16 +53,18 @@ export default function SidebarLayout({
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#0B1220", color: "#E5E7EB" }}>
+    <div style={{ display: "flex", height: "100vh", background: "var(--fx-hero)", color: "var(--fx-ink)" }}>
       {/* Sidebar */}
       <div
         style={{
           width: "260px",
-          background: "#121A2B",
+          background: "var(--fx-card)",
           padding: "20px 15px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          borderRight: "1px solid var(--fx-border)",
+          boxShadow: "var(--fx-shadow)",
         }}
       >
         <div>
@@ -71,7 +73,7 @@ export default function SidebarLayout({
             <h2 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "5px" }}>
               {user.name || "User"}
             </h2>
-            <p style={{ fontSize: "14px", color: "#17E8E5", fontWeight: "600" }}>
+            <p style={{ fontSize: "14px", color: "var(--fx-accent)", fontWeight: "600" }}>
               Balance: ${user.wallet_balance?.toLocaleString() || 0}
             </p>
           </div>
@@ -86,8 +88,8 @@ export default function SidebarLayout({
                 margin: "6px 0",
                 borderRadius: "8px",
                 cursor: "pointer",
-                backgroundColor: active === item.key ? "rgba(23,232,229,0.1)" : "transparent",
-                color: active === item.key ? "#17E8E5" : "#E5E7EB",
+                backgroundColor: active === item.key ? "rgba(var(--fx-accent-rgb),0.1)" : "transparent",
+                color: active === item.key ? "var(--fx-accent)" : "var(--fx-ink)",
                 fontWeight: active === item.key ? "600" : "400",
                 transition: "all 0.2s ease-in-out",
               }}
@@ -105,9 +107,9 @@ export default function SidebarLayout({
             margin: "6px 0",
             borderRadius: "8px",
             cursor: "pointer",
-            backgroundColor: "#1E293B",
+            backgroundColor: "var(--fx-surface-strong)",
             textAlign: "center",
-            color: "#F87171",
+            color: "var(--fx-danger)",
             fontWeight: "600",
           }}
         >
@@ -121,25 +123,25 @@ export default function SidebarLayout({
         <div
           style={{
             height: "60px",
-            background: "#121A2B",
+            background: "var(--fx-card)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             padding: "0 20px",
-            borderBottom: "1px solid #1E293B",
+            borderBottom: "1px solid var(--fx-border)",
           }}
         >
           <h1
             style={{
-              fontFamily: "Orbitron, sans-serif",
+              fontFamily: "var(--fx-font-display)",
               fontWeight: "700",
-              color: "#17E8E5",
+              color: "var(--fx-accent)",
               fontSize: "20px",
             }}
           >
             AlgoM³
           </h1>
-          <span style={{ fontSize: "14px", color: "#94A3B8", fontWeight: "600" }}>
+          <span style={{ fontSize: "14px", color: "var(--fx-muted)", fontWeight: "600" }}>
             {role.toUpperCase()} PANEL
           </span>
         </div>

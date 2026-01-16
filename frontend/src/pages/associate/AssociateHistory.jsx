@@ -15,7 +15,7 @@ export default function AssociateHistory() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -102,12 +102,12 @@ export default function AssociateHistory() {
                 fontWeight: "600",
                 background:
                   filter === btn.key
-                    ? "linear-gradient(135deg,#17E8E5,#14B8E5)"
+                    ? "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))"
                     : "rgba(55,65,81,0.6)",
-                color: filter === btn.key ? "#0B1220" : "#E5E7EB",
+                color: filter === btn.key ? "var(--fx-bg)" : "var(--fx-ink)",
                 boxShadow:
                   filter === btn.key
-                    ? "0 0 12px rgba(23,232,229,0.4)"
+                    ? "0 0 12px rgba(var(--fx-accent-rgb),0.4)"
                     : "none",
                 transition: "all 0.3s ease",
               }}
@@ -118,7 +118,7 @@ export default function AssociateHistory() {
         </div>
 
         {/* Table / Mobile Cards */}
-        <div style={cardWrapper}>
+        <div className="fx-table-wrap" style={cardWrapper}>
           {loading ? (
             <p style={{ padding: "20px" }}>Loading transactions...</p>
           ) : filteredTx.length === 0 ? (
@@ -188,9 +188,9 @@ export default function AssociateHistory() {
             </div>
           ) : (
             // Desktop → Table View
-            <table style={tableStyle}>
+            <table className="fx-table" style={tableStyle}>
               <thead>
-                <tr style={{ background: "rgba(31,41,55,0.9)" }}>
+                <tr style={{ background: "rgba(8, 10, 20, 0.7)" }}>
                   {["Type", "Amount", "Fee", "Status", "Tx Hash", "Date"].map(
                     (h, i) => (
                       <th key={i} style={thStyle}>
@@ -243,15 +243,15 @@ export default function AssociateHistory() {
 
 /* === Styles & Colors === */
 const colors = {
-  textPrimary: "#E5E7EB",
-  textSecondary: "#9CA3AF",
-  accentCyan: "#17E8E5",
-  accentYellow: "#FACC15",
-  accentRed: "#EF4444",
+  textPrimary: "var(--fx-ink)",
+  textSecondary: "var(--fx-muted)",
+  accentCyan: "var(--fx-accent)",
+  accentYellow: "var(--fx-gold)",
+  accentRed: "var(--fx-danger)",
 };
 
 const pageWrapper = {
-  backgroundColor: "#0f172a",
+  background: "transparent",
   minHeight: "100vh",
   width: "100%",
   overflowX: "hidden",
@@ -265,37 +265,35 @@ const mainContent = {
 
 const headerTitle = {
   marginBottom: "10px",
-  fontFamily: "Orbitron, sans-serif",
-  color: "#17E8E5",
+  fontFamily: "var(--fx-font-display)",
+  color: "var(--fx-accent)",
 };
 
 const glowLine = {
   height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 10px #17E8E5",
+  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
+  boxShadow: "0 0 10px var(--fx-accent)",
   margin: "8px 0 20px 0",
 };
 
 const cardWrapper = {
-  background: "rgba(17,24,39,0.85)",
-  backdropFilter: "blur(8px)",
+  background: "transparent",
   borderRadius: "12px",
-  boxShadow: "0 0 18px rgba(23,232,229,0.2)",
   overflowX: "auto",
   maxWidth: "100%",
   padding: "10px",
 };
 
 const mobileCard = {
-  background: "rgba(31,41,55,0.9)",
+  background: "var(--fx-card-strong)",
   borderRadius: "12px",
   padding: "15px",
-  boxShadow: "0 0 12px rgba(23,232,229,0.2)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
 };
 
 const tableStyle = {
   width: "100%",
-  borderCollapse: "collapse",
   minWidth: "700px",
 };
 
@@ -305,14 +303,14 @@ const thStyle = {
   fontSize: "14px",
   color: colors.textSecondary,
   fontWeight: "600",
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--fx-font-body)",
 };
 
-const rowStyle = { borderBottom: "1px solid rgba(255,255,255,0.05)" };
+const rowStyle = { borderBottom: "1px solid var(--fx-border)" };
 
 const tdStyle = {
   padding: "12px",
   fontSize: "14px",
   color: colors.textPrimary,
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--fx-font-body)",
 };

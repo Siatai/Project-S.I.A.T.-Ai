@@ -5,8 +5,8 @@ export default function ThemePage({ children }) {
   return (
     <div
       style={{
-        backgroundColor: "#0f172a", // 🔹 global dark theme bg
-        color: "#E5E7EB",
+        background: "var(--fx-hero)", // 🔹 global dark theme bg
+        color: "var(--fx-ink)",
         minHeight: "100vh",
         margin: 0,
         padding: 0,

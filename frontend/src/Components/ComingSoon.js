@@ -1,23 +1,20 @@
 // src/Components/ComingSoon.js
 import React from "react";
-import sniper from "./sniper.png";
+import {
+  FaChartLine,
+  FaBolt,
+  FaCrosshairs,
+  FaRobot,
+  FaLayerGroup,
+} from "react-icons/fa";
 
 export default function ComingSoon() {
   const comingSoon = [
-    { icon: "📊", desc: "Arbitrage Bot" },
-    { icon: "⚡", desc: "MEV Bot" },
-    {
-      icon: (
-        <img
-          src={sniper}
-          alt="Sniper Bot"
-          style={{ width: "40px", margin: "0 auto" }}
-        />
-      ),
-      desc: "Sniper Bot",
-    },
-    { icon: "💹", desc: "Crypto Trading Bot" },
-    { icon: "📈", desc: "Multi-Asset Smart Portfolio" },
+    { icon: <FaChartLine />, desc: "Arbitrage Bot" },
+    { icon: <FaBolt />, desc: "MEV Bot" },
+    { icon: <FaCrosshairs />, desc: "Sniper Bot" },
+    { icon: <FaRobot />, desc: "Crypto Trading Bot" },
+    { icon: <FaLayerGroup />, desc: "Multi-Asset Smart Portfolio" },
   ];
 
   return (
@@ -27,26 +24,39 @@ export default function ComingSoon() {
         zIndex: 2,
         padding: "60px 20px",
         textAlign: "center",
-        background: "rgba(15,23,42,0.7)",
+        background: "rgba(5, 10, 18, 0.55)",
       }}
     >
       <h3
         style={{
           fontSize: "22px",
           fontWeight: "700",
-          color: "#17E8E5",
+          color: "var(--fx-accent)",
           marginBottom: "20px",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
         }}
       >
         Coming Soon
       </h3>
 
-      <div style={{ overflow: "hidden" }}>
+      <div
+        style={{
+          overflow: "hidden",
+          position: "relative",
+          WebkitMaskImage:
+            "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+          maskImage:
+            "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+        }}
+      >
         <div
           style={{
             display: "flex",
             width: "max-content",
-            animation: "marquee 20s linear infinite",
+            gap: "18px",
+            animation: "marquee 22s linear infinite",
+            padding: "10px 0 20px",
           }}
         >
           {/* Infinite carousel */}
@@ -55,22 +65,79 @@ export default function ComingSoon() {
               key={i}
               style={{
                 flex: "0 0 250px",
-                margin: "0 12px",
-                background: "rgba(30,41,59,0.7)",
-                borderRadius: "12px",
-                padding: "30px 20px",
+                margin: "0 4px",
+                background:
+                  "linear-gradient(135deg, rgba(10, 18, 34, 0.85), rgba(10, 26, 48, 0.9)) padding-box, linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.6), rgba(var(--fx-accent-2-rgb), 0.6)) border-box",
+                borderRadius: "16px",
+                padding: "32px 22px",
                 textAlign: "center",
-                boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+                border: "1px solid transparent",
+                boxShadow: "0 18px 32px rgba(2, 8, 18, 0.5)",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              <h4 style={{ fontSize: "28px", marginBottom: "10px" }}>
+              <div
+                style={{
+                  width: "56px",
+                  height: "56px",
+                  margin: "0 auto 14px",
+                  borderRadius: "16px",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: "26px",
+                  color: "var(--fx-accent)",
+                  background: "rgba(5, 16, 26, 0.7)",
+                  border: "1px solid rgba(var(--fx-accent-rgb),0.4)",
+                  boxShadow: "0 0 18px rgba(var(--fx-accent-rgb),0.28)",
+                }}
+              >
                 {item.icon}
-              </h4>
-              <p style={{ fontSize: "16px", color: "#94A3B8" }}>{item.desc}</p>
+              </div>
+              <p
+                style={{
+                  fontSize: "15px",
+                  color: "var(--fx-ink)",
+                  marginBottom: "8px",
+                }}
+              >
+                {item.desc}
+              </p>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "11px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "var(--fx-muted)",
+                }}
+              >
+                online soon
+              </span>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: "0",
+                  background:
+                    "linear-gradient(120deg, transparent 0%, rgba(var(--fx-accent-2-rgb),0.14) 50%, transparent 100%)",
+                  opacity: 0.35,
+                  transform: "translateX(-100%)",
+                  animation: "scanline 6s linear infinite",
+                }}
+              />
             </div>
           ))}
         </div>
       </div>
+
+      <style>{`
+        @keyframes scanline {
+          0% { transform: translateX(-120%); }
+          100% { transform: translateX(120%); }
+        }
+      `}</style>
     </section>
   );
 }

@@ -15,7 +15,7 @@ export default function TransactionHistory() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -85,8 +85,8 @@ export default function TransactionHistory() {
         <h2
           style={{
             marginBottom: "10px",
-            fontFamily: "Orbitron, sans-serif",
-            color: "#17E8E5",
+            fontFamily: "var(--fx-font-display)",
+            color: "var(--fx-accent)",
           }}
         >
           Transaction History
@@ -111,12 +111,12 @@ export default function TransactionHistory() {
                 fontWeight: "600",
                 background:
                   filter === btn.key
-                    ? "linear-gradient(135deg,#17E8E5,#14B8E5)"
+                    ? "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))"
                     : "rgba(55,65,81,0.6)",
-                color: filter === btn.key ? "#0B1220" : "#E5E7EB",
+                color: filter === btn.key ? "var(--fx-bg)" : "var(--fx-ink)",
                 boxShadow:
                   filter === btn.key
-                    ? "0 0 12px rgba(23,232,229,0.4)"
+                    ? "0 0 12px rgba(var(--fx-accent-rgb),0.4)"
                     : "none",
                 transition: "all 0.3s ease",
               }}
@@ -127,11 +127,11 @@ export default function TransactionHistory() {
         </div>
 
         {/* Table / Mobile Cards */}
-        <div style={tableWrapper}>
+        <div className="fx-table-wrap">
           {loading ? (
             <p style={{ padding: "20px" }}>Loading transactions...</p>
           ) : filteredTx.length === 0 ? (
-            <p style={{ padding: "20px", color: "#9CA3AF" }}>
+            <p style={{ padding: "20px", color: "var(--fx-muted)" }}>
               No transactions found.
             </p>
           ) : isMobile ? (
@@ -155,11 +155,11 @@ export default function TransactionHistory() {
                       style={{
                         color:
                           t.status === "pending"
-                            ? "#FACC15"
+                            ? "var(--fx-gold)"
                             : t.status === "approved" ||
                               t.status === "confirmed"
-                            ? "#17E8E5"
-                            : "#EF4444",
+                            ? "var(--fx-accent)"
+                            : "var(--fx-danger)",
                         fontWeight: "600",
                       }}
                     >
@@ -176,9 +176,9 @@ export default function TransactionHistory() {
               ))}
             </div>
           ) : (
-            <table style={tableStyle}>
+            <table className="fx-table" style={tableStyle}>
               <thead>
-                <tr style={{ background: "rgba(31,41,55,0.9)" }}>
+                <tr style={{ background: "rgba(8, 10, 20, 0.7)" }}>
                   {["Type", "Amount", "Fee", "Status", "Tx Hash", "Date"].map(
                     (h, i) => (
                       <th key={i} style={thStyle}>
@@ -190,7 +190,7 @@ export default function TransactionHistory() {
               </thead>
               <tbody>
                 {filteredTx.map((t, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <tr key={i} style={{ borderBottom: "1px solid var(--fx-border)" }}>
                     <td style={tdStyle}>{t.type}</td>
                     <td style={tdStyle}>${t.amount}</td>
                     <td style={tdStyle}>{t.fee ? `$${t.fee}` : "-"}</td>
@@ -199,11 +199,11 @@ export default function TransactionHistory() {
                         ...tdStyle,
                         color:
                           t.status === "pending"
-                            ? "#FACC15"
+                            ? "var(--fx-gold)"
                             : t.status === "approved" ||
                               t.status === "confirmed"
-                            ? "#17E8E5"
-                            : "#EF4444",
+                            ? "var(--fx-accent)"
+                            : "var(--fx-danger)",
                         fontWeight: "600",
                       }}
                     >
@@ -226,8 +226,8 @@ export default function TransactionHistory() {
 
 /* === Styles === */
 const pageWrapper = {
-  backgroundColor: "#0f172a", // dark page background
-  color: "#E5E7EB",
+  background: "transparent", // dark page background
+  color: "var(--fx-ink)",
   minHeight: "100vh",
   display: "flex",
   flexDirection: "column",
@@ -239,19 +239,8 @@ const contentWrapper = {
   paddingBottom: "60px", // space for fixed footer
 };
 
-const tableWrapper = {
-  background: "rgba(17,24,39,0.85)",
-  backdropFilter: "blur(8px)",
-  borderRadius: "12px",
-  boxShadow: "0 0 18px rgba(23,232,229,0.2)",
-  overflowX: "auto",
-  maxWidth: "100%",
-  padding: "0",
-};
-
 const tableStyle = {
   width: "100%",
-  borderCollapse: "collapse",
   minWidth: "700px",
 };
 
@@ -259,28 +248,29 @@ const thStyle = {
   padding: "12px",
   textAlign: "left",
   fontSize: "14px",
-  color: "#9CA3AF",
+  color: "var(--fx-muted)",
   fontWeight: "600",
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--fx-font-body)",
 };
 
 const tdStyle = {
   padding: "12px",
   fontSize: "14px",
-  color: "#E5E7EB",
-  fontFamily: "Inter, sans-serif",
+  color: "var(--fx-ink)",
+  fontFamily: "var(--fx-font-body)",
 };
 
 const glowLine = {
   height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 10px #17E8E5",
+  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
+  boxShadow: "0 0 10px var(--fx-accent)",
   margin: "8px 0 20px 0",
 };
 
 const mobileCard = {
-  background: "rgba(31,41,55,0.9)",
+  background: "var(--fx-card-strong)",
   borderRadius: "12px",
   padding: "15px",
-  boxShadow: "0 0 12px rgba(23,232,229,0.2)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
 };

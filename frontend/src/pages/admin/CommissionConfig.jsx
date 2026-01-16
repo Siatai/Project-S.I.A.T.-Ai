@@ -82,21 +82,21 @@ export default function CommissionAndAssociateConfig() {
   if (loading) return <p>Loading configuration...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px" }}>
+    <div style={{ color: "var(--fx-ink)", padding: "20px" }}>
       <h2 style={{ marginBottom: "20px" }}>⚙️ Commission & Associate Configuration</h2>
 
       {/* Commission Table */}
       <h3>Commission Levels</h3>
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "20px" }}>
         <thead>
-          <tr style={{ background: "#1F2937" }}>
+          <tr style={{ background: "var(--fx-surface-strong)" }}>
             <th style={{ padding: "10px", textAlign: "left" }}>Level</th>
             <th style={{ padding: "10px", textAlign: "left" }}>Percentage (%)</th>
           </tr>
         </thead>
         <tbody>
           {levels.map((lvl, i) => (
-            <tr key={i} style={{ borderBottom: "1px solid #374151" }}>
+            <tr key={i} style={{ borderBottom: "1px solid var(--fx-rail)" }}>
               <td style={{ padding: "10px" }}>{lvl.level}</td>
               <td style={{ padding: "10px" }}>
                 <input
@@ -118,7 +118,7 @@ export default function CommissionAndAssociateConfig() {
           padding: "10px 20px",
           border: "none",
           borderRadius: "6px",
-          background: "#3B82F6",
+          background: "var(--fx-info)",
           color: "#fff",
           cursor: "pointer",
         }}
@@ -132,7 +132,7 @@ export default function CommissionAndAssociateConfig() {
           marginTop: "40px",
           padding: "15px",
           borderRadius: "8px",
-          background: "#1E293B",
+          background: "var(--fx-surface-strong)",
           maxWidth: "400px",
         }}
       >
@@ -166,7 +166,7 @@ export default function CommissionAndAssociateConfig() {
             padding: "10px 20px",
             border: "none",
             borderRadius: "6px",
-            background: "#22C55E",
+            background: "var(--fx-success)",
             color: "#fff",
             cursor: "pointer",
           }}

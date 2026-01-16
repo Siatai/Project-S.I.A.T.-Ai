@@ -60,10 +60,10 @@ export default function AdminUsers() {
   });
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={{ color: "var(--fx-ink)" }}>
       <h2>Manage Users</h2>
 
-      <h3 style={{ margin: "10px 0", color: "#17E8E5" }}>
+      <h3 style={{ margin: "10px 0", color: "var(--fx-accent)" }}>
         Total Deposits: ${totalDeposits}
       </h3>
 
@@ -72,101 +72,95 @@ export default function AdminUsers() {
         placeholder="Filter by Referrer Name"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
+        className="fx-input"
         style={{
-          padding: "8px",
           margin: "10px 0",
-          borderRadius: "6px",
-          border: "1px solid #374151",
-          background: "#111827",
-          color: "#E5E7EB",
+          maxWidth: "320px",
         }}
       />
-
-      <table
-        style={{
-          width: "100%",
-          marginTop: 20,
-          borderCollapse: "collapse",
-        }}
-      >
-        <thead>
-          <tr style={{ textAlign: "left", borderBottom: "1px solid #374151" }}>
-            <th>Email</th>
-            <th>Referrer</th>
-            <th>Role</th>
-            <th>Balance</th>
-            <th>Deposits</th>
-            <th>Associate Request</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map((u) => (
-            <tr key={u.id} style={{ borderBottom: "1px solid #374151" }}>
-              <td>{u.email}</td>
-              <td>{u.referrer_name || "—"}</td>
-              <td>
-                {u.is_admin
-                  ? "Admin"
-                  : u.is_associate
-                  ? "Associate"
-                  : "Investor"}
-              </td>
-              <td>${u.balance}</td>
-              <td>${u.deposit || 0}</td>
-              <td style={{ textAlign: "center" }}>
-                {u.pending_associate ? (
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "12px",
-                      height: "12px",
-                      borderRadius: "50%",
-                      background: "#FACC15", // yellow = pending
-                      boxShadow: "0 0 6px #FACC15",
-                    }}
-                  ></span>
-                ) : (
-                  "-"
-                )}
-              </td>
-              <td>
-                {!u.is_admin && u.pending_associate && (
-                  <>
-                    <button
-                      onClick={() => updateRole(u.id, "associate")}
-                      style={{
-                        marginRight: 10,
-                        background: "#22C55E",
-                        color: "#fff",
-                        border: "none",
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => denyAssociate(u.id)}
-                      style={{
-                        background: "#EF4444",
-                        color: "#fff",
-                        border: "none",
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Deny
-                    </button>
-                  </>
-                )}
-              </td>
+      <div className="fx-table-wrap" style={{ marginTop: 20 }}>
+        <table className="fx-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Referrer</th>
+              <th>Role</th>
+              <th>Balance</th>
+              <th>Deposits</th>
+              <th>Associate Request</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredUsers.map((u) => (
+              <tr key={u.id}>
+                <td>{u.email}</td>
+                <td>{u.referrer_name || "-"}</td>
+                <td>
+                  {u.is_admin
+                    ? "Admin"
+                    : u.is_associate
+                    ? "Associate"
+                    : "Investor"}
+                </td>
+                <td>${u.balance}</td>
+                <td>${u.deposit || 0}</td>
+                <td style={{ textAlign: "center" }}>
+                  {u.pending_associate ? (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        background: "var(--fx-gold)",
+                        boxShadow: "0 0 6px rgba(255, 209, 102, 0.6)",
+                      }}
+                    ></span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>
+                  {!u.is_admin && u.pending_associate && (
+                    <>
+                      <button
+                        onClick={() => updateRole(u.id, "associate")}
+                        style={{
+                          marginRight: 10,
+                          background: "var(--fx-success)",
+                          color: "#00130b",
+                          border: "none",
+                          padding: "6px 10px",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => denyAssociate(u.id)}
+                        style={{
+                          background: "var(--fx-danger)",
+                          color: "#1a0006",
+                          border: "none",
+                          padding: "6px 10px",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Deny
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

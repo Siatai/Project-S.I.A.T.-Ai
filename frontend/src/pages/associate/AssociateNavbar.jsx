@@ -7,7 +7,7 @@ import {
   FaHistory,
   FaMoneyBillWave,
 } from "react-icons/fa";
-import { logo, avatar } from "../../Components"; // ✅ barrel import
+import { avatar } from "../../Components"; // ✅ barrel import
 
 export default function AssociateNavbar() {
   const location = useLocation();
@@ -42,13 +42,6 @@ export default function AssociateNavbar() {
     <div>
       {/* HEADER */}
       <header style={headerStyle}>
-        {/* Left: Logo */}
-        <div style={logoHalo}>
-          <div style={logoBox}>
-            <img src={logo} alt="Logo" style={logoStyle} />
-          </div>
-        </div>
-
         {/* Center: Brand */}
         <h2 style={brandText}>
           AlgoM<sup style={{ fontSize: "12px" }}>3</sup> Ai
@@ -107,16 +100,16 @@ export default function AssociateNavbar() {
             <button style={closeBtn} onClick={() => setShowProfilePopup(false)}>
               ❌ Close
             </button>
-            <h3 style={{ color: "#17E8E5", marginBottom: "15px" }}>
+            <h3 style={{ color: "var(--fx-accent)", marginBottom: "15px" }}>
               Profile Options
             </h3>
-            <p style={{ color: "#E5E7EB", margin: "5px 0" }}>
+            <p style={{ color: "var(--fx-ink)", margin: "5px 0" }}>
               <strong>Name:</strong> {user?.name || "Loading..."}
             </p>
-            <p style={{ color: "#E5E7EB", margin: "5px 0" }}>
+            <p style={{ color: "var(--fx-ink)", margin: "5px 0" }}>
               <strong>Email:</strong> {user?.email || "Loading..."}
             </p>
-            <hr style={{ margin: "15px 0", borderColor: "#1E293B" }} />
+            <hr style={{ margin: "15px 0", borderColor: "var(--fx-surface-strong)" }} />
             <button style={popupBtn} onClick={handleSupport}>
               Raise a Request
             </button>
@@ -137,8 +130,8 @@ function FooterBtn({ icon, label, active, to }) {
     <button
       style={{
         ...footerBtn,
-        color: active ? "#17E8E5" : "#9CA3AF",
-        borderTop: active ? "2px solid #17E8E5" : "2px solid transparent",
+        color: active ? "var(--fx-accent)" : "var(--fx-muted)",
+        borderTop: active ? "2px solid var(--fx-accent)" : "2px solid transparent",
         paddingTop: "6px",
         paddingBottom: "6px",
       }}
@@ -157,60 +150,35 @@ const headerStyle = {
   left: 0,
   right: 0,
   height: "60px",
-  background: "#0f172a",
+  background: "rgba(10, 12, 20, 0.82)",
   padding: "14px 20px",
-  borderBottom: "1px solid #1F2937",
+  borderBottom: "1px solid var(--fx-border)",
   zIndex: 1000,
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
 };
 
-const logoHalo = {
-  width: "50px",
-  height: "50px",
-  borderRadius: "50%",
-  background:
-    "radial-gradient(circle, rgba(23,232,229,0.4) 0%, rgba(23,232,229,0) 70%)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const logoBox = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "42px",
-  height: "42px",
-  borderRadius: "12px",
-  border: "2px solid #17E8E5",
-  boxShadow: "0 0 10px #17E8E5, 0 0 20px rgba(23,232,229,0.6)",
-  background: "rgba(15,23,42,0.7)",
-};
-
-const logoStyle = { height: "32px", objectFit: "contain" };
-
 const brandText = {
   margin: "0",
-  color: "#17E8E5",
+  color: "var(--fx-accent-2)",
   fontWeight: "700",
   fontSize: "20px",
-  fontFamily: "Orbitron",
-  textShadow: "0 0 10px #17E8E5, 0 0 20px #17E8E5",
+  fontFamily: "var(--fx-font-display)",
+  textShadow: "0 0 12px rgba(var(--fx-accent-2-rgb),0.7)",
   flex: 1,
   textAlign: "center",
 };
 
 const rightHeader = { display: "flex", alignItems: "center", gap: "10px" };
 
-const panelText = { color: "#E5E7EB", fontSize: "14px", fontWeight: "500" };
+const panelText = { color: "var(--fx-muted)", fontSize: "14px", fontWeight: "600" };
 
 const profileIcon = {
   width: "36px",
   height: "36px",
   borderRadius: "50%",
-  border: "2px solid #17E8E5",
+  border: "2px solid var(--fx-accent)",
   cursor: "pointer",
   background: "#fff",
 };
@@ -221,12 +189,12 @@ const footerStyle = {
   left: 0,
   right: 0,
   height: "60px",
-  background: "#0f172a",
+  background: "rgba(10, 12, 20, 0.82)",
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
   padding: "8px 0",
-  borderTop: "1px solid #1F2937",
+  borderTop: "1px solid var(--fx-border)",
   zIndex: 1000,
 };
 
@@ -258,19 +226,19 @@ const popupOverlay = {
 };
 
 const popupBox = {
-  background: "rgba(15,23,42,0.95)",
-  border: "1px solid rgba(23,232,166,0.3)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
   borderRadius: "12px",
   padding: "20px",
   width: "300px",
   textAlign: "center",
-  boxShadow: "0 0 20px rgba(23,232,229,0.5)",
+  boxShadow: "0 18px 40px rgba(var(--fx-accent-rgb),0.2)",
 };
 
 const closeBtn = {
   background: "transparent",
   border: "none",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
   fontSize: "14px",
   cursor: "pointer",
   marginBottom: "10px",
@@ -282,8 +250,8 @@ const popupBtn = {
   margin: "8px 0",
   borderRadius: "8px",
   border: "none",
-  background: "#17E8E5",
-  color: "#0f172a",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+  color: "var(--fx-bg)",
   fontWeight: "600",
   cursor: "pointer",
 };

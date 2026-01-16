@@ -18,7 +18,7 @@ export default function InvestorHome() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -71,7 +71,7 @@ export default function InvestorHome() {
     }
   };
 
-  if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
+  if (!user) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
 
   return (
     <div style={pageWrapper}>
@@ -91,10 +91,10 @@ export default function InvestorHome() {
             <FaWallet style={walletIcon} />
           </div>
           <div>
-            <p style={{ fontSize: "13px", color: "#9CA3AF", margin: 0 }}>
+            <p style={{ fontSize: "13px", color: "var(--fx-muted)", margin: 0 }}>
               Wallet Balance
             </p>
-            <h3 style={{ fontSize: "20px", color: "#17E8E5", margin: 0 }}>
+            <h3 style={{ fontSize: "20px", color: "var(--fx-accent)", margin: 0 }}>
               {user.wallet_balance !== undefined
                 ? user.wallet_balance.toFixed(2)
                 : 0}{" "}
@@ -103,7 +103,7 @@ export default function InvestorHome() {
           </div>
         </div>
 
-        <p style={{ marginTop: 15, color: "#9CA3AF" }}>
+        <p style={{ marginTop: 15, color: "var(--fx-muted)" }}>
           You can deposit funds, withdraw profits, and track your ROI here.
         </p>
 
@@ -132,7 +132,7 @@ export default function InvestorHome() {
           )}
 
           {deposits.length === 0 ? (
-            <p style={{ color: "#9CA3AF", marginTop: "12px" }}>No deposits yet</p>
+            <p style={{ color: "var(--fx-muted)", marginTop: "12px" }}>No deposits yet</p>
           ) : (
             deposits.map((d, idx) => (
               <div key={idx} style={{ marginBottom: "18px" }}>
@@ -153,7 +153,7 @@ export default function InvestorHome() {
         {/* ✅ Associate Status / Button */}
         <div style={{ marginTop: 40, textAlign: "center" }}>
           {isAssociate ? (
-            <p style={{ color: "#4ADE80", fontWeight: "600" }}>
+            <p style={{ color: "var(--fx-success)", fontWeight: "600" }}>
               Welcome, <strong>Associate</strong>! You now have referral access.
             </p>
           ) : !applied ? (
@@ -162,7 +162,7 @@ export default function InvestorHome() {
             </button>
           ) : (
             showAppliedMsg && (
-              <p style={{ color: "#FACC15", fontWeight: "600" }}>
+              <p style={{ color: "var(--fx-gold)", fontWeight: "600" }}>
                 ⏳ Pending approval from Admin...
               </p>
             )
@@ -176,8 +176,8 @@ export default function InvestorHome() {
               <button style={closeBtn} onClick={() => setShowInfo(false)}>
                 ✕
               </button>
-              <h3 style={{ color: "#17E8E5", marginBottom: "12px" }}>Info</h3>
-              <p style={{ fontSize: "14px", color: "#E5E7EB" }}>
+              <h3 style={{ color: "var(--fx-accent)", marginBottom: "12px" }}>Info</h3>
+              <p style={{ fontSize: "14px", color: "var(--fx-ink)" }}>
                 Maximum Receivable:{" "}
                 <strong>{summary.total_max_return} USDT</strong>
               </p>
@@ -193,12 +193,12 @@ export default function InvestorHome() {
 function DepletingBar({ received, max }) {
   const percentLeft = max > 0 ? ((max - received) / max) * 100 : 0;
 
-  let gradient = "linear-gradient(90deg,#17E8E5,#14B8E5)";
+  let gradient = "linear-gradient(90deg,var(--fx-accent),var(--fx-accent-2))";
   if (percentLeft < 70 && percentLeft >= 40) {
-    gradient = "linear-gradient(90deg,#FACC15,#FBBF24)";
+    gradient = "linear-gradient(90deg,var(--fx-gold),var(--fx-gold-strong))";
   }
   if (percentLeft < 40) {
-    gradient = "linear-gradient(90deg,#EF4444,#DC2626)";
+    gradient = "linear-gradient(90deg,var(--fx-danger),var(--fx-danger-strong))";
   }
 
   return (
@@ -226,7 +226,7 @@ const pageWrapper = {
   width: "100%",
   display: "flex",
   flexDirection: "column",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
 };
 
 const contentWrapper = {
@@ -236,25 +236,26 @@ const contentWrapper = {
 };
 
 const welcomeText = {
-  fontFamily: "Orbitron, sans-serif",
+  fontFamily: "var(--fx-font-display)",
   fontSize: "22px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
 };
 
 const cardStyle = {
   marginTop: 30,
   padding: "20px",
   borderRadius: "12px",
-  background: "rgba(17,24,39,0.8)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
   backdropFilter: "blur(10px)",
   maxWidth: "600px",
-  boxShadow: "0 0 20px rgba(23,232,229,0.2)",
+  boxShadow: "var(--fx-shadow)",
 };
 
 const glowLine = {
   height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 10px #17E8E5",
+  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
+  boxShadow: "0 0 10px var(--fx-accent)",
   margin: "8px 0 18px 0",
 };
 
@@ -262,11 +263,12 @@ const walletCard = {
   display: "flex",
   alignItems: "center",
   gap: "12px",
-  background: "rgba(17,24,39,0.85)",
+  background: "var(--fx-card-strong)",
+  border: "1px solid var(--fx-border)",
   borderRadius: "12px",
   padding: "15px 20px",
   margin: "15px 0",
-  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+  boxShadow: "var(--fx-shadow)",
 };
 
 const walletIconBox = {
@@ -276,13 +278,13 @@ const walletIconBox = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  background: "rgba(23,232,229,0.1)",
-  boxShadow: "0 0 12px rgba(23,232,229,0.5)",
+  background: "rgba(var(--fx-accent-2-rgb),0.14)",
+  boxShadow: "0 0 18px rgba(var(--fx-accent-rgb),0.35)",
 };
 
 const walletIcon = {
   fontSize: "20px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
 };
 
 const glowRowGreen = {
@@ -292,8 +294,8 @@ const glowRowGreen = {
   marginTop: "6px",
   fontSize: "14px",
   borderRadius: "6px",
-  background: "rgba(15,23,42,0.85)",
-  borderLeft: "3px solid #22C55E",
+  background: "rgba(8, 10, 20, 0.55)",
+  borderLeft: "3px solid var(--fx-success)",
   boxShadow: "0 0 6px rgba(34,197,94,0.25)",
 };
 
@@ -301,7 +303,7 @@ const glowRowTotal = {
   ...glowRowGreen,
   fontSize: "16px",
   fontWeight: "700",
-  borderLeft: "4px solid #22C55E",
+  borderLeft: "4px solid var(--fx-success)",
   boxShadow: "0 0 12px rgba(34,197,94,0.4)",
   marginBottom: "8px",
 };
@@ -310,11 +312,11 @@ const btnTeal = {
   padding: "10px 20px",
   borderRadius: "8px",
   border: "none",
-  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
-  color: "#0B1220",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+  color: "var(--fx-bg)",
   fontWeight: "700",
   cursor: "pointer",
-  boxShadow: "0 0 15px rgba(23,232,229,0.4)",
+  boxShadow: "0 0 15px rgba(var(--fx-accent-rgb),0.4)",
   transition: "all 0.3s ease",
 };
 
@@ -332,13 +334,14 @@ const popupOverlay = {
 };
 
 const popupBox = {
-  background: "rgba(17,24,39,0.95)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
   padding: "20px",
   borderRadius: "10px",
   maxWidth: "350px",
   width: "90%",
   textAlign: "center",
-  boxShadow: "0 0 20px rgba(23,232,229,0.4)",
+  boxShadow: "0 18px 36px rgba(var(--fx-accent-rgb),0.25)",
   position: "relative",
 };
 
@@ -349,14 +352,14 @@ const closeBtn = {
   background: "transparent",
   border: "none",
   fontSize: "18px",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
   cursor: "pointer",
 };
 
 const infoIcon = {
   cursor: "pointer",
-  background: "#17E8E5",
-  color: "#0B1220",
+  background: "var(--fx-button)",
+  color: "var(--fx-bg)",
   borderRadius: "50%",
   width: "20px",
   height: "20px",
@@ -365,7 +368,7 @@ const infoIcon = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  boxShadow: "0 0 6px rgba(23,232,229,0.6)",
+  boxShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.35)",
   position: "absolute",
   top: "12px",
   right: "12px",
@@ -375,11 +378,11 @@ const depositTitle = {
   marginBottom: "10px",
   fontSize: "18px",
   fontWeight: "600",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
 };
 
 const progressBigTrack = {
-  background: "linear-gradient(145deg, #1F2937, #111827)",
+  background: "rgba(255,255,255,0.08)",
   borderRadius: "12px",
   overflow: "hidden",
   height: "18px",
@@ -401,13 +404,13 @@ const progressBigText = {
   transform: "translate(-50%, -50%)",
   fontSize: "12px",
   fontWeight: "700",
-  color: "#0B1220",
+  color: "var(--fx-bg)",
   textShadow: "0 0 5px rgba(255,255,255,0.7)",
 };
 
 const progressCaption = {
   marginTop: "6px",
   fontSize: "13px",
-  color: "#9CA3AF",
+  color: "var(--fx-muted)",
   textAlign: "center",
 };

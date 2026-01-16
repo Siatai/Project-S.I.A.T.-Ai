@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import AuthModal from "./auth/AuthModal";
 import bg from "../Components/bg.png";
 import avatar from "../Components/avatar.png";
-import logo from "../Components/logo.png";
 
 // ✅ externalized sections
 import FlowSection from "../Components/FlowSection";
@@ -19,8 +18,8 @@ const Divider = () => (
       maxWidth: "90%",
       borderRadius: "4px",
       background:
-        "linear-gradient(90deg, rgba(0,0,0,0) 0%, #17E8E5 20%, #17E8E5 50%, #17E8E5 80%, rgba(0,0,0,0) 100%)",
-      boxShadow: "0 0 30px 8px rgba(23,232,229,0.9)",
+        "linear-gradient(90deg, rgba(0,0,0,0) 0%, var(--fx-accent) 20%, var(--fx-accent) 50%, var(--fx-accent) 80%, rgba(0,0,0,0) 100%)",
+      boxShadow: "0 0 30px 8px rgba(var(--fx-accent-rgb),0.9)",
       position: "relative",
       overflow: "hidden",
     }}
@@ -48,12 +47,12 @@ export default function Landing() {
       style={{
         position: "relative",
         minHeight: "100vh",
-        fontFamily: "Inter, Arial, sans-serif",
-        backgroundImage: `url(${bg})`,
+        fontFamily: "var(--fx-font-body)",
+        backgroundImage: `radial-gradient(1200px 600px at 0% 0%, rgba(var(--fx-accent-2-rgb),0.16), transparent 60%), url(${bg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         overflowX: "hidden",
-        color: "#E5E7EB",
+        color: "var(--fx-ink)",
       }}
     >
       {/* Overlay */}
@@ -62,7 +61,7 @@ export default function Landing() {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(rgba(11,18,32,0.85), rgba(11,18,32,0.95))",
+            "radial-gradient(800px 400px at 15% 0%, rgba(var(--fx-accent-rgb),0.12), transparent 60%), linear-gradient(130deg, rgba(10,12,20,0.92), rgba(16,22,40,0.9))",
           zIndex: 0,
         }}
       />
@@ -77,33 +76,20 @@ export default function Landing() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          fontFamily: "Orbitron, Arial, sans-serif",
-          background: "rgba(11,18,32,0.9)",
+          fontFamily: "var(--fx-font-display)",
+          background: "rgba(10, 12, 20, 0.82)",
           backdropFilter: "blur(8px)",
           boxShadow: "0 2px 12px rgba(0,0,0,0.6)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img
-            src={logo}
-            alt="AlgoM³ Logo"
-            style={{
-              height: "45px",
-              width: "45px",
-              borderRadius: "8px",
-              border: "2px solid #17E8E5",
-              background: "#0B1220",
-              padding: "4px",
-              boxShadow: "0 0 12px rgba(23,232,229,0.6)",
-            }}
-          />
           <h1
             style={{
-              color: "#17E8E5",
+              color: "var(--fx-accent-2)",
               fontSize: "25px",
               fontWeight: "bold",
               margin: 0,
-              textShadow: "0 0 12px #17E8E5, 0 0 24px #0B1220",
+              textShadow: "0 0 12px rgba(var(--fx-accent-2-rgb),0.5)",
             }}
           >
             AlgoM³ Ai
@@ -119,7 +105,7 @@ export default function Landing() {
             height: "40px",
             borderRadius: "50%",
             cursor: "pointer",
-            border: "2px solid #17E8E5",
+            border: "2px solid var(--fx-accent)",
             background: "#fff",
           }}
         />
@@ -134,6 +120,11 @@ export default function Landing() {
           padding: "80px 20px",
           maxWidth: "900px",
           margin: "0 auto",
+          background: "rgba(10,12,20,0.4)",
+          border: "1px solid var(--fx-border)",
+          borderRadius: "24px",
+          boxShadow: "var(--fx-shadow)",
+          backdropFilter: "blur(10px)",
         }}
       >
         <motion.h2
@@ -141,19 +132,19 @@ export default function Landing() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           style={{
-            fontFamily: "Orbitron, Arial, sans-serif",
+            fontFamily: "var(--fx-font-display)",
             fontSize: "34px",
             fontWeight: "800",
             marginBottom: "20px",
-            textShadow: "0 0 25px #17E8E5, 0 0 60px #0B1220",
+            textShadow: "0 0 20px rgba(var(--fx-accent-2-rgb),0.35)",
             lineHeight: "1.2",
           }}
         >
           Meet Algo's{" "}
           <span
             style={{
-              color: "#17E8E5",
-              textShadow: "0 0 30px #17E8E5, 0 0 60px #0B1220",
+              color: "var(--fx-accent-2)",
+              textShadow: "0 0 18px rgba(var(--fx-accent-2-rgb),0.45)",
               animation: "pulse 2s infinite",
             }}
           >
@@ -168,13 +159,13 @@ export default function Landing() {
           transition={{ delay: 0.3, duration: 0.8 }}
           style={{
             fontSize: "16px",
-            color: "#94A3B8",
+            color: "var(--fx-muted)",
             lineHeight: "1.6",
             marginBottom: "40px",
           }}
         >
           AI-powered Forex bot delivering{" "}
-          <span style={{ color: "#17E8E5", fontWeight: "600" }}>8–10% ROI</span>{" "}
+          <span style={{ color: "var(--fx-accent)", fontWeight: "600" }}>8–10% ROI</span>{" "}
           monthly. Transparent, consistent, and futuristic growth.
         </motion.p>
 
@@ -183,8 +174,8 @@ export default function Landing() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setAuthOpen(true)}
           style={{
-            background: "#17E8E5",
-            color: "#0B1220",
+            background: "var(--fx-button)",
+            color: "var(--fx-bg)",
             border: "none",
             padding: "14px 36px",
             borderRadius: "10px",
@@ -192,7 +183,8 @@ export default function Landing() {
             fontWeight: "600",
             cursor: "pointer",
             transition: "all 0.3s ease",
-            fontFamily: "Rajdhani, Arial, sans-serif",
+            fontFamily: "var(--fx-font-display)",
+            boxShadow: "0 10px 20px rgba(var(--fx-accent-2-rgb),0.2)",
           }}
         >
           Get Started
@@ -206,10 +198,10 @@ export default function Landing() {
           style={{
             fontSize: "18px",
             marginTop: "25px",
-            color: "#17E8E5",
+            color: "var(--fx-accent-2)",
             fontWeight: "600",
-            textShadow: "0 0 12px #17E8E5, 0 0 24px #0B1220",
-            fontFamily: "Rajdhani, Arial, sans-serif",
+            textShadow: "0 0 12px rgba(var(--fx-accent-2-rgb),0.6)",
+            fontFamily: "var(--fx-font-display)",
           }}
         >
           AI creates the edge. ML makes it smarter. AlgoM³ turns it into profit.
@@ -233,8 +225,8 @@ export default function Landing() {
           zIndex: 2,
           textAlign: "center",
           padding: "30px 15px",
-          borderTop: "1px solid #1E293B",
-          color: "#64748B",
+          borderTop: "1px solid var(--fx-border)",
+          color: "var(--fx-muted)",
           fontSize: "14px",
         }}
       >
@@ -246,7 +238,7 @@ export default function Landing() {
           <a
             href="mailto:support@algomcube.com"
             style={{
-              color: "#17E8E5",
+              color: "var(--fx-accent)",
               textDecoration: "none",
               fontWeight: "600",
             }}
@@ -259,9 +251,9 @@ export default function Landing() {
       {/* Animations */}
       <style>{`
         @keyframes pulse {
-          0% { opacity: 1; text-shadow: 0 0 25px #17E8E5, 0 0 60px #0B1220; }
-          50% { opacity: 0.7; text-shadow: 0 0 15px #17E8E5; }
-          100% { opacity: 1; text-shadow: 0 0 25px #17E8E5, 0 0 60px #0B1220; }
+          0% { opacity: 1; text-shadow: 0 0 25px var(--fx-accent), 0 0 60px var(--fx-bg); }
+          50% { opacity: 0.7; text-shadow: 0 0 15px var(--fx-accent); }
+          100% { opacity: 1; text-shadow: 0 0 25px var(--fx-accent), 0 0 60px var(--fx-bg); }
         }
         @keyframes shine {
           0% { left: -50%; }
@@ -274,7 +266,7 @@ export default function Landing() {
         html, body {
           margin: 0;
           padding: 0;
-          background-color: #0B1220;
+          background-color: var(--fx-bg);
           height: 100%;
           overflow-x: hidden;
         }

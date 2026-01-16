@@ -1,13 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600&family=Syne:wght@500;700;800&display=swap');
+
+:root {
+  --fx-font-display: 'Syne', 'Space Grotesk', sans-serif;
+  --fx-font-body: 'Space Grotesk', 'Syne', sans-serif;
+  --fx-font-mono: 'JetBrains Mono', monospace;
+
+  --fx-bg: #050b14;
+  --fx-bg-2: #0a1222;
+  --fx-bg-3: #0f1b2f;
+  --fx-surface: rgba(10, 18, 34, 0.88);
+  --fx-surface-strong: rgba(14, 26, 44, 0.95);
+  --fx-glass: rgba(255, 255, 255, 0.06);
+  --fx-ink: #eaf7ff;
+  --fx-muted: #8fa7c6;
+  --fx-muted-2: #b6c5de;
+  --fx-accent: #22f2c7;
+  --fx-accent-2: #4cd7ff;
+  --fx-button: #22f2c7;
+  --fx-button-2: #2ab4ff;
+  --fx-gold: #ffd166;
+  --fx-gold-strong: #ffbf47;
+  --fx-success: #3fe4a0;
+  --fx-success-2: #6bf0c0;
+  --fx-danger: #ff6b7a;
+  --fx-danger-strong: #ff425a;
+  --fx-info: #6aa7ff;
+  --fx-border: rgba(255, 255, 255, 0.12);
+  --fx-rail: rgba(255, 255, 255, 0.14);
+  --fx-accent-rgb: 34, 242, 199;
+  --fx-accent-2-rgb: 76, 215, 255;
+  --fx-button-rgb: 34, 242, 199;
+
+  --fx-card: linear-gradient(140deg, rgba(10, 16, 30, 0.98), rgba(12, 24, 46, 0.9));
+  --fx-card-strong: linear-gradient(140deg, rgba(12, 22, 40, 0.98), rgba(12, 28, 52, 0.92));
+  --fx-hero: radial-gradient(1100px 600px at 6% -10%, rgba(34, 242, 199, 0.18), transparent 60%),
+    radial-gradient(900px 600px at 90% 0%, rgba(76, 215, 255, 0.16), transparent 55%),
+    linear-gradient(155deg, #050b14 0%, #0b162a 45%, #050b14 85%);
+  --fx-shadow: 0 14px 30px rgba(2, 8, 18, 0.45);
+  --fx-glow: 0 0 16px rgba(34, 242, 199, 0.18);
+  --fx-glow-hot: 0 0 16px rgba(76, 215, 255, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--fx-font-body);
+  background: var(--fx-hero);
+  color: var(--fx-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(var(--fx-accent-rgb), 0.09), transparent 45%),
+    radial-gradient(circle at 88% 6%, rgba(var(--fx-accent-2-rgb), 0.08), transparent 55%),
+    radial-gradient(circle at 15% 85%, rgba(255, 255, 255, 0.04), transparent 40%);
+  opacity: 0.55;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(transparent 0%, rgba(34, 242, 199, 0.05) 48%, transparent 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 60px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 60px);
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--fx-font-body);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: var(--fx-font-mono);
+}
+
+.fx-page {
+  min-height: 100vh;
+  padding: 90px 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.fx-page--tight {
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+
+.fx-title {
+  font-family: var(--fx-font-display);
+  letter-spacing: 0.01em;
+}
+
+.fx-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  color: var(--fx-muted);
+}
+
+.fx-card {
+  background: var(--fx-card);
+  border: 1px solid var(--fx-border);
+  border-radius: 18px;
+  box-shadow: var(--fx-shadow);
+}
+
+.fx-card--strong {
+  background: var(--fx-card-strong);
+}
+
+.fx-card--glass {
+  background: var(--fx-glass);
+  backdrop-filter: blur(12px);
+}
+
+.fx-button {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0b0c12;
+  background: linear-gradient(135deg, var(--fx-button), var(--fx-button-2));
+  box-shadow: 0 10px 22px rgba(var(--fx-button-rgb), 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fx-button:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 14px 28px rgba(var(--fx-button-rgb), 0.24);
+}
+
+.fx-button--ghost {
+  background: transparent;
+  border: 1px solid var(--fx-border);
+  color: var(--fx-ink);
+}
+
+.fx-button--soft {
+  background: rgba(var(--fx-accent-rgb), 0.12);
+  color: var(--fx-accent);
+  border: 1px solid rgba(var(--fx-accent-rgb), 0.25);
+}
+
+.fx-input {
+  width: 100%;
+  background: rgba(10, 13, 24, 0.75);
+  border: 1px solid var(--fx-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--fx-ink);
+}
+
+.fx-input:focus {
+  outline: none;
+  border-color: rgba(var(--fx-accent-rgb), 0.6);
+  box-shadow: 0 0 0 3px rgba(var(--fx-accent-rgb), 0.2);
+}
+
+.fx-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fx-accent), transparent);
+  box-shadow: var(--fx-glow);
+  border-radius: 999px;
+  margin: 16px 0;
+}
+
+.fx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(var(--fx-accent-2-rgb), 0.12);
+  color: var(--fx-accent-2);
+  border: 1px solid rgba(var(--fx-accent-2-rgb), 0.25);
+  font-size: 12px;
+}
+
+.fx-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(10, 13, 24, 0.65);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--fx-border);
+}
+
+.fx-table-wrap {
+  background: var(--fx-card);
+  border: 1px solid var(--fx-border);
+  border-radius: 16px;
+  box-shadow: var(--fx-shadow);
+  overflow: auto;
+}
+
+.fx-table th {
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fx-muted);
+  background: rgba(6, 16, 30, 0.9);
+}
+
+.fx-table th,
+.fx-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--fx-border);
+}
+
+.fx-table tr:last-child td {
+  border-bottom: none;
+}
+
+.fx-table tbody tr:hover td {
+  background: rgba(8, 20, 34, 0.6);
 }

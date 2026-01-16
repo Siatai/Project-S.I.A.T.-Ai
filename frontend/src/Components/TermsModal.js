@@ -216,14 +216,14 @@ const modalOverlay = {
 };
 
 const modalBox = {
-  background: "#1E293B",
+  background: "var(--fx-card)",
   padding: "20px",
   borderRadius: "12px",
   width: "60vw",          // 🔹 Wider rectangle
   height: "30vh",         // 🔹 Shorter height
-  color: "#E5E7EB",
-  border: "6px solid #00f4f099",
-  boxShadow: "0 0 30px rgba(19, 255, 251, 0.3)",
+  color: "var(--fx-ink)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -232,8 +232,8 @@ const modalBox = {
 const windowBox = {
   width: "100%",           // inner window
   height: "60%",          // takes 60% height of modal
-  background: "#0F172A",
-  border: "2px solid #2b0808ff",
+  background: "rgba(8, 10, 20, 0.7)",
+  border: "1px solid var(--fx-border)",
   borderRadius: "8px",
   overflow: "hidden",
   marginBottom: "10px",
@@ -254,7 +254,7 @@ const headingMain = {
   fontWeight: 400,
   fontSize: "18px",
   letterSpacing: "0.5px",
-  color: "#17E8E5",
+  color: "var(--fx-accent-2)",
   textAlign: "center",
   marginBottom: "10px",
 };
@@ -262,7 +262,7 @@ const headingMain = {
 const headingStyle = {
   fontWeight: 400,
   fontSize: "13px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
   marginTop: "12px",
   marginBottom: "4px",
 };
@@ -271,7 +271,7 @@ const fadeBottom = {
   position: "sticky",
   bottom: 0,
   height: "30px",
-  background: "linear-gradient(to bottom, rgba(15,23,42,0) 0%, #0F172A 100%)",
+  background: "linear-gradient(to bottom, rgba(10,12,20,0) 0%, rgba(10,12,20,0.9) 100%)",
   pointerEvents: "none",
 };
 
@@ -280,8 +280,8 @@ const buttonStyleTeal = {
   padding: "8px",
   border: "none",
   borderRadius: "8px",
-  background: "#17E8E5",
-  color: "#0B1220",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+  color: "var(--fx-bg)",
   fontSize: "13px",
   fontWeight: "700",
   cursor: "pointer",

@@ -8,7 +8,7 @@ export default function AssociateWalletPage() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -38,8 +38,8 @@ export default function AssociateWalletPage() {
 
 /* === Styles === */
 const pageWrapper = {
-  backgroundColor: "#0f172a", // ✅ dark covers full viewport
-  color: "#E5E7EB",
+  background: "transparent", // ✅ dark covers full viewport
+  color: "var(--fx-ink)",
   minHeight: "100vh",
   width: "100%",
   display: "flex",
@@ -60,9 +60,10 @@ const walletWrapper = {
   flexShrink: 0,
   padding: "20px",
   margin: "0 20px 20px",
-  background: "rgba(15,23,42,0.9)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
   borderRadius: "12px",
-  boxShadow: "0 0 15px rgba(23,232,229,0.25)",
+  boxShadow: "var(--fx-shadow)",
 };
 
 const depositWrapper = {
@@ -74,6 +75,6 @@ const depositWrapper = {
 const dividerLine = {
   margin: "0 20px 20px",
   height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 8px #17E8E5",
+  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
+  boxShadow: "0 0 8px var(--fx-accent)",
 };

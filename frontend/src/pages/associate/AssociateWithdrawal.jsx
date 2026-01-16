@@ -17,7 +17,7 @@ export default function AssociateWithdrawal() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -120,7 +120,7 @@ export default function AssociateWithdrawal() {
     }
   };
 
-  if (loading) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
+  if (loading) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
 
   return (
     <div style={pageWrapper}>
@@ -147,13 +147,13 @@ export default function AssociateWithdrawal() {
             </div>
             <div style={miniRow}>
               <span>Pending</span>
-              <strong style={{ color: "#FACC15" }}>
+              <strong style={{ color: "var(--fx-gold)" }}>
                 ${summary.pending.toFixed(2)}
               </strong>
             </div>
             <div style={miniRow}>
               <span>Deductions</span>
-              <strong style={{ color: "#EF4444" }}>
+              <strong style={{ color: "var(--fx-danger)" }}>
                 -${summary.deductions.toFixed(2)}
               </strong>
             </div>
@@ -190,7 +190,7 @@ export default function AssociateWithdrawal() {
         <div style={tableWrapper}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(31,41,55,0.9)" }}>
+              <tr style={{ background: "rgba(8, 10, 20, 0.7)" }}>
                 {["Date", "Amount", "Status"].map((h, i) => (
                   <th key={i} style={thStyle}>
                     {h}
@@ -210,10 +210,10 @@ export default function AssociateWithdrawal() {
                       ...tdStyle,
                       color:
                         w.status === "pending"
-                          ? "#FACC15"
+                          ? "var(--fx-gold)"
                           : w.status === "settled"
-                          ? "#17E8E5"
-                          : "#EF4444",
+                          ? "var(--fx-accent)"
+                          : "var(--fx-danger)",
                       fontWeight: "600",
                     }}
                   >
@@ -231,45 +231,47 @@ export default function AssociateWithdrawal() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "#0f172a",
+  background: "transparent",
   minHeight: "100vh",
   width: "100%",
   overflowX: "hidden",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
 };
 
 const wrapper = { padding: "20px", marginTop: "80px", marginBottom: "70px" };
 const headerTitle = {
-  fontFamily: "Orbitron, sans-serif",
-  color: "#17E8E5",
+  fontFamily: "var(--fx-font-display)",
+  color: "var(--fx-accent)",
   marginBottom: "20px",
 };
 const highlightCard = {
-  background: "linear-gradient(145deg,#1E293B,#0F172A)",
+  background: "var(--fx-card-strong)",
   padding: "20px",
   borderRadius: "14px",
   textAlign: "center",
   marginBottom: "20px",
-  boxShadow: "0 0 20px rgba(23,232,229,0.2)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
 };
 const mainCard = {
-  background: "rgba(17,24,39,0.9)",
+  background: "var(--fx-card)",
   padding: "20px",
   borderRadius: "14px",
   marginBottom: "30px",
-  boxShadow: "0 0 15px rgba(23,232,229,0.2)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
   textAlign: "center",
 };
-const cardTitle = { fontSize: "15px", color: "#94A3AF", marginBottom: "10px" };
-const bigValue = { fontSize: "28px", fontWeight: "700", color: "#E5E7EB" };
-const bigValueTeal = { fontSize: "26px", fontWeight: "700", color: "#17E8E5" };
+const cardTitle = { fontSize: "15px", color: "var(--fx-muted)", marginBottom: "10px" };
+const bigValue = { fontSize: "28px", fontWeight: "700", color: "var(--fx-ink)" };
+const bigValueTeal = { fontSize: "26px", fontWeight: "700", color: "var(--fx-accent)" };
 const miniRows = { marginTop: "15px", textAlign: "left" };
 const miniRow = {
   display: "flex",
   justifyContent: "space-between",
   marginBottom: "6px",
   fontSize: "14px",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
 };
 const btnTeal = {
   marginTop: "15px",
@@ -277,8 +279,8 @@ const btnTeal = {
   border: "none",
   borderRadius: "8px",
   fontWeight: "700",
-  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
-  color: "#0B1220",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+  color: "var(--fx-bg)",
   cursor: "pointer",
   width: "100%",
   maxWidth: "320px",
@@ -288,9 +290,9 @@ const inputStyle = {
   maxWidth: "320px",
   padding: "12px",
   borderRadius: "8px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.05)",
-  color: "#E5E7EB",
+  border: "1px solid var(--fx-border)",
+  background: "rgba(8, 10, 20, 0.6)",
+  color: "var(--fx-ink)",
   marginBottom: "12px",
 };
 const msgBox = (type) => ({
@@ -299,31 +301,32 @@ const msgBox = (type) => ({
   borderRadius: "8px",
   background:
     type === "error" ? "rgba(239,68,68,0.15)" : "rgba(16,185,129,0.15)",
-  border: `1px solid ${type === "error" ? "#EF4444" : "#10B981"}`,
-  color: type === "error" ? "#F87171" : "#34D399",
+  border: `1px solid ${type === "error" ? "var(--fx-danger)" : "var(--fx-success)"}`,
+  color: type === "error" ? "var(--fx-danger)" : "var(--fx-success-2)",
 });
 const subHeader = {
   marginBottom: "12px",
   marginTop: "20px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
   fontWeight: "600",
 };
 const tableWrapper = {
   borderRadius: "12px",
   overflowX: "auto",
-  background: "rgba(17,24,39,0.8)",
-  boxShadow: "0 0 12px rgba(23,232,229,0.15)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
 };
 const thStyle = {
   padding: "12px",
   textAlign: "left",
   fontSize: "14px",
-  color: "#9CA3AF",
+  color: "var(--fx-muted)",
 };
-const rowStyle = { borderBottom: "1px solid rgba(255,255,255,0.05)" };
+const rowStyle = { borderBottom: "1px solid var(--fx-border)" };
 const tdStyle = {
   padding: "12px",
   fontSize: "14px",
-  color: "#E5E7EB",
-  fontFamily: "Inter, sans-serif",
+  color: "var(--fx-ink)",
+  fontFamily: "var(--fx-font-body)",
 };

@@ -15,7 +15,7 @@ export default function InvestorEarn() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -72,11 +72,11 @@ export default function InvestorEarn() {
           <h2 style={heroTitle}>Apply to Become an Associate</h2>
           <p style={heroSubtitle}>
             Earn{" "}
-            <span style={{ color: "#17E8E5", fontWeight: "600" }}>
+            <span style={{ color: "var(--fx-accent)", fontWeight: "600" }}>
               {directPct}%
             </span>{" "}
             direct referral bonus and{" "}
-            <span style={{ color: "#FACC15", fontWeight: "600" }}>
+            <span style={{ color: "var(--fx-gold)", fontWeight: "600" }}>
               {commissionPct}%
             </span>{" "}
             of your investors’ monthly income.
@@ -116,8 +116,8 @@ export default function InvestorEarn() {
 
 /* === Styles === */
 const pageWrapper = {
-  backgroundColor: "#0f172a", // 🔹 dark background
-  color: "#E5E7EB",
+  background: "transparent", // 🔹 dark background
+  color: "var(--fx-ink)",
   minHeight: "100vh",        // ✅ full screen
   display: "flex",
   flexDirection: "column",
@@ -130,41 +130,43 @@ const wrapper = {
 };
 
 const heroCard = {
-  background: "linear-gradient(145deg,#1E293B,#0F172A)",
+  background: "var(--fx-card-strong)",
   borderRadius: "14px",
   padding: "25px 20px",
-  boxShadow: "0 0 20px rgba(23,232,229,0.25)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
   marginBottom: "20px",
 };
 
 const heroTitle = {
   fontSize: "22px",
   fontWeight: "700",
-  fontFamily: "Orbitron, sans-serif",
+  fontFamily: "var(--fx-font-display)",
   marginBottom: "10px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
 };
 
 const heroSubtitle = {
   fontSize: "15px",
   lineHeight: "1.5",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
 };
 
 const card = {
-  background: "rgba(17,24,39,0.9)",
+  background: "var(--fx-card)",
   borderRadius: "12px",
   padding: "20px",
   marginTop: "20px",
   textAlign: "left",
-  boxShadow: "0 0 12px rgba(23,232,229,0.15)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
 };
 
 const cardTitle = {
   fontSize: "18px",
   fontWeight: "600",
   marginBottom: "12px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
 };
 
 const listStyle = {
@@ -172,7 +174,7 @@ const listStyle = {
   paddingLeft: "20px",
   lineHeight: "1.6",
   fontSize: "14px",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
 };
 
 const ctaBox = { textAlign: "center", margin: "10px 0 20px" };
@@ -182,11 +184,11 @@ const btnApply = {
   fontSize: "16px",
   fontWeight: "700",
   borderRadius: "8px",
-  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
   border: "none",
   cursor: "pointer",
-  color: "#0B1220",
-  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
+  color: "var(--fx-bg)",
+  boxShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.4)",
 };
 
 const msgBox = (type) => ({
@@ -195,7 +197,7 @@ const msgBox = (type) => ({
   borderRadius: "8px",
   background:
     type === "error" ? "rgba(239,68,68,0.15)" : "rgba(16,185,129,0.15)",
-  border: `1px solid ${type === "error" ? "#EF4444" : "#10B981"}`,
-  color: type === "error" ? "#F87171" : "#34D399",
+  border: `1px solid ${type === "error" ? "var(--fx-danger)" : "var(--fx-success)"}`,
+  color: type === "error" ? "var(--fx-danger)" : "var(--fx-success-2)",
   fontSize: "14px",
 });

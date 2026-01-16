@@ -81,7 +81,7 @@ export default function AdminROICredit() {
   };
 
   return (
-    <div style={{ padding: "20px", color: "#E5E7EB" }}>
+    <div style={{ padding: "20px", color: "var(--fx-ink)" }}>
       <h2>📌 Credit ROI & Commission</h2>
       <p style={{ marginTop: 10 }}>
         Normally ROI & commissions are credited automatically once per day.  
@@ -103,7 +103,7 @@ export default function AdminROICredit() {
             padding: "10px 20px",
             border: "none",
             borderRadius: "6px",
-            background: loading ? "#9CA3AF" : "#3B82F6",
+            background: loading ? "var(--fx-muted)" : "var(--fx-info)",
             color: "#fff",
             cursor: loading ? "not-allowed" : "pointer",
           }}
@@ -118,7 +118,7 @@ export default function AdminROICredit() {
             padding: "10px 20px",
             border: "none",
             borderRadius: "6px",
-            background: forceLoading ? "#9CA3AF" : "#F59E0B",
+            background: forceLoading ? "var(--fx-muted)" : "var(--fx-gold)",
             color: "#fff",
             cursor: forceLoading ? "not-allowed" : "pointer",
           }}
@@ -133,7 +133,7 @@ export default function AdminROICredit() {
             padding: "10px 20px",
             border: "none",
             borderRadius: "6px",
-            background: resetLoading ? "#9CA3AF" : "#EF4444",
+            background: resetLoading ? "var(--fx-muted)" : "var(--fx-danger)",
             color: "#fff",
             cursor: resetLoading ? "not-allowed" : "pointer",
           }}
@@ -149,7 +149,7 @@ export default function AdminROICredit() {
             marginTop: 20,
             padding: "15px",
             borderRadius: "8px",
-            background: "#111827",
+            background: "var(--fx-surface-strong)",
             maxWidth: "800px",
           }}
         >
@@ -162,7 +162,7 @@ export default function AdminROICredit() {
             {result.credited && result.credited.length > 0 ? (
               <table style={{ width: "100%", fontSize: "14px" }}>
                 <thead>
-                  <tr style={{ textAlign: "left", borderBottom: "1px solid #374151" }}>
+                  <tr style={{ textAlign: "left", borderBottom: "1px solid var(--fx-rail)" }}>
                     <th style={{ padding: "6px" }}>Email</th>
                     <th style={{ padding: "6px" }}>Investment</th>
                     <th style={{ padding: "6px" }}>Days Credited</th>
@@ -172,7 +172,7 @@ export default function AdminROICredit() {
                 </thead>
                 <tbody>
                   {result.credited.map((c, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #374151" }}>
+                    <tr key={idx} style={{ borderBottom: "1px solid var(--fx-rail)" }}>
                       <td style={{ padding: "6px" }}>{c.email}</td>
                       <td style={{ padding: "6px" }}>{c.investment} USDT</td>
                       <td style={{ padding: "6px" }}>{c.days}</td>
@@ -185,7 +185,7 @@ export default function AdminROICredit() {
                 </tbody>
               </table>
             ) : (
-              <p style={{ color: "#9CA3AF" }}>No users credited.</p>
+              <p style={{ color: "var(--fx-muted)" }}>No users credited.</p>
             )}
           </div>
         </div>

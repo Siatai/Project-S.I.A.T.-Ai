@@ -20,17 +20,18 @@ export default function AuthModal({ open, onClose }) {
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
-        fontFamily: "Inter, Arial, sans-serif",
+        fontFamily: "var(--fx-font-body)",
       }}
     >
       <div
         style={{
-          background: "rgba(17, 24, 39, 0.95)",
-          color: "#E5E7EB",
+          background: "var(--fx-card)",
+          color: "var(--fx-ink)",
           padding: "25px 20px",
           borderRadius: "14px",
           width: "400px",
-          boxShadow: "0 0 30px rgba(23,232,166,0.35)",
+          border: "1px solid var(--fx-border)",
+          boxShadow: "0 18px 45px rgba(var(--fx-accent-rgb),0.18)",
         }}
       >
         {/* Tabs */}
@@ -47,8 +48,11 @@ export default function AuthModal({ open, onClose }) {
             style={{
               flex: 1,
               padding: "12px",
-              background: tab === "signin" ? "#17E8E5" : "transparent",
-              color: tab === "signin" ? "#0B1220" : "#94A3B8",
+              background:
+                tab === "signin"
+                  ? "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))"
+                  : "transparent",
+              color: tab === "signin" ? "var(--fx-bg)" : "var(--fx-muted)",
               border: "none",
               cursor: "pointer",
               fontWeight: "600",
@@ -63,8 +67,11 @@ export default function AuthModal({ open, onClose }) {
             style={{
               flex: 1,
               padding: "12px",
-              background: tab === "signup" ? "#17E8E5" : "transparent",
-              color: tab === "signup" ? "#0B1220" : "#94A3B8",
+              background:
+                tab === "signup"
+                  ? "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))"
+                  : "transparent",
+              color: tab === "signup" ? "var(--fx-bg)" : "var(--fx-muted)",
               border: "none",
               cursor: "pointer",
               fontWeight: "600",
@@ -88,8 +95,8 @@ export default function AuthModal({ open, onClose }) {
             marginTop: "15px",
             width: "100%",
             padding: "12px",
-            background: "rgba(255,255,255,0.08)",
-            color: "#E5E7EB",
+            background: "rgba(255,255,255,0.06)",
+            color: "var(--fx-ink)",
             border: "none",
             borderRadius: "10px",
             cursor: "pointer",
@@ -97,10 +104,10 @@ export default function AuthModal({ open, onClose }) {
             transition: "all 0.3s ease",
           }}
           onMouseOver={(e) =>
-            (e.target.style.background = "rgba(23,232,166,0.3)")
+            (e.target.style.background = "rgba(var(--fx-accent-rgb),0.2)")
           }
           onMouseOut={(e) =>
-            (e.target.style.background = "rgba(255,255,255,0.08)")
+            (e.target.style.background = "rgba(255,255,255,0.06)")
           }
         >
           Close

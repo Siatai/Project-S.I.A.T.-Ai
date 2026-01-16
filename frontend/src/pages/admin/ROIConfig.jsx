@@ -53,14 +53,14 @@ export default function AdminROI() {
   return (
     <div
       style={{
-        background: "#1E293B",
-        color: "#E5E7EB",
+        background: "var(--fx-surface-strong)",
+        color: "var(--fx-ink)",
         padding: "20px",
         borderRadius: "10px",
         maxWidth: "400px",
       }}
     >
-      <h2 style={{ color: "#17E8E5", marginBottom: "15px" }}>
+      <h2 style={{ color: "var(--fx-accent)", marginBottom: "15px" }}>
         ROI Configuration
       </h2>
 
@@ -77,9 +77,9 @@ export default function AdminROI() {
             width: "100%",
             padding: "8px",
             borderRadius: "6px",
-            border: "1px solid #374151",
-            background: "#111827",
-            color: "#E5E7EB",
+            border: "1px solid var(--fx-rail)",
+            background: "var(--fx-surface-strong)",
+            color: "var(--fx-ink)",
           }}
         />
       </div>
@@ -97,9 +97,9 @@ export default function AdminROI() {
             width: "100%",
             padding: "8px",
             borderRadius: "6px",
-            border: "1px solid #374151",
-            background: "#111827",
-            color: "#E5E7EB",
+            border: "1px solid var(--fx-rail)",
+            background: "var(--fx-surface-strong)",
+            color: "var(--fx-ink)",
           }}
         />
       </div>
@@ -111,8 +111,8 @@ export default function AdminROI() {
           padding: "10px",
           border: "none",
           borderRadius: "8px",
-          background: "#17E8E5",
-          color: "#0B1220",
+          background: "var(--fx-button)",
+          color: "var(--fx-bg)",
           fontWeight: "bold",
           cursor: "pointer",
         }}

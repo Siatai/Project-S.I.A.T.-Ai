@@ -21,10 +21,10 @@ export default function AdminFinancialSummary() {
     fetchSummary();
   }, []);
 
-  if (!summary) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
+  if (!summary) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
 
   return (
-    <div style={{ padding: "20px", color: "#E5E7EB" }}>
+    <div style={{ padding: "20px", color: "var(--fx-ink)" }}>
       <h2>📊 Financial Summary</h2>
 
       {/* Investors */}
@@ -33,7 +33,7 @@ export default function AdminFinancialSummary() {
           marginTop: "20px",
           padding: "15px",
           borderRadius: "8px",
-          background: "#1E293B",
+          background: "var(--fx-surface-strong)",
           maxWidth: "700px",
         }}
       >
@@ -47,7 +47,7 @@ export default function AdminFinancialSummary() {
           marginTop: "20px",
           padding: "15px",
           borderRadius: "8px",
-          background: "#1E293B",
+          background: "var(--fx-surface-strong)",
           maxWidth: "700px",
         }}
       >
@@ -64,7 +64,7 @@ export default function AdminFinancialSummary() {
           marginTop: "20px",
           padding: "15px",
           borderRadius: "8px",
-          background: "#111827",
+          background: "var(--fx-surface-strong)",
           maxWidth: "900px",
         }}
       >

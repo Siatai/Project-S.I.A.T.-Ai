@@ -20,7 +20,7 @@ export default function AssociateHome() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
 
     const fetchData = async () => {
@@ -73,7 +73,7 @@ export default function AssociateHome() {
     }
   };
 
-  if (!user) return <p style={{ color: "#E5E7EB" }}>Loading...</p>;
+  if (!user) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
 
   // ✅ Calculations
   const totalSelf = myDeposits.reduce((s, d) => s + d.capital, 0);
@@ -110,11 +110,11 @@ export default function AssociateHome() {
 
           <p style={subCaption}>
             Now enjoy{" "}
-            <span style={{ color: "#17E8E5", fontWeight: "600" }}>
+            <span style={{ color: "var(--fx-accent)", fontWeight: "600" }}>
               {directPct}%
             </span>{" "}
             as direct referral and{" "}
-            <span style={{ color: "#FACC15", fontWeight: "600" }}>
+            <span style={{ color: "var(--fx-gold)", fontWeight: "600" }}>
               {commissionPct}%
             </span>{" "}
             of your investors’ income.
@@ -155,7 +155,7 @@ export default function AssociateHome() {
             <p style={mutedText}>
               ROI: {Math.round(roiReceivedSelf)} / {Math.round(maxSelf)} USDT
             </p>
-            <p style={{ color: "#FACC15", fontSize: "13px" }}>
+            <p style={{ color: "var(--fx-gold)", fontSize: "13px" }}>
               {Math.round(leftSelf)} USDT left to receive
             </p>
           </div>
@@ -166,9 +166,9 @@ export default function AssociateHome() {
 }
 
 function ProgressBar({ percent }) {
-  let color = "#17E8E5";
-  if (percent < 70 && percent >= 40) color = "#FACC15";
-  if (percent < 40) color = "#EF4444";
+  let color = "var(--fx-accent)";
+  if (percent < 70 && percent >= 40) color = "var(--fx-gold)";
+  if (percent < 40) color = "var(--fx-danger)";
   return (
     <div style={progressTrack}>
       <div style={{ ...progressFill, width: `${percent}%`, background: color }} />
@@ -184,7 +184,7 @@ const pageWrapper = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
 };
 
 const mainContent = {
@@ -202,9 +202,10 @@ const haloBox = {
   padding: "20px",
   margin: "0 20px",
   borderRadius: "20px",
-  background: "rgba(15,23,42,0.85)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
   boxShadow:
-    "0 0 25px rgba(23,232,229,0.3), 0 0 50px rgba(23,232,229,0.15), inset 0 0 10px rgba(23,232,229,0.1)",
+    "0 0 25px rgba(var(--fx-accent-rgb),0.3), 0 0 50px rgba(var(--fx-accent-rgb),0.15), inset 0 0 10px rgba(var(--fx-accent-rgb),0.1)",
 };
 
 /* Wallet card */
@@ -212,11 +213,12 @@ const walletCard = {
   display: "flex",
   alignItems: "center",
   gap: "12px",
-  background: "rgba(17,24,39,0.85)",
+  background: "var(--fx-card-strong)",
+  border: "1px solid var(--fx-border)",
   borderRadius: "12px",
   padding: "15px 20px",
   margin: "15px 0",
-  boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+  boxShadow: "0 0 15px rgba(var(--fx-accent-rgb),0.3)",
 };
 
 const walletIconBox = {
@@ -226,19 +228,20 @@ const walletIconBox = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  background: "rgba(23,232,229,0.1)",
-  boxShadow: "0 0 12px rgba(23,232,229,0.5)",
+  background: "rgba(var(--fx-accent-2-rgb),0.14)",
+  boxShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.5)",
 };
 
-const walletIcon = { fontSize: "20px", color: "#17E8E5" };
-const walletLabel = { fontSize: "13px", color: "#9CA3AF", margin: 0 };
-const walletValue = { fontSize: "20px", color: "#17E8E5", margin: 0 };
+const walletIcon = { fontSize: "20px", color: "var(--fx-accent)" };
+const walletLabel = { fontSize: "13px", color: "var(--fx-muted)", margin: 0 };
+const walletValue = { fontSize: "20px", color: "var(--fx-accent)", margin: 0 };
 
 const cardStyle3D = {
-  background: "linear-gradient(145deg,#1E293B,#0F172A)",
+  background: "var(--fx-card-strong)",
   padding: "16px",
   borderRadius: "14px",
   marginBottom: "18px",
+  border: "1px solid var(--fx-border)",
   boxShadow:
     "5px 5px 15px rgba(0,0,0,0.7), -5px -5px 15px rgba(255,255,255,0.05)",
 };
@@ -250,25 +253,26 @@ const glowRow = {
   marginTop: "10px",
   fontSize: "14px",
   borderRadius: "8px",
-  background: "rgba(17,24,39,0.8)",
-  borderLeft: "3px solid #17E8E5",
-  boxShadow: "0 0 12px rgba(23,232,229,0.25)",
+  background: "rgba(8, 10, 20, 0.55)",
+  borderLeft: "3px solid var(--fx-accent)",
+  boxShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.25)",
 };
 
 const referralBox = {
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  background: "rgba(17,24,39,0.9)",
+  background: "var(--fx-card-strong)",
+  border: "1px solid var(--fx-border)",
   padding: "10px 14px",
   borderRadius: "10px",
   margin: "8px 0 12px",
-  boxShadow: "0 0 8px rgba(23,232,229,0.25)",
+  boxShadow: "0 0 8px rgba(var(--fx-accent-rgb),0.25)",
 };
 
 const referralText = {
   fontSize: "15px",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
   fontWeight: "600",
   fontFamily: "monospace",
 };
@@ -276,15 +280,15 @@ const referralText = {
 const copyIconBtn = {
   background: "transparent",
   border: "none",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
   fontSize: "18px",
   cursor: "pointer",
 };
 
-const copiedText = { fontSize: "11px", color: "#22C55E", marginTop: "4px" };
+const copiedText = { fontSize: "11px", color: "var(--fx-success)", marginTop: "4px" };
 
 const progressTrack = {
-  background: "#374151",
+  background: "var(--fx-rail)",
   borderRadius: "6px",
   overflow: "hidden",
   height: "12px",
@@ -293,32 +297,32 @@ const progressTrack = {
 
 const progressFill = { height: "100%", transition: "width 0.6s ease" };
 
-const mutedText = { color: "#9CA3AF", fontSize: "13px", margin: "6px 0" };
+const mutedText = { color: "var(--fx-muted)", fontSize: "13px", margin: "6px 0" };
 
 const welcomeText = {
   textAlign: "left",
-  color: "#17E8E5",
+  color: "var(--fx-accent)",
   fontSize: "18px",
   fontWeight: "600",
-  textShadow: "0 0 8px #17E8E5",
+  textShadow: "0 0 8px var(--fx-accent)",
   margin: "0 0 6px",
 };
 
 const subCaption = {
   fontSize: "13px",
-  color: "#9CA3AF",
+  color: "var(--fx-muted)",
   margin: "0 0 15px",
 };
 
 const sectionCaption = {
   fontSize: "13px",
-  color: "#9CA3AF",
+  color: "var(--fx-muted)",
   marginBottom: "6px",
 };
 
 const glowLine = {
   height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 10px #17E8E5",
+  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
+  boxShadow: "0 0 10px var(--fx-accent)",
   margin: "8px 0 18px 0",
 };

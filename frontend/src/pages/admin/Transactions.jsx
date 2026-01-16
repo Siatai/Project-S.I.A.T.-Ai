@@ -73,7 +73,7 @@ export default function Transactions() {
   }, [fetchTransactions, email]);
 
   return (
-    <div style={{ color: "#E5E7EB" }}>
+    <div style={{ color: "var(--fx-ink)" }}>
       <h2 style={{ marginBottom: "20px" }}>Transaction History</h2>
 
       {loading ? (
@@ -81,42 +81,43 @@ export default function Transactions() {
       ) : transactions.length === 0 ? (
         <p>No transactions found.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="fx-table-wrap">
+          <table className="fx-table">
           <thead>
-            <tr style={{ background: "#1F2937", color: "#E5E7EB" }}>
-              <th style={{ padding: "10px", textAlign: "left" }}>Type</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Amount</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Date</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Status</th>
-              <th style={{ padding: "10px", textAlign: "left" }}>Tx Hash</th>
+            <tr>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Tx Hash</th>
             </tr>
           </thead>
           <tbody>
             {transactions.map((t) => (
-              <tr key={t.id} style={{ borderBottom: "1px solid #374151" }}>
-                <td style={{ padding: "10px" }}>{t.type}</td>
-                <td style={{ padding: "10px" }}>${t.amount}</td>
-                <td style={{ padding: "10px" }}>
+              <tr key={t.id}>
+                <td>{t.type}</td>
+                <td>${t.amount}</td>
+                <td>
                   {new Date(t.date).toLocaleString()}
                 </td>
                 <td
                   style={{
-                    padding: "10px",
                     color:
                       t.status === "pending"
-                        ? "#FACC15"
+                        ? "var(--fx-gold)"
                         : t.status === "approved" || t.status === "confirmed"
-                        ? "#22C55E"
-                        : "#EF4444",
+                        ? "var(--fx-success)"
+                        : "var(--fx-danger)",
                   }}
                 >
                   {t.status}
                 </td>
-                <td style={{ padding: "10px" }}>{t.tx_hash}</td>
+                <td>{t.tx_hash}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       )}
     </div>
   );

@@ -22,21 +22,34 @@ export default function ForexStats() {
       <h3
         style={{
           fontSize: "24px",
-          color: "#17E8E5",
+          color: "var(--fx-accent)",
           fontWeight: "700",
           marginBottom: "20px",
           textAlign: "center",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
         }}
       >
         About Forex
       </h3>
 
-      <div style={{ overflow: "hidden" }}>
+      <div
+        style={{
+          overflow: "hidden",
+          position: "relative",
+          WebkitMaskImage:
+            "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+          maskImage:
+            "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+        }}
+      >
         <div
           style={{
             display: "flex",
             width: "max-content",
-            animation: "marquee 25s linear infinite",
+            gap: "18px",
+            animation: "marquee 26s linear infinite",
+            padding: "10px 0 20px",
           }}
         >
           {/* Infinite carousel by repeating 3 times */}
@@ -45,25 +58,27 @@ export default function ForexStats() {
               key={i}
               style={{
                 flex: "0 0 250px",
-                margin: "0 12px",
-                background: "rgba(30,41,59,0.7)",
-                borderRadius: "12px",
+                margin: "0 4px",
+                background:
+                  "linear-gradient(135deg, rgba(10, 18, 34, 0.85), rgba(10, 26, 48, 0.9)) padding-box, linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.6), rgba(var(--fx-accent-2-rgb), 0.6)) border-box",
+                borderRadius: "16px",
                 padding: "30px 20px",
                 textAlign: "center",
-                boxShadow: "0 0 15px rgba(23,232,229,0.3)",
+                border: "1px solid transparent",
+                boxShadow: "0 18px 32px rgba(2, 8, 18, 0.5)",
               }}
             >
               <h4
                 style={{
                   fontSize: "24px",
                   fontWeight: "700",
-                  color: "#17E8E5",
+                  color: "var(--fx-accent)",
                   marginBottom: "10px",
                 }}
               >
                 {item.stat}
               </h4>
-              <p style={{ fontSize: "14px", color: "#94A3B8" }}>
+              <p style={{ fontSize: "14px", color: "var(--fx-muted)" }}>
                 {item.desc}
               </p>
             </div>

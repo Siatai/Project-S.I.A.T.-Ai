@@ -22,21 +22,20 @@ export default function FlowSection() {
           padding: "10px 25px",
           borderRadius: "12px",
           marginBottom: "25px",
-          background: "rgba(23,232,229,0.08)",
-          border: "1px solid rgba(23,232,229,0.5)",
+          background: "var(--fx-card)",
+          border: "1px solid var(--fx-border)",
           backdropFilter: "blur(8px)",
-          boxShadow:
-            "0 0 15px rgba(23,232,229,0.5), 0 0 35px rgba(0,240,255,0.3)",
+          boxShadow: "var(--fx-shadow)",
         }}
       >
         <h2
           style={{
             fontSize: "24px",
             fontWeight: "700",
-            color: "#17E8E5",
+            color: "var(--fx-accent-2)",
             margin: 0,
-            fontFamily: "Orbitron, sans-serif",
-            textShadow: "0 0 10px #17E8E5, 0 0 25px rgba(0,240,255,0.6)",
+            fontFamily: "var(--fx-font-display)",
+            textShadow: "0 0 12px rgba(var(--fx-accent-2-rgb),0.6)",
           }}
         >
           M³'s Algo
@@ -60,7 +59,7 @@ export default function FlowSection() {
             inset: "-80px",
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(23,232,229,0.6), transparent 70%)",
+              "radial-gradient(circle, rgba(var(--fx-accent-rgb),0.5), rgba(var(--fx-accent-2-rgb),0.2), transparent 70%)",
             filter: "blur(60px)",
             zIndex: 0,
           }}

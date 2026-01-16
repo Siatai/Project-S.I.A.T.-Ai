@@ -77,12 +77,12 @@ export default function Deposit() {
   ];
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px" }}>
+    <div style={{ color: "var(--fx-ink)", padding: "20px" }}>
       <h2
         style={{
           marginBottom: "10px",
-          fontFamily: "Orbitron, sans-serif",
-          color: "#17E8E5",
+          fontFamily: "var(--fx-font-display)",
+          color: "var(--fx-accent)",
         }}
       >
         Deposit
@@ -109,7 +109,7 @@ export default function Deposit() {
             }}
             style={{
               position: "relative",
-              background: "rgba(17,24,39,0.7)",
+              background: "var(--fx-card)",
               backdropFilter: "blur(8px)",
               padding: "22px",
               borderRadius: "12px",
@@ -117,19 +117,19 @@ export default function Deposit() {
               opacity: m.active ? 1 : 0.5,
               border:
                 selected === m.id
-                  ? "2px solid #17E8E5"
+                  ? "2px solid var(--fx-accent)"
                   : "1px solid rgba(255,255,255,0.1)",
               transition: "all 0.3s ease",
               boxShadow:
                 selected === m.id
-                  ? "0 0 20px rgba(23,232,229,0.6)"
-                  : "0 0 8px rgba(23,232,229,0.2)",
+                  ? "0 0 20px rgba(var(--fx-accent-rgb),0.6)"
+                  : "0 0 8px rgba(var(--fx-accent-rgb),0.2)",
             }}
           >
             <h3 style={{ fontSize: "16px", marginBottom: "10px", fontWeight: "600" }}>
               {m.name}
             </h3>
-            <p style={{ fontSize: "13px", color: "#9CA3AF" }}>
+            <p style={{ fontSize: "13px", color: "var(--fx-muted)" }}>
               {m.active ? "Processing: Instant – 15 minutes" : "Coming soon"}
             </p>
 
@@ -139,13 +139,13 @@ export default function Deposit() {
                   position: "absolute",
                   top: "12px",
                   right: "12px",
-                  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
-                  color: "#0B1220",
+                  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+                  color: "var(--fx-bg)",
                   fontSize: "11px",
                   fontWeight: "700",
                   padding: "3px 10px",
                   borderRadius: "12px",
-                  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
+                  boxShadow: "0 12px 24px rgba(var(--fx-accent-rgb),0.22)",
                 }}
               >
                 LIVE
@@ -161,7 +161,7 @@ export default function Deposit() {
                   alignItems: "center",
                   justifyContent: "center",
                   background: "rgba(0,0,0,0.65)",
-                  color: "#E5E7EB",
+                  color: "var(--fx-ink)",
                   fontSize: "15px",
                   fontWeight: "600",
                   borderRadius: "12px",
@@ -181,18 +181,18 @@ export default function Deposit() {
             <button style={closeBtn} onClick={() => setSelected(null)}>
               ✕
             </button>
-            <h3 style={{ marginBottom: "18px", fontWeight: "600", color: "#17E8E5" }}>
+            <h3 style={{ marginBottom: "18px", fontWeight: "600", color: "var(--fx-accent)" }}>
               Deposit via TRC20 (USDT)
             </h3>
             <QRCodeCanvas value={TRC20_ADDRESS} size={180} />
-            <p style={{ marginTop: "15px", fontSize: "14px", color: "#9CA3AF" }}>
+            <p style={{ marginTop: "15px", fontSize: "14px", color: "var(--fx-muted)" }}>
               Send USDT to the address below:
             </p>
             <p
               style={{
                 marginTop: "12px",
                 padding: "12px",
-                background: "rgba(31,41,55,0.8)",
+                background: "rgba(8, 10, 20, 0.55)",
                 borderRadius: "8px",
                 fontFamily: "monospace",
                 wordBreak: "break-all",
@@ -218,7 +218,7 @@ export default function Deposit() {
             <button style={closeBtn} onClick={() => setShowWalletPopup(false)}>
               ✕
             </button>
-            <h3 style={{ marginBottom: "10px", color: "#17E8E5" }}>
+            <h3 style={{ marginBottom: "10px", color: "var(--fx-accent)" }}>
               Bind Your TRC20 Wallet
             </h3>
 
@@ -230,8 +230,8 @@ export default function Deposit() {
                   padding: "10px",
                   borderRadius: "8px",
                   background: "rgba(239,68,68,0.15)",
-                  border: "1px solid #EF4444",
-                  color: "#F87171",
+                  border: "1px solid var(--fx-danger)",
+                  color: "var(--fx-danger)",
                   fontWeight: "600",
                   textAlign: "center",
                   fontSize: "14px",
@@ -241,7 +241,7 @@ export default function Deposit() {
               </div>
             )}
 
-            <p style={{ fontSize: "13px", marginBottom: "8px", color: "#9CA3AF" }}>
+            <p style={{ fontSize: "13px", marginBottom: "8px", color: "var(--fx-muted)" }}>
               You must bind your withdrawal wallet before depositing.
             </p>
             <input
@@ -267,12 +267,12 @@ const btnTeal = {
   padding: "12px 24px",
   border: "none",
   borderRadius: "8px",
-  background: "linear-gradient(135deg,#17E8E5,#14B8E5)",
-  color: "#0B1220",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
+  color: "var(--fx-bg)",
   fontWeight: "700",
   cursor: "pointer",
   transition: "all 0.3s ease",
-  boxShadow: "0 0 12px rgba(23,232,229,0.4)",
+  boxShadow: "0 12px 24px rgba(var(--fx-accent-rgb),0.22)",
   width: "100%",
   maxWidth: "420px",
 };
@@ -282,9 +282,9 @@ const inputStyle = {
   padding: "12px",
   borderRadius: "8px",
   marginBottom: "12px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.05)",
-  color: "#E5E7EB",
+  border: "1px solid var(--fx-border)",
+  background: "rgba(8, 10, 20, 0.6)",
+  color: "var(--fx-ink)",
   fontSize: "14px",
   boxSizing: "border-box",
 };
@@ -301,12 +301,13 @@ const popupOverlay = {
   zIndex: 1000,
 };
 const popupBox = {
-  background: "rgba(17,24,39,0.95)",
+  border: "1px solid var(--fx-border)",
+  background: "var(--fx-card)",
   padding: "25px",
   borderRadius: "12px",
   maxWidth: "420px",
   width: "90%",
-  boxShadow: "0 0 25px rgba(23,232,229,0.35)",
+  boxShadow: "var(--fx-shadow)",
   textAlign: "center",
   position: "relative",
 };
@@ -317,12 +318,12 @@ const closeBtn = {
   background: "transparent",
   border: "none",
   fontSize: "20px",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
   cursor: "pointer",
 };
 const glowLine = {
   height: "2px",
-  background: "linear-gradient(90deg, transparent, #17E8E5, transparent)",
-  boxShadow: "0 0 10px #17E8E5",
+  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
+  boxShadow: "0 0 10px var(--fx-accent)",
   marginBottom: "20px",
 };

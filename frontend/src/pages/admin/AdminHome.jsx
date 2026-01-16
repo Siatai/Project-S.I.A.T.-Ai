@@ -20,10 +20,10 @@ export default function AdminHome() {
     fetchStats();
   }, []);
 
-  if (!stats) return <p style={{ color: "#E5E7EB" }}>Loading admin dashboard...</p>;
+  if (!stats) return <p style={{ color: "var(--fx-ink)" }}>Loading admin dashboard...</p>;
 
   return (
-    <div style={{ color: "#E5E7EB", padding: "20px" }}>
+    <div style={{ color: "var(--fx-ink)", padding: "20px" }}>
       <h2>📊 Admin Dashboard</h2>
 
       <div
@@ -38,7 +38,9 @@ export default function AdminHome() {
           style={{
             padding: "15px",
             borderRadius: "8px",
-            background: "#1E293B",
+            background: "var(--fx-card)",
+            border: "1px solid var(--fx-border)",
+            boxShadow: "var(--fx-shadow)",
           }}
         >
           <h3>Total Users</h3>
@@ -49,7 +51,9 @@ export default function AdminHome() {
           style={{
             padding: "15px",
             borderRadius: "8px",
-            background: "#1E293B",
+            background: "var(--fx-card)",
+            border: "1px solid var(--fx-border)",
+            boxShadow: "var(--fx-shadow)",
           }}
         >
           <h3>Total Deposits</h3>
@@ -62,7 +66,9 @@ export default function AdminHome() {
           style={{
             padding: "15px",
             borderRadius: "8px",
-            background: "#1E293B",
+            background: "var(--fx-card)",
+            border: "1px solid var(--fx-border)",
+            boxShadow: "var(--fx-shadow)",
           }}
         >
           <h3>Total Withdrawals</h3>
@@ -75,7 +81,9 @@ export default function AdminHome() {
           style={{
             padding: "15px",
             borderRadius: "8px",
-            background: "#1E293B",
+            background: "var(--fx-card)",
+            border: "1px solid var(--fx-border)",
+            boxShadow: "var(--fx-shadow)",
           }}
         >
           <h3>Total Commissions</h3>

@@ -21,7 +21,7 @@ export default function Referrals() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#0f172a";
+    document.body.style.background = "var(--fx-hero)";
     document.body.style.overflowX = "hidden";
   }, []);
 
@@ -104,7 +104,7 @@ export default function Referrals() {
     }
   };
 
-  if (loading) return <p style={{ color: "#E5E7EB" }}>Loading referrals...</p>;
+  if (loading) return <p style={{ color: "var(--fx-ink)" }}>Loading referrals...</p>;
 
   // ✅ Totals
   const totalEarned = referees.reduce((s, r) => s + r.earned, 0);
@@ -130,7 +130,7 @@ export default function Referrals() {
               style={{
                 ...progressFill,
                 width: totalAll > 0 ? `${(totalLeft / totalAll) * 100}%` : "0%",
-                background: "#17E8E5",
+                background: "var(--fx-button)",
               }}
             />
           </div>
@@ -142,7 +142,7 @@ export default function Referrals() {
         {/* === PER REFEREE === */}
         <h3 style={subHeader}>Referrals</h3>
         {referees.length === 0 && (
-          <p style={{ color: "#9CA3AF" }}>No referrals yet.</p>
+          <p style={{ color: "var(--fx-muted)" }}>No referrals yet.</p>
         )}
         {referees.map((r, i) => {
           const percentLeft = r.total > 0 ? (r.left / r.total) * 100 : 0;
@@ -156,7 +156,7 @@ export default function Referrals() {
               }}
             >
               <div style={glowRow}>
-                <span style={{ color: "#17E8E5", fontWeight: "600" }}>
+                <span style={{ color: "var(--fx-accent)", fontWeight: "600" }}>
                   {r.name}
                 </span>
                 <strong>
@@ -168,7 +168,7 @@ export default function Referrals() {
                   style={{
                     ...progressFill,
                     width: `${percentLeft}%`,
-                    background: "#17E8E5",
+                    background: "var(--fx-button)",
                   }}
                 />
               </div>
@@ -197,12 +197,12 @@ export default function Referrals() {
                   ✖
                 </button>
               </div>
-              <h3 style={{ color: "#17E8E5", marginBottom: "10px" }}>
+              <h3 style={{ color: "var(--fx-accent)", marginBottom: "10px" }}>
                 {selectedReferee.name} – Bonuses
               </h3>
 
               {packages.length === 0 && (
-                <p style={{ color: "#9CA3AF" }}>No bonuses yet</p>
+                <p style={{ color: "var(--fx-muted)" }}>No bonuses yet</p>
               )}
 
               <div style={{ maxHeight: "80vh", overflowY: "auto" }}>
@@ -240,7 +240,7 @@ export default function Referrals() {
                           style={{
                             ...progressFill,
                             width: `${percentDone}%`,
-                            background: "#22C55E",
+                            background: "var(--fx-success)",
                           }}
                         />
                       </div>
@@ -249,7 +249,7 @@ export default function Referrals() {
                           ? `${daysLeft} days left`
                           : "Unlocked – ready!"}
                       </p>
-                      <p style={{ color: "#9CA3AF", fontSize: "12px" }}>
+                      <p style={{ color: "var(--fx-muted)", fontSize: "12px" }}>
                         Matures: {maturedAt.toLocaleDateString()}
                       </p>
                       <div style={{ marginTop: "10px" }}>
@@ -293,20 +293,21 @@ export default function Referrals() {
 }
 
 /* === Styles === */
-const pageWrapper = { background: "#0f172a", minHeight: "100vh", color: "#E5E7EB" };
+const pageWrapper = { background: "transparent", minHeight: "100vh", color: "var(--fx-ink)" };
 const mainContent = { padding: "20px", marginTop: "80px" };
-const headerTitle = { marginBottom: "20px", color: "#17E8E5" };
-const subHeader = { margin: "20px 0 12px", color: "#17E8E5" };
+const headerTitle = { marginBottom: "20px", color: "var(--fx-accent)" };
+const subHeader = { margin: "20px 0 12px", color: "var(--fx-accent)" };
 const cardStyle = {
   padding: "16px",
   borderRadius: "14px",
   marginBottom: "18px",
-  background: "rgba(17,24,39,0.85)",
-  boxShadow: "0 0 12px rgba(23,232,229,0.2)",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
+  boxShadow: "var(--fx-shadow)",
 };
 const glowRow = { display: "flex", justifyContent: "space-between", marginBottom: "8px" };
 const progressTrack = {
-  background: "#374151",
+  background: "var(--fx-rail)",
   borderRadius: "6px",
   overflow: "hidden",
   height: "14px",
@@ -314,7 +315,7 @@ const progressTrack = {
   position: "relative",
 };
 const progressFill = { height: "100%", transition: "width 0.6s ease" };
-const mutedText = { color: "#9CA3AF", fontSize: "13px", marginTop: "6px" };
+const mutedText = { color: "var(--fx-muted)", fontSize: "13px", marginTop: "6px" };
 const modalOverlay = {
   position: "fixed",
   top: 0,
@@ -328,13 +329,15 @@ const modalOverlay = {
   zIndex: 1000,
 };
 const modalBox = {
-  background: "#0f172a",
+  background: "var(--fx-card)",
+  border: "1px solid var(--fx-border)",
   padding: "20px",
   borderRadius: "12px",
   width: "90%",
   maxWidth: "500px",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
   position: "relative",
+  boxShadow: "var(--fx-shadow)",
 };
 const modalHeader = {
   display: "flex",
@@ -343,9 +346,9 @@ const modalHeader = {
   marginBottom: "10px",
 };
 const backBtn = {
-  background: "transparent",
-  border: "1px solid #17E8E5",
-  color: "#17E8E5",
+  background: "rgba(var(--fx-accent-2-rgb),0.12)",
+  border: "1px solid rgba(var(--fx-accent-2-rgb),0.4)",
+  color: "var(--fx-accent-2)",
   padding: "4px 10px",
   borderRadius: "6px",
   cursor: "pointer",
@@ -353,37 +356,40 @@ const backBtn = {
 const closeBtn = {
   background: "transparent",
   border: "none",
-  color: "#E5E7EB",
+  color: "var(--fx-ink)",
   fontSize: "18px",
   cursor: "pointer",
 };
 const depositCard = {
-  background: "rgba(17,24,39,0.9)",
+  background: "var(--fx-card-strong)",
+  border: "1px solid var(--fx-border)",
   padding: "12px",
   borderRadius: "8px",
   marginBottom: "12px",
 };
 const btnPrimary = {
-  background: "#17E8E5",
+  background: "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))",
   border: "none",
   padding: "8px 14px",
   marginRight: "10px",
   borderRadius: "6px",
   cursor: "pointer",
+  color: "var(--fx-bg)",
 };
 const btnSecondary = {
-  background: "#FACC15",
+  background: "linear-gradient(135deg, var(--fx-gold), var(--fx-accent-2))",
   border: "none",
   padding: "8px 14px",
   borderRadius: "6px",
   cursor: "pointer",
+  color: "var(--fx-bg)",
 };
 const btnDisabled = {
-  background: "#374151",
+  background: "var(--fx-rail)",
   border: "none",
   padding: "8px 14px",
   marginRight: "10px",
   borderRadius: "6px",
-  color: "#9CA3AF",
+  color: "var(--fx-muted)",
   cursor: "not-allowed",
 };
