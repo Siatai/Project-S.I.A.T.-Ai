@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar";
+import HudLoader from "../../Components/HudLoader";
 
 export default function Referrals() {
   const [referees, setReferees] = useState([]);
@@ -104,7 +105,7 @@ export default function Referrals() {
     }
   };
 
-  if (loading) return <p style={{ color: "var(--fx-ink)" }}>Loading referrals...</p>;
+  if (loading) return <HudLoader text="Loading referrals" />;
 
   //  Totals
   const totalEarned = referees.reduce((s, r) => s + r.earned, 0);

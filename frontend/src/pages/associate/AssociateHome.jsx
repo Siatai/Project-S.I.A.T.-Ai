@@ -3,6 +3,7 @@ import axios from "axios";
 
 import { FaCopy, FaWallet } from "react-icons/fa";
 import AssociateNavbar from "./AssociateNavbar"; //  Fixed Navbar
+import HudLoader from "../../Components/HudLoader";
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
@@ -37,7 +38,7 @@ export default function AssociateHome() {
         setWalletBalance(walletRes.data.wallet_balance || 0);
 
         //  Investor deposits (exclude top ADMIN_EMAIL)
-        if (res.dataemail && res.data.email !== ADMIN_EMAIL) {
+        if (res.data?.email && res.data.email !== ADMIN_EMAIL) {
           const investorRes = await axios.get(`${API}/investor-roi-status`, {
             headers,
           });
@@ -65,7 +66,7 @@ export default function AssociateHome() {
   }, []);
 
   const copyReferral = () => {
-    if (userreferral_code) {
+    if (user?.referral_code) {
       const signupUrl = `${window.location.origin}/referral-signup?ref=${user.referral_code}`;
       navigator.clipboard.writeText(signupUrl);
       setCopied(true);
@@ -73,7 +74,7 @@ export default function AssociateHome() {
     }
   };
 
-  if (!user) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
+  if (!user) return <HudLoader text="Loading dashboard" />;
 
   //  Calculations
   const totalSelf = myDeposits.reduce((s, d) => s + d.capital, 0);
@@ -185,22 +186,24 @@ const pageWrapper = {
   alignItems: "center",
   background: "var(--fx-hero)",
   color: "var(--fx-ink)",
+  padding: "0 16px",
+  boxSizing: "border-box",
 };
 
 const mainContent = {
-  padding: "20px",
   marginTop: "100px",
   marginBottom: "70px",
   width: "100%",
   display: "flex",
   justifyContent: "center",
+  boxSizing: "border-box",
 };
 
 const haloBox = {
   width: "100%",
   maxWidth: "420px",
   padding: "20px",
-  margin: "0 20px",
+  margin: "0",
   borderRadius: "20px",
   background: "var(--fx-card)",
   border: "1px solid var(--fx-border)",

@@ -18,7 +18,7 @@ export default function WalletPage() {
       <InvestorNavbar />
 
       {/* Content Wrapper (with header/footer spacing) */}
-      <div style={contentWrapper}>
+      <div style={contentWrapper} className="wallet-shell">
         {/*  Wallet Section (fixed top look) */}
         <div style={walletWrapper}>
           <Wallet />
@@ -32,6 +32,16 @@ export default function WalletPage() {
           <Deposit hideInfoIcon={true} />
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .wallet-shell {
+            padding: 0;
+            padding-top: 72px;
+            padding-bottom: 84px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -45,35 +55,37 @@ const pageWrapper = {
   alignItems: "center",
   background: "var(--fx-hero)",
   color: "var(--fx-ink)",
+  padding: "0 16px",
+  boxSizing: "border-box",
 };
 
 const contentWrapper = {
   width: "100%",
   maxWidth: "1200px",
   margin: "0 auto",
-  padding: "20px",
   paddingTop: "80px",
   paddingBottom: "70px",
+  boxSizing: "border-box",
 };
 
 const walletWrapper = {
   flexShrink: 0,
-  padding: "20px",
+  padding: "2px",
   background: "var(--fx-card)",
   border: "1px solid var(--fx-border)",
   boxShadow: "var(--fx-shadow)",
   borderRadius: "12px",
-  margin: "0 20px 20px", // spacing from sides and bottom
+  marginBottom: "20px",
 };
 
 const depositWrapper = {
   flex: 1,
   overflowY: "auto",
-  padding: "0 20px 20px",
+  paddingBottom: "2px",
 };
 
 const dividerLine = {
-  margin: "0 20px 20px",
+  marginBottom: "20px",
   height: "2px",
   background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
   boxShadow: "0 0 8px var(--fx-accent)",

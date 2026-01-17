@@ -45,21 +45,23 @@ const pageWrapper = {
   alignItems: "center",
   background: "var(--fx-hero)",
   color: "var(--fx-ink)",
+  padding: "0 16px",
+  boxSizing: "border-box",
 };
 
 const contentWrapper = {
   width: "100%",
   maxWidth: "1200px",
   margin: "0 auto",
-  padding: "20px",
   paddingTop: "80px",
   paddingBottom: "70px",
+  boxSizing: "border-box",
 };
 
 const walletWrapper = {
   flexShrink: 0,
   padding: "20px",
-  margin: "0 20px 20px",
+  marginBottom: "20px",
   background: "var(--fx-card)",
   border: "1px solid var(--fx-border)",
   borderRadius: "12px",
@@ -69,11 +71,11 @@ const walletWrapper = {
 const depositWrapper = {
   flex: 1,
   overflowY: "auto",
-  padding: "0 20px 20px",
+  paddingBottom: "20px",
 };
 
 const dividerLine = {
-  margin: "0 20px 20px",
+  marginBottom: "20px",
   height: "2px",
   background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
   boxShadow: "0 0 8px var(--fx-accent)",

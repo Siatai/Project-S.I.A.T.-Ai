@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar"; //  Associate Navbar
+import HudLoader from "../../Components/HudLoader";
 
 export default function AssociateWithdrawal() {
   const [summary, setSummary] = useState(null);
@@ -120,13 +121,13 @@ export default function AssociateWithdrawal() {
     }
   };
 
-  if (loading) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
+  if (loading) return <HudLoader text="Loading withdrawal" />;
 
   return (
     <div style={pageWrapper}>
       <AssociateNavbar />
 
-      <div style={wrapper}>
+      <div style={wrapper} className="page-shell">
         <h2 style={headerTitle}>Withdrawal</h2>
 
         {/*  Total Earnings Card */}
@@ -187,8 +188,8 @@ export default function AssociateWithdrawal() {
 
         {/*  Withdrawals History */}
         <h3 style={subHeader}>Withdrawal History</h3>
-        <div style={tableWrapper}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={tableWrapper} className="withdraw-table">
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
             <thead>
               <tr style={{ background: "rgba(8, 10, 20, 0.7)" }}>
                 {["Date", "Amount", "Status"].map((h, i) => (
@@ -225,6 +226,20 @@ export default function AssociateWithdrawal() {
           </table>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .page-shell {
+            padding: 16px;
+            padding-top: 72px;
+            padding-bottom: 84px;
+          }
+          .withdraw-table {
+            margin: 0 -6px;
+            padding: 10px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -240,11 +255,19 @@ const pageWrapper = {
   color: "var(--fx-ink)",
 };
 
-const wrapper = { padding: "20px", marginTop: "80px", marginBottom: "70px" };
+const wrapper = {
+  padding: "20px",
+  marginTop: "80px",
+  marginBottom: "70px",
+  width: "100%",
+  maxWidth: "1200px",
+  boxSizing: "border-box",
+};
 const headerTitle = {
   fontFamily: "var(--fx-font-display)",
   color: "var(--fx-accent)",
-  marginBottom: "20px",
+  marginBottom: "16px",
+  fontSize: "18px",
 };
 const highlightCard = {
   background: "var(--fx-card-strong)",
@@ -264,15 +287,15 @@ const mainCard = {
   boxShadow: "var(--fx-shadow)",
   textAlign: "center",
 };
-const cardTitle = { fontSize: "15px", color: "var(--fx-muted)", marginBottom: "10px" };
-const bigValue = { fontSize: "28px", fontWeight: "700", color: "var(--fx-ink)" };
-const bigValueTeal = { fontSize: "26px", fontWeight: "700", color: "var(--fx-accent)" };
+const cardTitle = { fontSize: "13px", color: "var(--fx-muted)", marginBottom: "8px" };
+const bigValue = { fontSize: "24px", fontWeight: "700", color: "var(--fx-ink)" };
+const bigValueTeal = { fontSize: "22px", fontWeight: "700", color: "var(--fx-accent)" };
 const miniRows = { marginTop: "15px", textAlign: "left" };
 const miniRow = {
   display: "flex",
   justifyContent: "space-between",
   marginBottom: "6px",
-  fontSize: "14px",
+  fontSize: "12px",
   color: "var(--fx-ink)",
 };
 const btnTeal = {
@@ -314,21 +337,22 @@ const subHeader = {
 };
 const tableWrapper = {
   borderRadius: "12px",
-  overflowX: "auto",
+  overflowX: "hidden",
   background: "var(--fx-card)",
   border: "1px solid var(--fx-border)",
   boxShadow: "var(--fx-shadow)",
 };
 const thStyle = {
-  padding: "12px",
+  padding: "10px",
   textAlign: "left",
-  fontSize: "14px",
+  fontSize: "12px",
   color: "var(--fx-muted)",
 };
 const rowStyle = { borderBottom: "1px solid var(--fx-border)" };
 const tdStyle = {
-  padding: "12px",
-  fontSize: "14px",
+  padding: "10px",
+  fontSize: "12px",
   color: "var(--fx-ink)",
   fontFamily: "var(--fx-font-body)",
+  wordBreak: "break-word",
 };

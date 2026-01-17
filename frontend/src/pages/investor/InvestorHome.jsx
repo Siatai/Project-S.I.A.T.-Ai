@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaWallet } from "react-icons/fa";
 import InvestorNavbar from "./Navbar";
+import HudLoader from "../../Components/HudLoader";
 
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
@@ -71,7 +72,7 @@ export default function InvestorHome() {
     }
   };
 
-  if (!user) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
+  if (!user) return <HudLoader text="Loading dashboard" />;
 
   return (
     <div style={pageWrapper}>
@@ -103,7 +104,7 @@ export default function InvestorHome() {
           </div>
         </div>
 
-        <p style={{ marginTop: 15, color: "var(--fx-muted)" }}>
+        <p style={helperText}>
           You can deposit funds, withdraw profits, and track your ROI here.
         </p>
 
@@ -151,7 +152,7 @@ export default function InvestorHome() {
         </div>
 
         {/*  Associate Status / Button */}
-        <div style={{ marginTop: 40, textAlign: "center" }}>
+        <div style={{ marginTop: 40, textAlign: "center", width: "100%" }}>
           {isAssociate ? (
             <p style={{ color: "var(--fx-success)", fontWeight: "600" }}>
               Welcome, <strong>Associate</strong>! You now have referral access.
@@ -229,21 +230,28 @@ const pageWrapper = {
   alignItems: "center",
   background: "var(--fx-hero)",
   color: "var(--fx-ink)",
+  padding: "0 16px",
+  boxSizing: "border-box",
 };
 
 const contentWrapper = {
   width: "100%",
   maxWidth: "1200px",
   margin: "0 auto",
-  padding: "20px",
   paddingTop: "80px",
   paddingBottom: "70px",
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
 };
 
 const welcomeText = {
   fontFamily: "var(--fx-font-display)",
   fontSize: "22px",
   color: "var(--fx-accent)",
+  width: "100%",
+  maxWidth: "920px",
 };
 
 const cardStyle = {
@@ -253,7 +261,8 @@ const cardStyle = {
   background: "var(--fx-card)",
   border: "1px solid var(--fx-border)",
   backdropFilter: "blur(10px)",
-  maxWidth: "600px",
+  width: "100%",
+  maxWidth: "920px",
   boxShadow: "var(--fx-shadow)",
 };
 
@@ -274,6 +283,8 @@ const walletCard = {
   padding: "15px 20px",
   margin: "15px 0",
   boxShadow: "var(--fx-shadow)",
+  width: "100%",
+  maxWidth: "920px",
 };
 
 const walletIconBox = {
@@ -323,6 +334,13 @@ const btnTeal = {
   cursor: "pointer",
   boxShadow: "0 0 15px rgba(var(--fx-accent-rgb),0.4)",
   transition: "all 0.3s ease",
+};
+
+const helperText = {
+  marginTop: 15,
+  color: "var(--fx-muted)",
+  width: "100%",
+  maxWidth: "920px",
 };
 
 const popupOverlay = {

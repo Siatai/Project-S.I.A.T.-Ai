@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar"; //  Navbar for associates
+import HudLoader from "../../Components/HudLoader";
 
 export default function AssociateHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -80,12 +81,12 @@ export default function AssociateHistory() {
     <div style={pageWrapper}>
       <AssociateNavbar />
 
-      <div style={mainContent}>
+      <div style={mainContent} className="page-shell">
         <h2 style={headerTitle}>Transaction History</h2>
         <div style={glowLine} />
 
         {/* Filters */}
-        <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
+        <div style={{ marginBottom: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
           {[
             { key: "all", label: "All" },
             { key: "7d", label: "Last 7 Days" },
@@ -118,9 +119,9 @@ export default function AssociateHistory() {
         </div>
 
         {/* Table / Mobile Cards */}
-        <div className="fx-table-wrap" style={cardWrapper}>
+        <div>
           {loading ? (
-            <p style={{ padding: "20px" }}>Loading transactions...</p>
+            <HudLoader text="Loading history" />
           ) : filteredTx.length === 0 ? (
             <p style={{ padding: "20px", color: colors.textSecondary }}>
               No transactions found.
@@ -172,7 +173,13 @@ export default function AssociateHistory() {
                       {t.status}
                     </span>
                   </p>
-                  <p style={{ fontFamily: "monospace", color: colors.textSecondary }}>
+                  <p
+                    style={{
+                      fontFamily: "monospace",
+                      color: colors.textSecondary,
+                      wordBreak: "break-all",
+                    }}
+                  >
                     <strong>Tx:</strong> {t.tx}
                   </p>
                   <p>
@@ -237,6 +244,19 @@ export default function AssociateHistory() {
           )}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .page-shell {
+            padding: 16px;
+            padding-top: 72px;
+            padding-bottom: 84px;
+          }
+          .fx-table-wrap {
+            padding: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -258,12 +278,18 @@ const pageWrapper = {
   alignItems: "center",
   background: "var(--fx-hero)",
   color: "var(--fx-ink)",
+  padding: "0 16px",
+  boxSizing: "border-box",
+  overflowX: "hidden",
 };
 
 const mainContent = {
   padding: "20px",
   marginTop: "80px",
   marginBottom: "70px",
+  width: "100%",
+  maxWidth: "1200px",
+  boxSizing: "border-box",
 };
 
 const headerTitle = {
@@ -279,25 +305,19 @@ const glowLine = {
   margin: "8px 0 20px 0",
 };
 
-const cardWrapper = {
-  background: "var(--fx-hero)",
-  borderRadius: "12px",
-  overflowX: "auto",
-  maxWidth: "100%",
-  padding: "10px",
-};
-
 const mobileCard = {
   background: "var(--fx-card-strong)",
   borderRadius: "12px",
-  padding: "15px",
+  padding: "14px",
   border: "1px solid var(--fx-border)",
   boxShadow: "var(--fx-shadow)",
+  fontSize: "14px",
+  lineHeight: 1.5,
 };
 
 const tableStyle = {
   width: "100%",
-  minWidth: "700px",
+  tableLayout: "fixed",
 };
 
 const thStyle = {
@@ -316,4 +336,6 @@ const tdStyle = {
   fontSize: "14px",
   color: colors.textPrimary,
   fontFamily: "var(--fx-font-body)",
+  wordBreak: "break-word",
+  whiteSpace: "normal",
 };

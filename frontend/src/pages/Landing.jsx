@@ -67,6 +67,18 @@ export default function Landing() {
           zIndex: 0,
         }}
       />
+      {/* Subtle texture */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          opacity: 0.035,
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
 
       {/* Sticky Header */}
       <header
@@ -296,6 +308,7 @@ export default function Landing() {
             Get Started
           </motion.button>
           <div
+            className="hero-status"
             style={{
               display: "flex",
               alignItems: "center",
@@ -353,6 +366,7 @@ export default function Landing() {
           ].map((item) => (
             <div
               key={item.label}
+              className="hero-metric-card"
               style={{
                 border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
                 borderRadius: "12px",
@@ -487,14 +501,43 @@ export default function Landing() {
 
         @media (max-width: 768px) {
           .landing-hero {
-            padding: 40px 20px;
-            margin: 20px 10px;
+            padding: 36px 18px;
+            margin: 18px 12px;
+            align-items: center;
+            text-align: center;
           }
           .landing-title {
             font-size: 28px;
           }
           .hero-metrics {
             grid-template-columns: 1fr 1fr;
+            justify-items: center;
+          }
+          .hero-right {
+            display: none !important;
+          }
+          .hero-cta-row {
+            justify-content: center;
+          }
+          .hero-status {
+            justify-content: center;
+          }
+          .hero-metric-card {
+            text-align: center;
+            width: 100%;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .hero-right {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .flow-section {
+            padding: 44px 18px 54px;
+            margin: 18px 12px;
           }
         }
 

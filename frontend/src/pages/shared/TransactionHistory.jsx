@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import InvestorNavbar from "../investor/Navbar"; //  Import Navbar
+import HudLoader from "../../Components/HudLoader";
 
 export default function TransactionHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -81,7 +82,7 @@ export default function TransactionHistory() {
       {/*  Navbar */}
       <InvestorNavbar />
 
-      <div style={contentWrapper}>
+      <div style={contentWrapper} className="page-shell">
         <h2
           style={{
             marginBottom: "10px",
@@ -94,7 +95,7 @@ export default function TransactionHistory() {
         <div style={glowLine} />
 
         {/* Filters */}
-        <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
+        <div style={{ marginBottom: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
           {[
             { key: "all", label: "All" },
             { key: "7d", label: "Last 7 Days" },
@@ -127,9 +128,9 @@ export default function TransactionHistory() {
         </div>
 
         {/* Table / Mobile Cards */}
-        <div className="fx-table-wrap">
+        <div>
           {loading ? (
-            <p style={{ padding: "20px" }}>Loading transactions...</p>
+            <HudLoader text="Loading history" />
           ) : filteredTx.length === 0 ? (
             <p style={{ padding: "20px", color: "var(--fx-muted)" }}>
               No transactions found.
@@ -220,6 +221,19 @@ export default function TransactionHistory() {
           )}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .page-shell {
+            padding: 16px;
+            padding-top: 72px;
+            padding-bottom: 84px;
+          }
+          .fx-table-wrap {
+            padding: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -233,6 +247,9 @@ const pageWrapper = {
   alignItems: "center",
   background: "var(--fx-hero)",
   color: "var(--fx-ink)",
+  padding: "0 16px",
+  boxSizing: "border-box",
+  overflowX: "hidden",
 };
 
 const contentWrapper = {
@@ -242,11 +259,12 @@ const contentWrapper = {
   padding: "20px",
   paddingTop: "80px",
   paddingBottom: "70px",
+  boxSizing: "border-box",
 };
 
 const tableStyle = {
   width: "100%",
-  minWidth: "700px",
+  tableLayout: "fixed",
 };
 
 const thStyle = {
@@ -263,6 +281,8 @@ const tdStyle = {
   fontSize: "14px",
   color: "var(--fx-ink)",
   fontFamily: "var(--fx-font-body)",
+  wordBreak: "break-word",
+  whiteSpace: "normal",
 };
 
 const glowLine = {
@@ -275,7 +295,9 @@ const glowLine = {
 const mobileCard = {
   background: "var(--fx-card-strong)",
   borderRadius: "12px",
-  padding: "15px",
+  padding: "14px",
   border: "1px solid var(--fx-border)",
   boxShadow: "var(--fx-shadow)",
+  fontSize: "14px",
+  lineHeight: 1.5,
 };

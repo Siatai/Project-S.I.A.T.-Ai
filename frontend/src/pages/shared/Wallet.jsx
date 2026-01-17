@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import HudLoader from "../../Components/HudLoader";
 
 export default function Wallet() {
   const [wallet, setWallet] = useState("");
@@ -104,11 +105,10 @@ export default function Wallet() {
     }
   };
 
-  if (loading)
-    return <p style={{ color: "var(--fx-ink)", textAlign: "center" }}>Loading...</p>;
+  if (loading) return <HudLoader text="Loading wallet" />;
 
   return (
-    <div style={{ color: "var(--fx-ink)", padding: "20px" }}>
+    <div style={{ color: "var(--fx-ink)", padding: "2px" }}>
       <h2
         style={{
           marginBottom: "10px",
