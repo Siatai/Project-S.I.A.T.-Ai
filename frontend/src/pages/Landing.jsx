@@ -602,16 +602,22 @@ export default function Landing() {
 
         .hero-scan {
           position: absolute;
-          inset: -20% 0 0;
+          inset: -40% 0 0;
           pointer-events: none;
-          background: linear-gradient(180deg, transparent 0%, rgba(var(--fx-accent-rgb), 0.14) 50%, transparent 100%);
-          animation: scanDown 6s linear infinite;
+          background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(var(--fx-accent-rgb), 0.18) 45%,
+            rgba(var(--fx-accent-rgb), 0.08) 55%,
+            transparent 70%
+          );
+          animation: scanDown 7s linear infinite;
           opacity: 0.6;
         }
 
         @keyframes scanDown {
-          0% { transform: translateY(-40%); }
-          100% { transform: translateY(40%); }
+          0% { transform: translateY(-60%); }
+          100% { transform: translateY(60%); }
         }
 
         .hero-metrics {
