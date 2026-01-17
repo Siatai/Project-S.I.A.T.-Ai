@@ -51,6 +51,15 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+}
+
 html,
 body,
 #root {

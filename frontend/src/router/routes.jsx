@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // Layout (only for Admin now)
 import DashboardLayout from "../Layouts/DashboardLayout";
@@ -49,9 +49,20 @@ function RequireAdmin({ children }) {
 }
 
 // --- Routes ---
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+}
+
 export default function AppRoutes() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* 🌍 Public Pages */}
         <Route path="/" element={<Landing />} />
