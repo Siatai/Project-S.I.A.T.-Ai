@@ -31,7 +31,7 @@ export default function FlowSection() {
         backdropFilter: "blur(12px)",
       }}
     >
-      <div style={{ flex: "1 1 320px" }}>
+      <div style={{ flex: "1 1 320px", textAlign: "justify" }}>
         <div
           style={{
             display: "inline-flex",
@@ -58,6 +58,7 @@ export default function FlowSection() {
             color: "var(--fx-ink)",
             textShadow: "0 0 16px rgba(var(--fx-accent-rgb),0.25)",
             fontFamily: "var(--fx-font-display)",
+            textAlign: "center",
           }}
         >
           A precision pipeline that senses, decides, and executes in real time.
@@ -67,6 +68,8 @@ export default function FlowSection() {
             color: "var(--fx-muted-2)",
             lineHeight: "1.6",
             maxWidth: "420px",
+            marginLeft: "auto",
+            marginRight: "auto",
           }}
         >
           Each layer is tuned for stability and speed, so AlgoM3 stays composed through

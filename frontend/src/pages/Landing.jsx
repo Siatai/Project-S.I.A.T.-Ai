@@ -193,38 +193,39 @@ export default function Landing() {
             </div>
           </div>
         </div>
-        <motion.div
-          className="landing-kicker"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "10px",
-            padding: "10px 18px",
-            borderRadius: "999px",
-            border: "1px solid rgba(var(--fx-accent-rgb), 0.3)",
-            color: "var(--fx-accent)",
-            fontSize: "11px",
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            fontFamily: "var(--fx-font-mono)",
-            marginBottom: "20px",
-            background: "rgba(var(--fx-accent-rgb), 0.08)",
-          }}
-        >
-          <span
+        <div className="hero-content">
+          <motion.div
+            className="landing-kicker"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              background: "var(--fx-accent-2)",
-              boxShadow: "0 0 12px rgba(var(--fx-accent-2-rgb), 0.6)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px 18px",
+              borderRadius: "999px",
+              border: "1px solid rgba(var(--fx-accent-rgb), 0.3)",
+              color: "var(--fx-accent)",
+              fontSize: "11px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontFamily: "var(--fx-font-mono)",
+              marginBottom: "20px",
+              background: "rgba(var(--fx-accent-rgb), 0.08)",
             }}
-          />
-          Command Interface Online
-        </motion.div>
+          >
+            <span
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: "var(--fx-accent-2)",
+                boxShadow: "0 0 12px rgba(var(--fx-accent-2-rgb), 0.6)",
+              }}
+            />
+            Command Interface Online
+          </motion.div>
 
         <motion.h2
           className="landing-title"
@@ -246,9 +247,7 @@ export default function Landing() {
             style={{
               color: "var(--fx-accent)",
               textShadow:
-                "0 0 12px rgba(var(--fx-accent-rgb),0.7), 0 0 28px rgba(var(--fx-accent-rgb),0.45)",
-              filter:
-                "drop-shadow(0 0 10px rgba(var(--fx-accent-rgb),0.65)) drop-shadow(0 0 26px rgba(var(--fx-accent-rgb),0.35))",
+                "0 0 6px rgba(var(--fx-accent-rgb),0.5), 0 0 14px rgba(var(--fx-accent-rgb),0.25)",
               background: "transparent",
               display: "inline-block",
               animation: "pulse 2s infinite",
@@ -279,39 +278,43 @@ export default function Landing() {
           monthly with volatility-aware controls.
         </motion.p>
 
-        <div
-          className="hero-cta-row"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          <motion.button
-            className="landing-cta"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setAuthOpen(true)}
+          <div
+            className="hero-cta-row"
             style={{
-              background:
-                "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
-              color: "#05101b",
-              border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
-              padding: "14px 35px",
-              borderRadius: "6px",
-              fontSize: "14px",
-              fontWeight: "700",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              fontFamily: "var(--fx-font-display)",
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              boxShadow: "0 10px 20px rgba(var(--fx-accent-rgb),0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+              flexWrap: "wrap",
             }}
           >
-            Get Started
-          </motion.button>
+            <motion.button
+              className="landing-cta"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setAuthOpen(true)}
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
+                color: "#05101b",
+                border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
+                padding: "14px 35px",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "700",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                fontFamily: "var(--fx-font-display)",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                boxShadow: "0 10px 20px rgba(var(--fx-accent-rgb),0.2)",
+              }}
+            >
+              Get Started
+            </motion.button>
+          </div>
+        </div>
+
+        <div className="hero-subpanel">
           <div
             className="hero-status"
             style={{
@@ -322,45 +325,63 @@ export default function Landing() {
               fontSize: "12px",
               textTransform: "uppercase",
               letterSpacing: "0.18em",
+              justifyContent: "center",
+              width: "100%",
+              textAlign: "center",
+              whiteSpace: "nowrap",
+              margin: "0 auto",
             }}
           >
             <span
               style={{
-                height: "2px",
-                width: "50px",
-                background: "var(--fx-accent)",
-                boxShadow: "0 0 10px rgba(var(--fx-accent-rgb), 0.5)",
+                height: "10px",
+                width: "10px",
+                borderRadius: "50%",
+                background: "var(--fx-success)",
+                boxShadow: "0 0 12px rgba(34,197,94,0.9)",
+                display: "inline-block",
+                animation: "pulseGreen 1.6s ease-in-out infinite",
               }}
             />
             Live Systems Active
           </div>
-        </div>
 
-        {/* New Slogan */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 1 }}
-          style={{
-            fontSize: "22px",
-            marginTop: "28px",
-            color: "var(--fx-accent)",
-            fontWeight: "600",
-            textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.6)",
-            fontFamily: "var(--fx-font-display)",
-            letterSpacing: "0.05em",
-          }}
-        >
-          Signal. Execute. Scale. No noise, just results.
-        </motion.p>
-        <div className="hero-grid" />
-        <div className="hero-scan" />
-        <div
+          {/* New Slogan */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1 }}
+            style={{
+              fontSize: "22px",
+              marginTop: "18px",
+              color: "var(--fx-accent)",
+              fontWeight: "600",
+              textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.6)",
+              fontFamily: "var(--fx-font-display)",
+              letterSpacing: "0.05em",
+              textAlign: "center",
+              width: "100%",
+            }}
+          >
+            <span style={{ display: "block", fontSize: "20px" }}>
+              Signal. Execute. Scale.
+            </span>
+            <span style={{ display: "block", fontSize: "16px", color: "var(--fx-muted-2)" }}>
+              No noise, just results.
+            </span>
+          </motion.p>
+
+          <div
           className="hero-metrics"
           style={{
             display: "grid",
             gap: "16px",
-            marginTop: "40px",
+            marginTop: "26px",
+            width: "100%",
+            maxWidth: "720px",
+            marginLeft: "auto",
+            marginRight: "auto",
+            justifyItems: "center",
           }}
         >
           {[
@@ -378,6 +399,12 @@ export default function Landing() {
                 padding: "20px",
                 background:
                   "linear-gradient(145deg, rgba(6, 14, 28, 0.9), rgba(10, 22, 42, 0.7))",
+                width: "100%",
+                minHeight: "110px",
+                display: "grid",
+                alignContent: "center",
+                gap: "6px",
+                textAlign: "center",
               }}
             >
               <div
@@ -393,10 +420,12 @@ export default function Landing() {
               </div>
               <div
                 style={{
-                  fontSize: "20px",
+                  fontSize: "17px",
                   color: "var(--fx-accent)",
                   fontWeight: "600",
-                  marginTop: "6px",
+                  lineHeight: "1.2",
+                  wordBreak: "normal",
+                  hyphens: "manual",
                 }}
               >
                 {item.value}
@@ -404,6 +433,9 @@ export default function Landing() {
             </div>
           ))}
         </div>
+        </div>
+        <div className="hero-grid" />
+        <div className="hero-scan" />
       </main>
 
       <Divider />
@@ -455,6 +487,11 @@ export default function Landing() {
           50% { opacity: 0.7; text-shadow: 0 0 15px var(--fx-accent); }
           100% { opacity: 1; text-shadow: 0 0 25px var(--fx-accent), 0 0 60px var(--fx-bg); }
         }
+        @keyframes pulseGreen {
+          0% { transform: scale(1); box-shadow: 0 0 10px rgba(34,197,94,0.7); }
+          50% { transform: scale(1.25); box-shadow: 0 0 18px rgba(34,197,94,0.95); }
+          100% { transform: scale(1); box-shadow: 0 0 10px rgba(34,197,94,0.7); }
+        }
         @keyframes shine {
           0% { left: -50%; }
           100% { left: 120%; }
@@ -504,6 +541,29 @@ export default function Landing() {
           grid-template-columns: repeat(4, 1fr);
         }
 
+        .hero-content {
+          width: 100%;
+          max-width: 720px;
+        }
+
+        .hero-subpanel {
+          width: 100%;
+          max-width: 760px;
+          margin-top: 30px;
+          padding: 24px 22px;
+          border-radius: 18px;
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.25);
+          background: linear-gradient(150deg, rgba(6, 14, 30, 0.85), rgba(10, 20, 38, 0.8));
+          box-shadow: 0 18px 30px rgba(2, 8, 18, 0.45);
+          margin-left: auto;
+          margin-right: auto;
+          text-align: center;
+          align-self: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
         @media (max-width: 768px) {
           .landing-hero {
             padding: 36px 18px;
@@ -536,6 +596,9 @@ export default function Landing() {
         @media (max-width: 900px) {
           .hero-right {
             display: none !important;
+          }
+          .hero-metrics {
+            grid-template-columns: 1fr;
           }
         }
 
@@ -575,6 +638,7 @@ export default function Landing() {
           .hero-metrics {
             justify-items: center;
             width: 100%;
+            grid-template-columns: 1fr;
           }
           .hero-grid {
             opacity: 0.25;
@@ -586,11 +650,17 @@ export default function Landing() {
 
         @media (min-width: 900px) {
           .landing-hero {
-            padding-right: 280px;
+            padding: 72px 70px 64px;
+            padding-right: 320px;
+            align-items: flex-start;
+            text-align: left;
           }
           .hero-metrics {
             grid-template-columns: repeat(4, minmax(160px, 1fr));
             justify-items: stretch;
+          }
+          .hero-subpanel {
+            margin-left: 0;
           }
           .hero-right {
             position: absolute;
@@ -598,6 +668,12 @@ export default function Landing() {
             right: 28px;
             width: 210px;
             display: block;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .hero-metrics {
+            grid-template-columns: 1fr;
           }
         }
 
