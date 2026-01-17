@@ -193,6 +193,28 @@ export default function Landing() {
             </div>
           </div>
         </div>
+        <div className="hero-right-orb" aria-hidden="true">
+          <div className="hero-right-orb__ring" />
+          <div className="hero-right-orb__ring hero-right-orb__ring--outer" />
+          <div className="hero-right-orb__core">
+            <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+              <defs>
+                <linearGradient id="botGlow" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="rgba(31,215,255,0.9)" />
+                  <stop offset="1" stopColor="rgba(6,182,212,0.7)" />
+                </linearGradient>
+              </defs>
+              <rect x="12" y="18" width="40" height="30" rx="8" fill="url(#botGlow)" opacity="0.15" />
+              <rect x="16" y="20" width="32" height="26" rx="7" fill="none" stroke="rgba(31,215,255,0.8)" strokeWidth="2" />
+              <circle cx="26" cy="33" r="4" fill="rgba(31,215,255,0.9)" />
+              <circle cx="38" cy="33" r="4" fill="rgba(31,215,255,0.9)" />
+              <rect x="28" y="40" width="8" height="4" rx="2" fill="rgba(31,215,255,0.7)" />
+              <line x1="32" y1="8" x2="32" y2="16" stroke="rgba(31,215,255,0.7)" strokeWidth="2" />
+              <circle cx="32" cy="6" r="3" fill="rgba(31,215,255,0.9)" />
+            </svg>
+          </div>
+          <div className="hero-right-orb__pulse" />
+        </div>
         <div className="hero-content">
           <motion.div
             className="landing-kicker"
@@ -260,59 +282,42 @@ export default function Landing() {
           for Precision Growth
         </motion.h2>
 
-        <motion.p
-          className="landing-subtitle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
+        <div
+          className="hero-cta-row"
           style={{
-            fontSize: "17px",
-            color: "var(--fx-muted-2)",
-            lineHeight: "1.6",
-            marginBottom: "30px",
-            maxWidth: "600px",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+            marginTop: "8px",
           }}
         >
-          Adaptive strategy, disciplined execution, and transparent reporting. Targeting{" "}
-          <span style={{ color: "var(--fx-accent-2)", fontWeight: "600" }}>8-10% ROI</span>{" "}
-          monthly with volatility-aware controls.
-        </motion.p>
-
-          <div
-            className="hero-cta-row"
+          <motion.button
+            className="landing-cta"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setAuthOpen(true)}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "20px",
-              flexWrap: "wrap",
+              background:
+                "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
+              color: "#05101b",
+              border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
+              padding: "14px 35px",
+              borderRadius: "6px",
+              fontSize: "14px",
+              fontWeight: "700",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              fontFamily: "var(--fx-font-display)",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              boxShadow: "0 10px 20px rgba(var(--fx-accent-rgb),0.2)",
             }}
           >
-            <motion.button
-              className="landing-cta"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setAuthOpen(true)}
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
-                color: "#05101b",
-                border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
-                padding: "14px 35px",
-                borderRadius: "6px",
-                fontSize: "14px",
-                fontWeight: "700",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                fontFamily: "var(--fx-font-display)",
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                boxShadow: "0 10px 20px rgba(var(--fx-accent-rgb),0.2)",
-              }}
-            >
-              Get Started
-            </motion.button>
-          </div>
+            Initiate
+          </motion.button>
         </div>
+      </div>
 
         <div className="hero-subpanel">
           <div
@@ -371,19 +376,89 @@ export default function Landing() {
             </span>
           </motion.p>
 
+          <motion.ul
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } },
+            }}
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: "18px auto 0",
+              width: "100%",
+              maxWidth: "560px",
+              display: "grid",
+              gap: "10px",
+              color: "var(--fx-muted-2)",
+              textAlign: "left",
+            }}
+          >
+            {[
+              "Volatility-aware risk control with adaptive throttling.",
+              "8-10% monthly ROI target with transparent reporting.",
+              "Signal stack tuned for disciplined execution.",
+              "Low-latency routing for clean entries.",
+            ].map((point) => (
+              <motion.li
+                key={point}
+                variants={{
+                  hidden: { opacity: 0, x: -12 },
+                  show: { opacity: 1, x: 0 },
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(var(--fx-accent-rgb), 0.25)",
+                  background: "rgba(6, 14, 28, 0.75)",
+                }}
+              >
+                <span
+                  style={{
+                    height: "8px",
+                    width: "8px",
+                    borderRadius: "50%",
+                    background: "var(--fx-accent)",
+                    boxShadow: "0 0 10px rgba(var(--fx-accent-rgb),0.6)",
+                    display: "inline-block",
+                  }}
+                />
+                <span style={{ fontSize: "13px", lineHeight: "1.4" }}>{point}</span>
+              </motion.li>
+            ))}
+          </motion.ul>
+
           <div
-          className="hero-metrics"
-          style={{
-            display: "grid",
-            gap: "16px",
-            marginTop: "26px",
-            width: "100%",
-            maxWidth: "720px",
-            marginLeft: "auto",
-            marginRight: "auto",
-            justifyItems: "center",
-          }}
-        >
+            className="hero-metrics"
+            style={{
+              display: "grid",
+              gap: "16px",
+              marginTop: "26px",
+              width: "100%",
+              maxWidth: "720px",
+              marginLeft: "auto",
+              marginRight: "auto",
+              justifyItems: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                textAlign: "center",
+                fontSize: "12px",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                color: "var(--fx-muted)",
+                fontFamily: "var(--fx-font-mono)",
+                marginBottom: "-4px",
+              }}
+            >
+              Metrics
+            </div>
           {[
             { label: "Latency", value: "< 120ms" },
             { label: "Strategy", value: "Adaptive AI" },
@@ -646,6 +721,9 @@ export default function Landing() {
           .hero-scan {
             opacity: 0.35;
           }
+          .hero-right-orb__core svg {
+            display: none;
+          }
         }
 
         @media (min-width: 900px) {
@@ -661,12 +739,14 @@ export default function Landing() {
           }
           .hero-subpanel {
             margin-left: 0;
+            margin-top: 16px;
+            align-self: flex-start;
           }
           .hero-right {
             position: absolute;
-            top: 86px;
-            right: 28px;
-            width: 210px;
+            top: 450px;
+            right: 44px;
+            width: 240px;
             display: block;
           }
         }
@@ -725,6 +805,59 @@ export default function Landing() {
         .hero-right-metric strong {
           color: var(--fx-accent);
           font-weight: 600;
+        }
+
+        .hero-right-orb {
+          position: absolute;
+          top: 96px;
+          right: 54px;
+          width: 180px;
+          height: 180px;
+          display: grid;
+          place-items: center;
+          pointer-events: none;
+          opacity: 0.9;
+        }
+
+        .hero-right-orb__ring {
+          position: absolute;
+          inset: 18px;
+          border-radius: 50%;
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.35);
+          animation: orbit 8s linear infinite;
+        }
+
+        .hero-right-orb__ring--outer {
+          inset: -6px;
+          border: 1px dashed rgba(var(--fx-accent-rgb), 0.25);
+          animation-duration: 12s;
+        }
+
+        .hero-right-orb__core {
+          width: 88px;
+          height: 88px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          font-family: var(--fx-font-display);
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          color: var(--fx-accent);
+          background: radial-gradient(circle at 30% 30%, rgba(var(--fx-accent-rgb), 0.35), rgba(6, 14, 28, 0.9));
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.5);
+          box-shadow: 0 0 26px rgba(var(--fx-accent-rgb), 0.3);
+        }
+
+        .hero-right-orb__core svg {
+          filter: drop-shadow(0 0 12px rgba(var(--fx-accent-rgb), 0.7));
+        }
+
+        .hero-right-orb__pulse {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.2);
+          animation: pulseGreen 2.4s ease-in-out infinite;
         }
       `}</style>
 
