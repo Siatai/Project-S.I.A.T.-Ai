@@ -819,7 +819,7 @@ export default function Landing() {
 
         .initiate-btn {
           position: relative;
-          min-width: 220px;
+          min-width: 280px;
           text-align: left;
         }
 
@@ -827,10 +827,14 @@ export default function Landing() {
           content: "";
           position: absolute;
           inset: 0;
-          border-radius: 14px;
-          background: linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.95), rgba(var(--fx-accent-rgb), 0.65));
-          border: 1px solid rgba(var(--fx-accent-rgb), 0.8);
-          box-shadow: 0 16px 28px rgba(var(--fx-accent-rgb), 0.25);
+          border-radius: 16px;
+          background:
+            linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.95), rgba(var(--fx-accent-rgb), 0.6));
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.85);
+          box-shadow:
+            0 16px 30px rgba(var(--fx-accent-rgb), 0.28),
+            inset 0 -10px 18px rgba(0, 0, 0, 0.25);
+          clip-path: polygon(0 0, 92% 0, 100% 20%, 100% 80%, 92% 100%, 0 100%, 0 70%, 4% 62%, 4% 38%, 0 30%);
         }
 
         .initiate-btn::after {
@@ -838,8 +842,8 @@ export default function Landing() {
           position: absolute;
           top: 50%;
           left: 16px;
-          width: 50px;
-          height: 50px;
+          width: 54px;
+          height: 54px;
           transform: translateY(-50%);
           border-radius: 50%;
           background:
@@ -854,7 +858,7 @@ export default function Landing() {
         .initiate-btn span {
           position: relative;
           z-index: 1;
-          color: #05101b;
+          color: #04121f;
           text-shadow: 0 0 6px rgba(255,255,255,0.3);
         }
 
