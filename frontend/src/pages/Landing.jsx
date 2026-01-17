@@ -215,7 +215,7 @@ export default function Landing() {
           </div>
           <div className="hero-right-orb__pulse" />
         </div>
-        <div className="hero-content">
+        <div className="hero-content" style={{ position: "relative", zIndex: 9999 }}>
           <motion.div
             className="landing-kicker"
             initial={{ opacity: 0, y: 18 }}
