@@ -216,7 +216,7 @@ const inputStyle = {
   border: "1px solid var(--fx-border)",
   background: "rgba(8, 10, 20, 0.6)",
   color: "var(--fx-ink)",
-  fontSize: "14px",
+  fontSize: "12px",
   boxSizing: "border-box",
 };
 
