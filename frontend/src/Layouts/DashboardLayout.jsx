@@ -178,7 +178,7 @@ export default function DashboardLayout() {
                 textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb), 0.6)",
               }}
             >
-              AlgoM3 AI
+              AlgoM3
             </h1>
           </div>
 

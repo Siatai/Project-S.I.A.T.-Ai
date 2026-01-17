@@ -44,7 +44,7 @@ export default function AssociateNavbar() {
       <header style={headerStyle}>
         {/* Center: Brand */}
         <h2 style={brandText}>
-          AlgoM3 AI
+          AlgoM3
         </h2>
 
         {/* Right: Panel name + Profile */}

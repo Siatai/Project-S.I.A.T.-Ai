@@ -44,7 +44,7 @@ export default function InvestorNavbar() {
       <header style={headerStyle}>
         {/* Center: Brand */}
         <h2 style={brandText}>
-          AlgoM3 AI
+          AlgoM3
         </h2>
 
         {/* Right: Profile only */}
@@ -63,7 +63,7 @@ export default function InvestorNavbar() {
       <footer style={footerStyle}>
         <FooterBtn
           icon={<FaHome />}
-          label="Dashboard"
+          label="Home"
           active={location.pathname === "/investor"}
           to="/investor"
         />

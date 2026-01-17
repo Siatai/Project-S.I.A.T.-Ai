@@ -202,7 +202,7 @@ const walletBox = {
   borderRadius: "8px",
   fontFamily: "monospace",
   wordBreak: "break-all",
-  fontSize: "14px",
+  fontSize: "12px",
   marginBottom: "10px",
   boxShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.2)",
 };
