@@ -245,7 +245,12 @@ export default function Landing() {
           <span
             style={{
               color: "var(--fx-accent)",
-              textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.6)",
+              textShadow:
+                "0 0 12px rgba(var(--fx-accent-rgb),0.7), 0 0 28px rgba(var(--fx-accent-rgb),0.45)",
+              filter:
+                "drop-shadow(0 0 10px rgba(var(--fx-accent-rgb),0.65)) drop-shadow(0 0 26px rgba(var(--fx-accent-rgb),0.35))",
+              background: "transparent",
+              display: "inline-block",
               animation: "pulse 2s infinite",
             }}
           >
