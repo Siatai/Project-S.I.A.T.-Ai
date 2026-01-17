@@ -293,28 +293,27 @@ export default function Landing() {
           }}
         >
           <motion.button
-            className="landing-cta"
+            className="landing-cta initiate-btn"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setAuthOpen(true)}
             style={{
-              background:
-                "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
-              color: "#05101b",
-              border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
-              padding: "14px 35px",
-              borderRadius: "6px",
-              fontSize: "14px",
+              background: "transparent",
+              color: "var(--fx-bg)",
+              border: "none",
+              padding: "12px 20px 12px 88px",
+              borderRadius: "14px",
+              fontSize: "13px",
               fontWeight: "700",
               cursor: "pointer",
               transition: "all 0.3s ease",
               fontFamily: "var(--fx-font-display)",
               textTransform: "uppercase",
               letterSpacing: "0.12em",
-              boxShadow: "0 10px 20px rgba(var(--fx-accent-rgb),0.2)",
+              boxShadow: "none",
             }}
           >
-            Initiate
+            <span>Initiate</span>
           </motion.button>
         </div>
       </div>
@@ -816,6 +815,51 @@ export default function Landing() {
         .hero-right-metric strong {
           color: var(--fx-accent);
           font-weight: 600;
+        }
+
+        .initiate-btn {
+          position: relative;
+          min-width: 220px;
+          text-align: left;
+        }
+
+        .initiate-btn::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.95), rgba(var(--fx-accent-rgb), 0.65));
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.8);
+          box-shadow: 0 16px 28px rgba(var(--fx-accent-rgb), 0.25);
+        }
+
+        .initiate-btn::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 16px;
+          width: 50px;
+          height: 50px;
+          transform: translateY(-50%);
+          border-radius: 50%;
+          background:
+            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 45%),
+            radial-gradient(circle, rgba(var(--fx-accent-rgb), 0.95), rgba(6, 20, 40, 0.9));
+          border: 2px solid rgba(var(--fx-accent-rgb), 0.85);
+          box-shadow:
+            0 0 16px rgba(var(--fx-accent-rgb), 0.6),
+            inset 0 0 12px rgba(0,0,0,0.4);
+        }
+
+        .initiate-btn span {
+          position: relative;
+          z-index: 1;
+          color: #05101b;
+          text-shadow: 0 0 6px rgba(255,255,255,0.3);
+        }
+
+        .initiate-btn:hover::before {
+          filter: brightness(1.08);
         }
 
         .hero-right-orb {
