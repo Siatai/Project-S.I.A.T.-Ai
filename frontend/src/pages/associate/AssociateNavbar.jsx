@@ -162,11 +162,11 @@ const headerStyle = {
 
 const brandText = {
   margin: "0",
-  color: "var(--fx-accent)",
+  color: "var(--fx-accent-legacy)",
   fontWeight: "700",
   fontSize: "20px",
-  fontFamily: "var(--fx-font-display)",
-  textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.6)",
+  fontFamily: "var(--fx-brand-font)",
+  textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb),0.6)",
   flex: 1,
   textAlign: "center",
 };

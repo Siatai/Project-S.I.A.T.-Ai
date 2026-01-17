@@ -12,12 +12,12 @@ export default function Referrals() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // ✅ build headers safely
+  //  build headers safely
   const headers = useMemo(() => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }, [token]);
 
-  // ✅ Global styles
+  //  Global styles
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -25,11 +25,11 @@ export default function Referrals() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // ✅ Load referrals + deposits together
+  //  Load referrals + deposits together
   useEffect(() => {
     const fetchData = async () => {
       if (!token) {
-        console.warn("⚠️ No token found in localStorage");
+        console.warn(" No token found in localStorage");
         setLoading(false);
         return;
       }
@@ -62,8 +62,8 @@ export default function Referrals() {
 
         setReferees(merged);
       } catch (err) {
-        console.error("Error fetching referrals:", err.response?.data || err.message);
-        alert(err.response?.data?.detail || "Failed to load referrals. Please login again.");
+        console.error("Error fetching referrals:", err?.response?.data || err?.message);
+        alert(err?.response?.data?.detail || "Failed to load referrals. Please login again.");
       } finally {
         setLoading(false);
       }
@@ -72,7 +72,7 @@ export default function Referrals() {
     fetchData();
   }, [token, headers]);
 
-  // ✅ Load referral packages (direct bonuses)
+  //  Load referral packages (direct bonuses)
   const fetchReferralPackages = async (refEmail) => {
     try {
       const res = await axios.get(
@@ -84,11 +84,11 @@ export default function Referrals() {
       );
       setPackages(sorted);
     } catch (err) {
-      console.error("Error fetching referral packages:", err.response?.data || err.message);
+      console.error("Error fetching referral packages:", err?.response?.data || err?.message);
     }
   };
 
-  // ✅ Handle withdraw/reinvest
+  //  Handle withdraw/reinvest
   const handleAction = async (pkgId, action) => {
     try {
       setActionLoading(pkgId + action);
@@ -97,8 +97,8 @@ export default function Referrals() {
       alert(res.data.message || "Action successful");
       if (selectedReferee) fetchReferralPackages(selectedReferee.email);
     } catch (err) {
-      console.error("Error:", err.response?.data || err.message);
-      alert(err.response?.data?.detail || "Failed");
+      console.error("Error:", err?.response?.data || err?.message);
+      alert(err?.response?.data?.detail || "Failed");
     } finally {
       setActionLoading(null);
     }
@@ -106,7 +106,7 @@ export default function Referrals() {
 
   if (loading) return <p style={{ color: "var(--fx-ink)" }}>Loading referrals...</p>;
 
-  // ✅ Totals
+  //  Totals
   const totalEarned = referees.reduce((s, r) => s + r.earned, 0);
   const totalLeft = referees.reduce((s, r) => s + r.left, 0);
   const totalAll = totalEarned + totalLeft;
@@ -188,17 +188,17 @@ export default function Referrals() {
                   onClick={() => setSelectedReferee(null)}
                   style={backBtn}
                 >
-                  ← Back
+                   Back
                 </button>
                 <button
                   onClick={() => setSelectedReferee(null)}
                   style={closeBtn}
                 >
-                  ✖
+                  X
                 </button>
               </div>
               <h3 style={{ color: "var(--fx-accent)", marginBottom: "10px" }}>
-                {selectedReferee.name} – Bonuses
+                {selectedReferee.name}  Bonuses
               </h3>
 
               {packages.length === 0 && (
@@ -247,7 +247,7 @@ export default function Referrals() {
                       <p style={mutedText}>
                         {daysLeft > 0
                           ? `${daysLeft} days left`
-                          : "Unlocked – ready!"}
+                          : "Unlocked ready!"}
                       </p>
                       <p style={{ color: "var(--fx-muted)", fontSize: "12px" }}>
                         Matures: {maturedAt.toLocaleDateString()}
@@ -293,7 +293,15 @@ export default function Referrals() {
 }
 
 /* === Styles === */
-const pageWrapper = { background: "transparent", minHeight: "100vh", color: "var(--fx-ink)" };
+const pageWrapper = {
+  minHeight: "100vh",
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
+};
 const mainContent = { padding: "20px", marginTop: "80px" };
 const headerTitle = { marginBottom: "20px", color: "var(--fx-accent)" };
 const subHeader = { margin: "20px 0 12px", color: "var(--fx-accent)" };
@@ -354,7 +362,7 @@ const backBtn = {
   cursor: "pointer",
 };
 const closeBtn = {
-  background: "transparent",
+  background: "var(--fx-hero)",
   border: "none",
   color: "var(--fx-ink)",
   fontSize: "18px",

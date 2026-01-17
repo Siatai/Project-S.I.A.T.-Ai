@@ -71,7 +71,13 @@ export default function DashboardLayout() {
     fetchUser();
   }, [navigate]);
 
-  if (loading) return <div className="loading-screen">Loading dashboard...</div>;
+  if (loading)
+    return (
+      <div className="loading-screen">
+        <div className="loading-pulse" />
+        <span>Loading dashboard...</span>
+      </div>
+    );
   if (!user) return null;
 
   let role = "Investor";
@@ -168,8 +174,8 @@ export default function DashboardLayout() {
                 margin: 0,
                 fontSize: "22px",
                 fontWeight: "bold",
-                color: "var(--fx-accent)",
-                textShadow: "0 0 12px rgba(var(--fx-accent-rgb), 0.6)",
+                color: "var(--fx-accent-legacy)",
+                textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb), 0.6)",
               }}
             >
               AlgoM3 AI
@@ -188,7 +194,9 @@ export default function DashboardLayout() {
         </header>
 
         <main className="dashboard-content">
-          <Outlet />
+          <div className="hud-shell">
+            <Outlet />
+          </div>
         </main>
       </div>
 
@@ -213,6 +221,26 @@ export default function DashboardLayout() {
           font-weight: 600;
           letter-spacing: 0.08em;
           text-transform: uppercase;
+          gap: 12px;
+        }
+
+        .loading-pulse {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.4);
+          box-shadow: 0 0 24px rgba(var(--fx-accent-rgb), 0.25);
+          position: relative;
+          animation: loadingPulse 2.4s ease-in-out infinite;
+        }
+
+        .loading-pulse::after {
+          content: '';
+          position: absolute;
+          inset: 8px;
+          border-radius: 50%;
+          border: 1px dashed rgba(var(--fx-accent-rgb), 0.5);
+          animation: loadingSpin 4s linear infinite;
         }
 
         .dashboard-sidebar {
@@ -359,7 +387,7 @@ export default function DashboardLayout() {
         }
 
         .brand {
-          font-family: var(--fx-font-display);
+          font-family: var(--fx-brand-font);
           letter-spacing: 0.03em;
         }
         .panel {
@@ -390,6 +418,12 @@ export default function DashboardLayout() {
           padding-bottom: 120px;
         }
 
+        .hud-shell {
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
         html, body, #root {
           margin: 0;
           padding: 0;
@@ -397,6 +431,17 @@ export default function DashboardLayout() {
           width: 100%;
           overflow: hidden;
           background: var(--fx-bg);
+        }
+
+        @keyframes loadingPulse {
+          0% { transform: scale(0.96); opacity: 0.5; }
+          50% { transform: scale(1.02); opacity: 1; }
+          100% { transform: scale(0.96); opacity: 0.5; }
+        }
+
+        @keyframes loadingSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>

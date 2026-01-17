@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import AssociateNavbar from "./AssociateNavbar"; // ✅ Navbar for associates
+import AssociateNavbar from "./AssociateNavbar"; //  Navbar for associates
 
 export default function AssociateHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -11,7 +11,7 @@ export default function AssociateHistory() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // ✅ Force dark background
+  //  Force dark background
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -126,7 +126,7 @@ export default function AssociateHistory() {
               No transactions found.
             </p>
           ) : isMobile ? (
-            // Mobile → Card View
+            // Mobile  Card View
             <div style={{ display: "grid", gap: "15px" }}>
               {filteredTx.map((t, i) => (
                 <div key={i} style={mobileCard}>
@@ -187,7 +187,7 @@ export default function AssociateHistory() {
               ))}
             </div>
           ) : (
-            // Desktop → Table View
+            // Desktop  Table View
             <table className="fx-table" style={tableStyle}>
               <thead>
                 <tr style={{ background: "rgba(8, 10, 20, 0.7)" }}>
@@ -251,10 +251,13 @@ const colors = {
 };
 
 const pageWrapper = {
-  background: "transparent",
   minHeight: "100vh",
   width: "100%",
-  overflowX: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
 };
 
 const mainContent = {
@@ -277,7 +280,7 @@ const glowLine = {
 };
 
 const cardWrapper = {
-  background: "transparent",
+  background: "var(--fx-hero)",
   borderRadius: "12px",
   overflowX: "auto",
   maxWidth: "100%",

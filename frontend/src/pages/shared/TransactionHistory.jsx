@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import InvestorNavbar from "../investor/Navbar"; // ✅ Import Navbar
+import InvestorNavbar from "../investor/Navbar"; //  Import Navbar
 
 export default function TransactionHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -11,7 +11,7 @@ export default function TransactionHistory() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // 🔹 Apply global dark background + reset body (no bleed)
+  //  Apply global dark background + reset body (no bleed)
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -19,7 +19,7 @@ export default function TransactionHistory() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // Handle resize → detect mobile
+  // Handle resize  detect mobile
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
@@ -78,7 +78,7 @@ export default function TransactionHistory() {
 
   return (
     <div style={pageWrapper}>
-      {/* ✅ Navbar */}
+      {/*  Navbar */}
       <InvestorNavbar />
 
       <div style={contentWrapper}>
@@ -226,17 +226,22 @@ export default function TransactionHistory() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "transparent", // dark page background
-  color: "var(--fx-ink)",
   minHeight: "100vh",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
 };
 
 const contentWrapper = {
+  width: "100%",
+  maxWidth: "1200px",
+  margin: "0 auto",
   padding: "20px",
-  paddingTop: "80px",    // space for fixed header
-  paddingBottom: "60px", // space for fixed footer
+  paddingTop: "80px",
+  paddingBottom: "70px",
 };
 
 const tableStyle = {

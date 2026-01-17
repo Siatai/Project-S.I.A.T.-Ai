@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600&family=Syne:wght@500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@500;700;800&display=swap');
 
 :root {
-  --fx-font-display: 'Syne', 'Space Grotesk', sans-serif;
-  --fx-font-body: 'Space Grotesk', 'Syne', sans-serif;
-  --fx-font-mono: 'JetBrains Mono', monospace;
+  --fx-font-display: 'Orbitron', 'Space Grotesk', sans-serif;
+  --fx-font-body: 'Michroma', 'Space Grotesk', sans-serif;
+  --fx-font-mono: 'IBM Plex Mono', monospace;
+  --fx-brand-font: 'Syne', 'Space Grotesk', sans-serif;
 
   --fx-bg: #040911;
   --fx-bg-2: #091427;
@@ -15,7 +16,7 @@
   --fx-muted: #7f9abd;
   --fx-muted-2: #adc2de;
   --fx-accent: #1fd7ff;
-  --fx-accent-2: #ffd166;
+  --fx-accent-2: #06b6d4;
   --fx-button: #1fd7ff;
   --fx-button-2: #14a6cc;
   --fx-gold: #ffd166;
@@ -28,8 +29,10 @@
   --fx-border: rgba(47, 119, 170, 0.35);
   --fx-rail: rgba(255, 255, 255, 0.12);
   --fx-accent-rgb: 31, 215, 255;
-  --fx-accent-2-rgb: 255, 209, 102;
+  --fx-accent-2-rgb: 6, 182, 212;
   --fx-button-rgb: 31, 215, 255;
+  --fx-accent-legacy: #1fd7ff;
+  --fx-accent-legacy-rgb: 31, 215, 255;
 
   --fx-card: linear-gradient(145deg, rgba(8, 18, 36, 0.98), rgba(12, 26, 46, 0.9));
   --fx-card-strong: linear-gradient(145deg, rgba(10, 22, 42, 0.98), rgba(12, 30, 52, 0.94));
@@ -112,6 +115,41 @@ input,
 select,
 textarea {
   font-family: var(--fx-font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--fx-font-display);
+  letter-spacing: 0.02em;
+}
+
+p,
+span,
+li {
+  font-family: var(--fx-font-body);
+}
+
+.dashboard-content button,
+.fx-button {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dashboard-content input,
+.dashboard-content select,
+.dashboard-content textarea {
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(var(--fx-accent-rgb), 0.35);
+  border-radius: 8px;
+  color: var(--fx-ink);
+}
+
+.dashboard-content table {
+  border-collapse: collapse;
+  width: 100%;
 }
 
 code {

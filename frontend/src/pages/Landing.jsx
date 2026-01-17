@@ -90,11 +90,12 @@ export default function Landing() {
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <h1
             style={{
-              color: "var(--fx-accent)",
+              color: "var(--fx-accent-legacy)",
               fontSize: "25px",
               fontWeight: "bold",
               margin: 0,
-              textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.5)",
+              fontFamily: "var(--fx-brand-font)",
+              textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb),0.5)",
             }}
           >
             AlgoM3 AI
@@ -123,9 +124,12 @@ export default function Landing() {
           position: "relative",
           zIndex: 2,
           textAlign: "left",
-          padding: "78px 52px 64px",
-          maxWidth: "980px",
-          margin: "80px auto 0",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          padding: "60px 50px",
+          maxWidth: "1100px",
+          margin: "40px auto 0",
           background:
             "linear-gradient(145deg, rgba(6, 14, 30, 0.9), rgba(10, 22, 42, 0.88))",
           border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
@@ -145,10 +149,10 @@ export default function Landing() {
             pointerEvents: "none",
           }}
         />
-        <div className="hero-right">
+        <div className="hero-right" style={{ display: "grid", gap: "14px" }}>
           <div className="hero-right-card">
             <div className="hero-right-title">Live Ops</div>
-            <div className="hero-right-value">AlgoM3 Core</div>
+            <div className="hero-right-value">M3 Core</div>
             <div className="hero-right-line" />
             <div className="hero-right-metric">
               <span>Signal</span>
@@ -163,24 +167,52 @@ export default function Landing() {
               <strong>Adaptive</strong>
             </div>
           </div>
+          <div className="hero-right-card hero-right-card--sub">
+            <div className="hero-right-title">Session</div>
+            <div className="hero-right-value">Neural Sync</div>
+            <div className="hero-right-line" />
+            <div className="hero-right-metric">
+              <span>Mode</span>
+              <strong>Auto</strong>
+            </div>
+            <div className="hero-right-metric">
+              <span>Exposure</span>
+              <strong>Balanced</strong>
+            </div>
+          </div>
         </div>
-        <motion.p
+        <motion.div
           className="landing-kicker"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "10px 18px",
+            borderRadius: "999px",
+            border: "1px solid rgba(var(--fx-accent-rgb), 0.3)",
+            color: "var(--fx-accent)",
             fontSize: "11px",
-            letterSpacing: "0.34em",
+            letterSpacing: "0.18em",
             textTransform: "uppercase",
-            color: "var(--fx-muted-2)",
-            fontWeight: "700",
-            marginBottom: "16px",
             fontFamily: "var(--fx-font-mono)",
+            marginBottom: "20px",
+            background: "rgba(var(--fx-accent-rgb), 0.08)",
           }}
         >
+          <span
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              background: "var(--fx-accent-2)",
+              boxShadow: "0 0 12px rgba(var(--fx-accent-2-rgb), 0.6)",
+            }}
+          />
           Command Interface Online
-        </motion.p>
+        </motion.div>
 
         <motion.h2
           className="landing-title"
@@ -189,23 +221,23 @@ export default function Landing() {
           transition={{ duration: 0.8 }}
           style={{
             fontFamily: "var(--fx-font-display)",
-            fontSize: "30px",
+            fontSize: "42px",
             fontWeight: "800",
-            marginBottom: "18px",
+            marginBottom: "24px",
             textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.35)",
-            lineHeight: "1.08",
-            maxWidth: "520px",
+            lineHeight: "1.15",
+            maxWidth: "700px",
           }}
         >
           The{" "}
           <span
             style={{
               color: "var(--fx-accent)",
-              textShadow: "0 0 18px rgba(var(--fx-accent-rgb),0.45)",
+              textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.6)",
               animation: "pulse 2s infinite",
             }}
           >
-            AlgoM3
+            M3
           </span>{" "}
           Tactical Trading Core
           <br />
@@ -218,23 +250,24 @@ export default function Landing() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
           style={{
-            fontSize: "15px",
+            fontSize: "17px",
             color: "var(--fx-muted-2)",
             lineHeight: "1.6",
-            marginBottom: "26px",
-            maxWidth: "520px",
+            marginBottom: "30px",
+            maxWidth: "600px",
           }}
         >
           Adaptive strategy, disciplined execution, and transparent reporting. Targeting{" "}
-          <span style={{ color: "var(--fx-accent)", fontWeight: "600" }}>8-10% ROI</span>{" "}
+          <span style={{ color: "var(--fx-accent-2)", fontWeight: "600" }}>8-10% ROI</span>{" "}
           monthly with volatility-aware controls.
         </motion.p>
 
         <div
+          className="hero-cta-row"
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
+            gap: "20px",
             flexWrap: "wrap",
           }}
         >
@@ -248,15 +281,15 @@ export default function Landing() {
                 "linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.92), rgba(var(--fx-accent-rgb), 0.65))",
               color: "#05101b",
               border: "1px solid rgba(var(--fx-accent-rgb), 0.6)",
-              padding: "12px 28px",
+              padding: "14px 35px",
               borderRadius: "6px",
-              fontSize: "13px",
+              fontSize: "14px",
               fontWeight: "700",
               cursor: "pointer",
               transition: "all 0.3s ease",
               fontFamily: "var(--fx-font-display)",
               textTransform: "uppercase",
-              letterSpacing: "0.1em",
+              letterSpacing: "0.12em",
               boxShadow: "0 10px 20px rgba(var(--fx-accent-rgb),0.2)",
             }}
           >
@@ -276,7 +309,7 @@ export default function Landing() {
             <span
               style={{
                 height: "2px",
-                width: "40px",
+                width: "50px",
                 background: "var(--fx-accent)",
                 boxShadow: "0 0 10px rgba(var(--fx-accent-rgb), 0.5)",
               }}
@@ -291,12 +324,13 @@ export default function Landing() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 1 }}
           style={{
-            fontSize: "16px",
+            fontSize: "22px",
             marginTop: "28px",
             color: "var(--fx-accent)",
             fontWeight: "600",
             textShadow: "0 0 12px rgba(var(--fx-accent-rgb),0.6)",
             fontFamily: "var(--fx-font-display)",
+            letterSpacing: "0.05em",
           }}
         >
           Signal. Execute. Scale. No noise, just results.
@@ -304,30 +338,32 @@ export default function Landing() {
         <div className="hero-grid" />
         <div className="hero-scan" />
         <div
+          className="hero-metrics"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: "12px",
-            marginTop: "26px",
+            gap: "16px",
+            marginTop: "40px",
           }}
         >
           {[
             { label: "Latency", value: "< 120ms" },
             { label: "Strategy", value: "Adaptive AI" },
             { label: "Coverage", value: "Multi-Market" },
+            { label: "Uptime", value: "99.99%" },
           ].map((item) => (
             <div
               key={item.label}
               style={{
                 border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
-                borderRadius: "10px",
-                padding: "12px 14px",
-                background: "rgba(6, 14, 28, 0.75)",
+                borderRadius: "12px",
+                padding: "20px",
+                background:
+                  "linear-gradient(145deg, rgba(6, 14, 28, 0.9), rgba(10, 22, 42, 0.7))",
               }}
             >
               <div
                 style={{
-                  fontSize: "10px",
+                  fontSize: "11px",
                   textTransform: "uppercase",
                   letterSpacing: "0.2em",
                   color: "var(--fx-muted)",
@@ -338,8 +374,8 @@ export default function Landing() {
               </div>
               <div
                 style={{
-                  fontSize: "14px",
-                  color: "var(--fx-ink)",
+                  fontSize: "20px",
+                  color: "var(--fx-accent)",
                   fontWeight: "600",
                   marginTop: "6px",
                 }}
@@ -445,12 +481,30 @@ export default function Landing() {
           100% { transform: translateY(40%); }
         }
 
+        .hero-metrics {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (max-width: 768px) {
+          .landing-hero {
+            padding: 40px 20px;
+            margin: 20px 10px;
+          }
+          .landing-title {
+            font-size: 28px;
+          }
+          .hero-metrics {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
         @media (max-width: 640px) {
           .landing-hero {
-            padding: 50px 22px 44px;
-            margin: 0 12px;
+            padding: 40px 20px;
+            margin: 20px 10px;
             border-radius: 16px;
             text-align: center;
+            align-items: center;
           }
           .landing-kicker {
             font-size: 9px;
@@ -467,6 +521,13 @@ export default function Landing() {
             max-width: 220px;
             font-size: 12px;
           }
+          .hero-cta-row {
+            justify-content: center;
+          }
+          .hero-metrics {
+            justify-items: center;
+            width: 100%;
+          }
           .hero-grid {
             opacity: 0.25;
           }
@@ -478,6 +539,10 @@ export default function Landing() {
         @media (min-width: 900px) {
           .landing-hero {
             padding-right: 280px;
+          }
+          .hero-metrics {
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            justify-items: stretch;
           }
           .hero-right {
             position: absolute;

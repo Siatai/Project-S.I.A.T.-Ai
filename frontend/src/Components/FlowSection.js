@@ -12,16 +12,26 @@ export default function FlowSection() {
 
   return (
     <section
+      className="flow-section"
       style={{
         position: "relative",
         padding: "60px 24px 70px",
-        display: "grid",
+        maxWidth: "980px",
+        margin: "0 auto",
+        display: "flex",
+        flexWrap: "wrap",
         gap: "30px",
-        gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
         alignItems: "center",
+        justifyContent: "center",
+        background:
+          "linear-gradient(145deg, rgba(6, 14, 30, 0.9), rgba(10, 22, 42, 0.88))",
+        border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
+        borderRadius: "20px",
+        boxShadow: "0 24px 40px rgba(2, 8, 18, 0.55)",
+        backdropFilter: "blur(12px)",
       }}
     >
-      <div>
+      <div style={{ flex: "1 1 320px" }}>
         <div
           style={{
             display: "inline-flex",
@@ -105,7 +115,7 @@ export default function FlowSection() {
         </div>
       </div>
 
-      <div style={{ position: "relative", display: "grid", placeItems: "center" }}>
+      <div style={{ position: "relative", display: "grid", placeItems: "center", flex: "1 1 260px" }}>
         <div className="orb-core">
           <div className="orb-ring" />
           <div className="orb-ring orb-ring--outer" />
@@ -177,6 +187,9 @@ export default function FlowSection() {
         }
 
         @media (max-width: 720px) {
+          .flow-section {
+            text-align: center;
+          }
           .orb-core {
             width: 180px;
             height: 180px;

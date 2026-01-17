@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import InvestorNavbar from "../investor/Navbar"; // ✅ Investor Navbar
+import InvestorNavbar from "../investor/Navbar"; //  Investor Navbar
 
 export default function Withdrawal() {
   const [summary, setSummary] = useState(null);
@@ -13,7 +13,7 @@ export default function Withdrawal() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // 🔹 Apply global dark background + reset body (no bleed)
+  //  Apply global dark background + reset body (no bleed)
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -21,7 +21,7 @@ export default function Withdrawal() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // 🔹 Fetch wallet summary
+  //  Fetch wallet summary
   const fetchSummary = useCallback(async () => {
     try {
       setLoading(true);
@@ -67,7 +67,7 @@ export default function Withdrawal() {
     if (token) fetchSummary();
   }, [token, fetchSummary]);
 
-  // 🔹 Request OTP (with Sat/Sun + $20 check)
+  //  Request OTP (with Sat/Sun + $20 check)
   const requestOtp = async () => {
     if (summary.withdrawable < 20) {
       return setMessage({ type: "error", text: "Minimum withdrawal is $20." });
@@ -95,7 +95,7 @@ export default function Withdrawal() {
     }
   };
 
-  // 🔹 Confirm withdrawal
+  //  Confirm withdrawal
   const confirmWithdrawal = async () => {
     try {
       setWithdrawing(true);
@@ -127,13 +127,13 @@ export default function Withdrawal() {
       <div style={wrapper}>
         <h2 style={headerTitle}>Withdrawal</h2>
 
-        {/* 🔹 Total Earnings Card */}
+        {/*  Total Earnings Card */}
         <div style={highlightCard}>
           <h3 style={cardTitle}>Total Earnings</h3>
           <p style={bigValue}>${summary.total.toFixed(2)}</p>
         </div>
 
-        {/* 🔹 Main Balance Card */}
+        {/*  Main Balance Card */}
         <div style={mainCard}>
           <h3 style={cardTitle}>Withdrawable Balance</h3>
           <p style={bigValueTeal}>${summary.withdrawable.toFixed(2)}</p>
@@ -157,7 +157,7 @@ export default function Withdrawal() {
             </div>
           </div>
 
-          {/* 🔹 Glow line below Wallet */}
+          {/*  Glow line below Wallet */}
           <div style={glowLine} />
 
           {message && <div style={msgBox(message.type)}>{message.text}</div>}
@@ -186,7 +186,7 @@ export default function Withdrawal() {
           )}
         </div>
 
-        {/* 🔹 Withdrawals History */}
+        {/*  Withdrawals History */}
         <h3 style={subHeader}>Withdrawal History</h3>
         <div style={tableWrapper}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -232,11 +232,13 @@ export default function Withdrawal() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "transparent", // 🔹 dark background
-  color: "var(--fx-ink)",
   minHeight: "100vh",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
 };
 
 const wrapper = { padding: "20px", marginTop: "80px", marginBottom: "70px" };

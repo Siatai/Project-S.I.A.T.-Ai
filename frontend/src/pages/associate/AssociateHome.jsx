@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import { FaCopy, FaWallet } from "react-icons/fa";
-import AssociateNavbar from "./AssociateNavbar"; // ✅ Fixed Navbar
+import AssociateNavbar from "./AssociateNavbar"; //  Fixed Navbar
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
-  const [walletBalance, setWalletBalance] = useState(0); // ✅ wallet balance state
+  const [walletBalance, setWalletBalance] = useState(0); //  wallet balance state
   const [myDeposits, setMyDeposits] = useState([]);
   const [teamDeposits, setTeamDeposits] = useState([]);
   const [totalReceivable, setTotalReceivable] = useState(0);
@@ -28,23 +28,23 @@ export default function AssociateHome() {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        // ✅ Fetch user
+        //  Fetch user
         const res = await axios.get(`${API}/me`, { headers });
         setUser(res.data);
 
-        // ✅ Fetch wallet balance
+        //  Fetch wallet balance
         const walletRes = await axios.get(`${API}/wallet/summary`, { headers });
         setWalletBalance(walletRes.data.wallet_balance || 0);
 
-        // ✅ Investor deposits (exclude top ADMIN_EMAIL)
-        if (res.data?.email && res.data.email !== ADMIN_EMAIL) {
+        //  Investor deposits (exclude top ADMIN_EMAIL)
+        if (res.dataemail && res.data.email !== ADMIN_EMAIL) {
           const investorRes = await axios.get(`${API}/investor-roi-status`, {
             headers,
           });
           setMyDeposits(investorRes.data.deposits || []);
         }
 
-        // ✅ Team deposits & commission
+        //  Team deposits & commission
         const teamRes = await axios.get(`${API}/associate-roi-status`, {
           headers,
         });
@@ -52,7 +52,7 @@ export default function AssociateHome() {
         setTotalReceivable(teamRes.data.total_commission_left || 0);
         setCommissionPct(teamRes.data.commission_percent || 0);
 
-        // ✅ Direct commission %
+        //  Direct commission %
         const commRes = await axios.get(`${API}/commission-percent`, {
           headers,
         });
@@ -65,7 +65,7 @@ export default function AssociateHome() {
   }, []);
 
   const copyReferral = () => {
-    if (user?.referral_code) {
+    if (userreferral_code) {
       const signupUrl = `${window.location.origin}/referral-signup?ref=${user.referral_code}`;
       navigator.clipboard.writeText(signupUrl);
       setCopied(true);
@@ -75,7 +75,7 @@ export default function AssociateHome() {
 
   if (!user) return <p style={{ color: "var(--fx-ink)" }}>Loading...</p>;
 
-  // ✅ Calculations
+  //  Calculations
   const totalSelf = myDeposits.reduce((s, d) => s + d.capital, 0);
   const roiReceivedSelf = myDeposits.reduce((s, d) => s + d.roi_received, 0);
   const maxSelf = myDeposits.reduce((s, d) => s + d.max_return, 0);
@@ -93,11 +93,11 @@ export default function AssociateHome() {
 
       <main style={mainContent}>
         <div style={haloBox}>
-          {/* 🔹 Welcome Section */}
+          {/*  Welcome Section */}
           <h3 style={welcomeText}>Welcome, {user.name || user.email}</h3>
           <div style={glowLine} />
 
-          {/* 🔹 Wallet Balance Card */}
+          {/*  Wallet Balance Card */}
           <div style={walletCard}>
             <div style={walletIconBox}>
               <FaWallet style={walletIcon} />
@@ -117,7 +117,7 @@ export default function AssociateHome() {
             <span style={{ color: "var(--fx-gold)", fontWeight: "600" }}>
               {commissionPct}%
             </span>{" "}
-            of your investors’ income.
+            of your investors income.
           </p>
 
           {/* Referral Code */}
@@ -132,7 +132,7 @@ export default function AssociateHome() {
             {copied && <p style={copiedText}>Copied!</p>}
           </div>
 
-          {/* 🔹 Commission First */}
+          {/*  Commission First */}
           <div style={cardStyle3D}>
             <div style={glowRow}>
               <span>Total Commission</span>
@@ -145,7 +145,7 @@ export default function AssociateHome() {
             </p>
           </div>
 
-          {/* 🔹 Deposits Second */}
+          {/*  Deposits Second */}
           <div style={cardStyle3D}>
             <div style={glowRow}>
               <span>Total Deposits</span>
@@ -180,10 +180,10 @@ function ProgressBar({ percent }) {
 const pageWrapper = {
   minHeight: "100vh",
   width: "100%",
-  overflowX: "hidden",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  background: "var(--fx-hero)",
   color: "var(--fx-ink)",
 };
 
@@ -278,7 +278,7 @@ const referralText = {
 };
 
 const copyIconBtn = {
-  background: "transparent",
+  background: "var(--fx-hero)",
   border: "none",
   color: "var(--fx-accent)",
   fontSize: "18px",

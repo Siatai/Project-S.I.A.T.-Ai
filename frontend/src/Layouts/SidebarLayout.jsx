@@ -133,10 +133,11 @@ export default function SidebarLayout({
         >
           <h1
             style={{
-              fontFamily: "var(--fx-font-display)",
+              fontFamily: "var(--fx-brand-font)",
               fontWeight: "700",
-              color: "var(--fx-accent)",
+              color: "var(--fx-accent-legacy)",
               fontSize: "20px",
+              textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb),0.6)",
             }}
           >
             AlgoM3

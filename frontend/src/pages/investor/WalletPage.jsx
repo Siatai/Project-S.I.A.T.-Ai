@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import InvestorNavbar from "./Navbar";   // ✅ Navbar with halo logo
-import Wallet from "../shared/Wallet";   // ✅ Wallet Section (fetches /wallet/summary)
-import Deposit from "../shared/Deposit"; // ✅ Deposit Section (fetches /investor-roi-status)
+import InvestorNavbar from "./Navbar";   //  Navbar with halo logo
+import Wallet from "../shared/Wallet";   //  Wallet Section (fetches /wallet/summary)
+import Deposit from "../shared/Deposit"; //  Deposit Section (fetches /investor-roi-status)
 
 export default function WalletPage() {
-  // 🔹 Apply global body reset like AssociateHome
+  //  Apply global body reset like AssociateHome
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -14,12 +14,12 @@ export default function WalletPage() {
 
   return (
     <div style={pageWrapper}>
-      {/* 🔹 Navbar */}
+      {/*  Navbar */}
       <InvestorNavbar />
 
       {/* Content Wrapper (with header/footer spacing) */}
       <div style={contentWrapper}>
-        {/* 🔹 Wallet Section (fixed top look) */}
+        {/*  Wallet Section (fixed top look) */}
         <div style={walletWrapper}>
           <Wallet />
         </div>
@@ -27,7 +27,7 @@ export default function WalletPage() {
         {/* Divider */}
         <div style={dividerLine} />
 
-        {/* 🔹 Deposit Section (scrollable area) */}
+        {/*  Deposit Section (scrollable area) */}
         <div style={depositWrapper}>
           <Deposit hideInfoIcon={true} />
         </div>
@@ -38,19 +38,22 @@ export default function WalletPage() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "transparent", // 🔹 dark page background
-  color: "var(--fx-ink)",
   minHeight: "100vh",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
 };
 
 const contentWrapper = {
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  paddingTop: "80px",    // space for fixed header
-  paddingBottom: "60px", // space for fixed footer
+  width: "100%",
+  maxWidth: "1200px",
+  margin: "0 auto",
+  padding: "20px",
+  paddingTop: "80px",
+  paddingBottom: "70px",
 };
 
 const walletWrapper = {

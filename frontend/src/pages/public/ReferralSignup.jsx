@@ -32,7 +32,7 @@ export default function ReferralSignup() {
   api.interceptors.response.use(
     (res) => res,
     (err) => {
-      if (err.response.status === 401) {
+      if (err?.response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/signup");
       }
@@ -45,7 +45,7 @@ export default function ReferralSignup() {
     try {
       await api.get("/me");
     } catch (err) {
-      console.error("Fetch user failed:", err.response.data || err.message);
+      console.error("Fetch user failed:", err?.response?.data || err?.message);
     }
   }, [api]);
 
@@ -76,7 +76,7 @@ export default function ReferralSignup() {
       setToast({ type: "success", message: "OTP sent to your email." });
     } catch (err) {
       console.error("Send OTP error:", err);
-      setToast({ type: "error", message: err.response.data.detail || "Error sending OTP" });
+      setToast({ type: "error", message: err?.response?.data?.detail || "Error sending OTP" });
       setSending(false); // Allow retry if failed
     }
   };
@@ -103,7 +103,7 @@ export default function ReferralSignup() {
       else navigate("/investor");
     } catch (err) {
       console.error("Verify OTP error:", err);
-      setToast({ type: "error", message: err.response.data.detail || "Invalid OTP" });
+      setToast({ type: "error", message: err?.response?.data?.detail || "Invalid OTP" });
     }
   };
 
@@ -193,8 +193,9 @@ export default function ReferralSignup() {
           <span style={{ color: "var(--fx-ink)" }}>Welcome to </span>
           <span
             style={{
-              color: "var(--fx-accent)",
-              textShadow: "0 0 10px rgba(var(--fx-accent-rgb),0.6)",
+              color: "var(--fx-accent-legacy)",
+              textShadow: "0 0 10px rgba(var(--fx-accent-legacy-rgb),0.6)",
+              fontFamily: "var(--fx-brand-font)",
             }}
           >
             AlgoM3

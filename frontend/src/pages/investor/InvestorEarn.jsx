@@ -11,7 +11,7 @@ export default function InvestorEarn() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // 🔹 Apply global dark background + reset body
+  //  Apply global dark background + reset body
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -24,13 +24,13 @@ export default function InvestorEarn() {
       try {
         const headers = { Authorization: `Bearer ${token}` };
 
-        // 🔹 Direct referral %
+        //  Direct referral %
         const commRes = await axios.get(`${API}/commission-percent`, {
           headers,
         });
         setDirectPct(commRes.data.commission_percent || 0);
 
-        // 🔹 Team commission %
+        //  Team commission %
         const configRes = await axios.get(`${API}/associate/admin/config`, {
           headers,
         });
@@ -42,7 +42,7 @@ export default function InvestorEarn() {
     if (token) fetchData();
   }, [token]);
 
-  // 🔹 Handle Apply Now
+  //  Handle Apply Now
   const handleApply = async () => {
     try {
       setLoading(true);
@@ -79,7 +79,7 @@ export default function InvestorEarn() {
             <span style={{ color: "var(--fx-gold)", fontWeight: "600" }}>
               {commissionPct}%
             </span>{" "}
-            of your investors’ monthly income.
+            of your investors monthly income.
           </p>
         </div>
 
@@ -116,16 +116,17 @@ export default function InvestorEarn() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "transparent", // 🔹 dark background
-  color: "var(--fx-ink)",
-  minHeight: "100vh",        // ✅ full screen
+  minHeight: "100vh",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
-  overflowY: "auto",         // ✅ scrollable
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
 };
 
 const wrapper = {
-  padding: "100px 20px 70px", // ✅ header + footer safe space
+  padding: "100px 20px 70px", //  header + footer safe space
   textAlign: "center",
 };
 

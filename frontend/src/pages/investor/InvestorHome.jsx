@@ -14,7 +14,7 @@ export default function InvestorHome() {
 
   const API = "https://project-s-i-a-t-ai.onrender.com";
 
-  // 🔹 Apply global dark background + reset body
+  //  Apply global dark background + reset body
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -22,7 +22,7 @@ export default function InvestorHome() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // 🔹 Fetch user, wallet, deposits
+  //  Fetch user, wallet, deposits
   useEffect(() => {
     const fetchUserAndData = async () => {
       try {
@@ -52,7 +52,7 @@ export default function InvestorHome() {
     fetchUserAndData();
   }, []);
 
-  // 🔹 Apply for associate
+  //  Apply for associate
   const applyForAssociate = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -79,13 +79,13 @@ export default function InvestorHome() {
 
       {/* Content Wrapper with header/footer spacing */}
       <div style={contentWrapper}>
-        {/* ✅ Name greeting */}
+        {/*  Name greeting */}
         <h2 style={welcomeText}>
           Welcome, {user.name || user.email}
         </h2>
         <div style={glowLine} />
 
-        {/* ✅ Wallet Balance */}
+        {/*  Wallet Balance */}
         <div style={walletCard}>
           <div style={walletIconBox}>
             <FaWallet style={walletIcon} />
@@ -107,7 +107,7 @@ export default function InvestorHome() {
           You can deposit funds, withdraw profits, and track your ROI here.
         </p>
 
-        {/* ✅ Deposits with Depleting Progress */}
+        {/*  Deposits with Depleting Progress */}
         <div style={{ ...cardStyle, position: "relative" }}>
           {summary && (
             <span onClick={() => setShowInfo(true)} style={infoIcon}>
@@ -150,7 +150,7 @@ export default function InvestorHome() {
           )}
         </div>
 
-        {/* ✅ Associate Status / Button */}
+        {/*  Associate Status / Button */}
         <div style={{ marginTop: 40, textAlign: "center" }}>
           {isAssociate ? (
             <p style={{ color: "var(--fx-success)", fontWeight: "600" }}>
@@ -163,18 +163,18 @@ export default function InvestorHome() {
           ) : (
             showAppliedMsg && (
               <p style={{ color: "var(--fx-gold)", fontWeight: "600" }}>
-                ⏳ Pending approval from Admin...
+                 Pending approval from Admin...
               </p>
             )
           )}
         </div>
 
-        {/* ℹ️ Info Popup */}
+        {/*  Info Popup */}
         {showInfo && (
           <div style={popupOverlay} onClick={() => setShowInfo(false)}>
             <div style={popupBox} onClick={(e) => e.stopPropagation()}>
               <button style={closeBtn} onClick={() => setShowInfo(false)}>
-                ✕
+                X
               </button>
               <h3 style={{ color: "var(--fx-accent)", marginBottom: "12px" }}>Info</h3>
               <p style={{ fontSize: "14px", color: "var(--fx-ink)" }}>
@@ -226,13 +226,18 @@ const pageWrapper = {
   width: "100%",
   display: "flex",
   flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
   color: "var(--fx-ink)",
 };
 
 const contentWrapper = {
+  width: "100%",
+  maxWidth: "1200px",
+  margin: "0 auto",
   padding: "20px",
-  paddingTop: "80px",  // space for fixed header
-  paddingBottom: "70px", // space for fixed footer
+  paddingTop: "80px",
+  paddingBottom: "70px",
 };
 
 const welcomeText = {
@@ -349,7 +354,7 @@ const closeBtn = {
   position: "absolute",
   top: "10px",
   right: "12px",
-  background: "transparent",
+  background: "var(--fx-hero)",
   border: "none",
   fontSize: "18px",
   color: "var(--fx-ink)",

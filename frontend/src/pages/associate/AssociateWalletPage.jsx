@@ -4,7 +4,7 @@ import Wallet from "../shared/Wallet";
 import Deposit from "../shared/Deposit";         
 
 export default function AssociateWalletPage() {
-  // ✅ On mount → enforce global dark background
+  //  On mount  enforce global dark background
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -14,10 +14,10 @@ export default function AssociateWalletPage() {
 
   return (
     <div style={pageWrapper}>
-      {/* 🔹 Navbar */}
+      {/*  Navbar */}
       <AssociateNavbar />
 
-      {/* 🔹 Content Wrapper */}
+      {/*  Content Wrapper */}
       <div style={contentWrapper}>
         {/* Wallet Section */}
         <div style={walletWrapper}>
@@ -38,22 +38,22 @@ export default function AssociateWalletPage() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "transparent", // ✅ dark covers full viewport
-  color: "var(--fx-ink)",
   minHeight: "100vh",
   width: "100%",
   display: "flex",
   flexDirection: "column",
-  overflow: "hidden",
+  alignItems: "center",
+  background: "var(--fx-hero)",
+  color: "var(--fx-ink)",
 };
 
 const contentWrapper = {
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  paddingTop: "80px",    // safe for header
-  paddingBottom: "60px", // safe for footer
-  overflowY: "auto",
+  width: "100%",
+  maxWidth: "1200px",
+  margin: "0 auto",
+  padding: "20px",
+  paddingTop: "80px",
+  paddingBottom: "70px",
 };
 
 const walletWrapper = {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import AssociateNavbar from "./AssociateNavbar"; // ✅ Associate Navbar
+import AssociateNavbar from "./AssociateNavbar"; //  Associate Navbar
 
 export default function AssociateWithdrawal() {
   const [summary, setSummary] = useState(null);
@@ -13,7 +13,7 @@ export default function AssociateWithdrawal() {
   const API = "https://project-s-i-a-t-ai.onrender.com";
   const token = localStorage.getItem("token");
 
-  // ✅ Force dark background on body
+  //  Force dark background on body
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
@@ -21,7 +21,7 @@ export default function AssociateWithdrawal() {
     document.body.style.overflowX = "hidden";
   }, []);
 
-  // 🔹 Fetch wallet summary
+  //  Fetch wallet summary
   const fetchSummary = useCallback(async () => {
     try {
       setLoading(true);
@@ -67,7 +67,7 @@ export default function AssociateWithdrawal() {
     if (token) fetchSummary();
   }, [token, fetchSummary]);
 
-  // 🔹 Request OTP (Sat, Sun, and hidden Monday allowed)
+  //  Request OTP (Sat, Sun, and hidden Monday allowed)
   const requestOtp = async () => {
     const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, 6 = Saturday
     if (today !== 0 && today !== 1 && today !== 2 && today !== 3 && today !== 4 && today !== 5 && today !== 6) {
@@ -97,7 +97,7 @@ export default function AssociateWithdrawal() {
     }
   };
 
-  // 🔹 Confirm withdrawal
+  //  Confirm withdrawal
   const confirmWithdrawal = async () => {
     try {
       setWithdrawing(true);
@@ -129,13 +129,13 @@ export default function AssociateWithdrawal() {
       <div style={wrapper}>
         <h2 style={headerTitle}>Withdrawal</h2>
 
-        {/* 🔹 Total Earnings Card */}
+        {/*  Total Earnings Card */}
         <div style={highlightCard}>
           <h3 style={cardTitle}>Total Earnings</h3>
           <p style={bigValue}>${summary.total.toFixed(2)}</p>
         </div>
 
-        {/* 🔹 Main Balance Card */}
+        {/*  Main Balance Card */}
         <div style={mainCard}>
           <h3 style={cardTitle}>Withdrawable Balance</h3>
           <p style={bigValueTeal}>${summary.withdrawable.toFixed(2)}</p>
@@ -185,7 +185,7 @@ export default function AssociateWithdrawal() {
           )}
         </div>
 
-        {/* 🔹 Withdrawals History */}
+        {/*  Withdrawals History */}
         <h3 style={subHeader}>Withdrawal History</h3>
         <div style={tableWrapper}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -231,10 +231,12 @@ export default function AssociateWithdrawal() {
 
 /* === Styles === */
 const pageWrapper = {
-  background: "transparent",
   minHeight: "100vh",
   width: "100%",
-  overflowX: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  background: "var(--fx-hero)",
   color: "var(--fx-ink)",
 };
 
