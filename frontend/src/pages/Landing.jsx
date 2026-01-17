@@ -449,12 +449,14 @@ export default function Landing() {
               style={{
                 width: "100%",
                 textAlign: "center",
-                fontSize: "12px",
-                letterSpacing: "0.28em",
+                fontSize: "18px",
+                letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                color: "var(--fx-muted)",
-                fontFamily: "var(--fx-font-mono)",
-                marginBottom: "-4px",
+                color: "var(--fx-accent)",
+                fontFamily: "var(--fx-font-display)",
+                textShadow: "0 0 14px rgba(var(--fx-accent-rgb),0.45)",
+                marginBottom: "-2px",
+                gridColumn: "1 / -1",
               }}
             >
               Metrics
@@ -623,9 +625,9 @@ export default function Landing() {
 
         .hero-subpanel {
           width: 100%;
-          max-width: 760px;
+          max-width: 860px;
           margin-top: 30px;
-          padding: 24px 22px;
+          padding: 22px 18px;
           border-radius: 18px;
           border: 1px solid rgba(var(--fx-accent-rgb), 0.25);
           background: linear-gradient(150deg, rgba(6, 14, 30, 0.85), rgba(10, 20, 38, 0.8));
@@ -723,6 +725,9 @@ export default function Landing() {
           }
           .hero-right-orb__core svg {
             display: none;
+          }
+          .hero-right-orb__core {
+            font-size: 0;
           }
         }
 
