@@ -97,7 +97,7 @@ export default function TransactionHistory() {
             maxWidth: "100%",
           }}
         >
-          Transaction History
+          Transactions
         </h2>
         <div style={glowLine} />
 
@@ -174,6 +174,9 @@ export default function TransactionHistory() {
                             ? "var(--fx-accent)"
                             : "var(--fx-danger)",
                         fontWeight: "600",
+                        fontFamily: "var(--fx-font-display)",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
                       }}
                     >
                       {t.status}

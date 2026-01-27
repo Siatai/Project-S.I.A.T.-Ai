@@ -334,12 +334,14 @@ const headerTitle = {
   whiteSpace: "nowrap",
 };
 const subHeader = {
-  margin: "20px 0 12px",
+  margin: "20px auto 12px",
   color: "var(--fx-accent)",
   fontFamily: "var(--fx-font-display)",
   fontSize: "14px",
   letterSpacing: "0.18em",
   textTransform: "uppercase",
+  textAlign: "center",
+  width: "fit-content",
 };
 const cardStyle = {
   padding: "16px",

@@ -82,7 +82,7 @@ export default function AssociateHistory() {
       <AssociateNavbar />
 
       <div style={mainContent} className="page-shell">
-        <h2 style={headerTitle}>Transaction History</h2>
+        <h2 style={headerTitle}>Transactions</h2>
         <div style={glowLine} />
 
         {/* Filters */}
@@ -173,6 +173,9 @@ export default function AssociateHistory() {
                             ? colors.accentCyan
                             : colors.accentRed,
                         fontWeight: "600",
+                        fontFamily: "var(--fx-font-display)",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
                       }}
                     >
                       {t.status}

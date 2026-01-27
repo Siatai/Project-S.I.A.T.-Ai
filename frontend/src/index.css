@@ -147,7 +147,9 @@ h5 {
   font-family: var(--fx-font-display);
   letter-spacing: 0.02em;
   position: relative;
-  display: inline-block;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
   padding-bottom: 8px;
   text-align: center;
 }
@@ -175,6 +177,8 @@ header h4,
 header h5 {
   text-align: left;
   padding-bottom: 0;
+  margin: 0;
+  display: inline-block;
 }
 
 header h1::after,

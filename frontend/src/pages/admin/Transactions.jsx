@@ -74,7 +74,7 @@ export default function Transactions() {
 
   return (
     <div style={{ color: "var(--fx-ink)" }}>
-      <h2 style={{ marginBottom: "20px" }}>Transaction History</h2>
+      <h2 style={{ marginBottom: "20px" }}>Transactions</h2>
 
       {loading ? (
         <p>Loading transactions...</p>
