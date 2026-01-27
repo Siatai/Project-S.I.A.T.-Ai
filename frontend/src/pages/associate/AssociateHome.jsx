@@ -277,7 +277,9 @@ const referralText = {
   fontSize: "15px",
   color: "var(--fx-accent)",
   fontWeight: "600",
-  fontFamily: "monospace",
+  fontFamily: "var(--fx-font-display)",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
 };
 
 const copyIconBtn = {

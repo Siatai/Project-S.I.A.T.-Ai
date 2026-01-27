@@ -126,6 +126,13 @@ export default function InvestorNavbar() {
 /* Footer Button */
 function FooterBtn({ icon, label, active, to }) {
   const navigate = useNavigate();
+  const iconStyle = {
+    fontSize: "18px",
+    color: active ? "var(--fx-accent)" : "var(--fx-muted)",
+    filter: active
+      ? "drop-shadow(0 0 8px rgba(var(--fx-accent-rgb),0.7))"
+      : "drop-shadow(0 0 4px rgba(var(--fx-accent-rgb),0.15))",
+  };
   return (
     <button
       style={{
@@ -136,14 +143,45 @@ function FooterBtn({ icon, label, active, to }) {
     >
       <div
         style={{
-          height: "4px",
+          height: "3px",
           marginBottom: "6px",
-          width: "100%",
+          width: "70%",
           borderTop: active ? "2px solid var(--fx-accent)" : "2px solid transparent",
+          boxShadow: active ? "0 0 10px rgba(var(--fx-accent-rgb),0.6)" : "none",
         }}
       />
-      {icon}
-      <span style={{ fontSize: "12px", marginTop: "4px" }}>{label}</span>
+      <div
+        style={{
+          width: "34px",
+          height: "34px",
+          borderRadius: "12px",
+          display: "grid",
+          placeItems: "center",
+          background: active
+            ? "linear-gradient(145deg, rgba(6, 20, 36, 0.9), rgba(10, 34, 54, 0.9))"
+            : "rgba(6, 14, 28, 0.55)",
+          border: active
+            ? "1px solid rgba(var(--fx-accent-rgb), 0.6)"
+            : "1px solid rgba(var(--fx-accent-rgb), 0.2)",
+          boxShadow: active
+            ? "0 0 16px rgba(var(--fx-accent-rgb),0.35)"
+            : "inset 0 0 8px rgba(0,0,0,0.35)",
+        }}
+      >
+        {React.cloneElement(icon, { style: iconStyle })}
+      </div>
+      <span
+        style={{
+          fontSize: "10px",
+          marginTop: "4px",
+          fontFamily: "var(--fx-font-display)",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          lineHeight: "1",
+        }}
+      >
+        {label}
+      </span>
     </button>
   );
 }
