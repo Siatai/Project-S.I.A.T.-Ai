@@ -390,7 +390,7 @@ export default function Landing() {
                 textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.55)",
               }}
             >
-              Signal. Execute. Scale.
+              Signal Execute Scale
             </span>
             <span style={{ display: "block", fontSize: "16px", color: "var(--fx-muted-2)" }}>
               No noise, just results.
@@ -643,6 +643,11 @@ export default function Landing() {
           100% { transform: translateY(60%); }
         }
 
+        @keyframes initiateSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
         .hero-metrics {
           grid-template-columns: repeat(4, 1fr);
         }
@@ -859,32 +864,28 @@ export default function Landing() {
           inset: 0;
           border-radius: 18px;
           background:
-            linear-gradient(135deg, rgba(10, 24, 40, 0.92) 0%, rgba(12, 40, 58, 0.95) 45%, rgba(8, 20, 36, 0.95) 100%);
-          border: 1px solid rgba(var(--fx-accent-rgb), 0.7);
+            linear-gradient(135deg, rgba(8, 20, 36, 0.92) 0%, rgba(10, 30, 46, 0.94) 45%, rgba(6, 16, 30, 0.96) 100%);
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.35);
           box-shadow:
-            0 22px 36px rgba(2, 10, 18, 0.6),
-            0 0 28px rgba(var(--fx-accent-rgb), 0.28),
+            0 18px 30px rgba(2, 10, 18, 0.55),
+            0 0 22px rgba(var(--fx-accent-rgb), 0.22),
             inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-            inset 0 -12px 18px rgba(0, 0, 0, 0.35);
-          clip-path: polygon(0 0, 90% 0, 100% 18%, 100% 82%, 90% 100%, 0 100%, 0 72%, 5% 62%, 5% 38%, 0 28%);
+            inset 0 -10px 16px rgba(0, 0, 0, 0.35);
+          clip-path: polygon(0 0, 92% 0, 100% 18%, 100% 82%, 92% 100%, 0 100%, 0 74%, 4% 62%, 4% 38%, 0 26%);
         }
 
         .initiate-btn::after {
           content: "";
           position: absolute;
-          top: 50%;
-          left: 16px;
-          width: 54px;
-          height: 54px;
-          transform: translateY(-50%);
-          border-radius: 50%;
+          inset: 0;
+          border-radius: 18px;
           background:
-            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 48%),
-            radial-gradient(circle, rgba(var(--fx-accent-rgb), 0.85), rgba(6, 20, 40, 0.95));
-          border: 2px solid rgba(var(--fx-accent-rgb), 0.7);
-          box-shadow:
-            0 0 18px rgba(var(--fx-accent-rgb), 0.65),
-            inset 0 0 14px rgba(0,0,0,0.5);
+            radial-gradient(160px 90px at 18% 50%, rgba(var(--fx-accent-rgb), 0.22), transparent 60%),
+            radial-gradient(180px 120px at 82% 50%, rgba(var(--fx-accent-2-rgb), 0.18), transparent 62%),
+            linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+          opacity: 0.85;
+          pointer-events: none;
+          animation: none;
         }
 
         .initiate-btn::marker {
@@ -894,6 +895,27 @@ export default function Landing() {
         .initiate-btn::before,
         .initiate-btn::after {
           transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .initiate-btn::before {
+          background:
+            linear-gradient(135deg, rgba(8, 20, 36, 0.92) 0%, rgba(10, 30, 46, 0.94) 45%, rgba(6, 16, 30, 0.96) 100%),
+            conic-gradient(
+              from 0deg,
+              rgba(var(--fx-accent-rgb), 0.0),
+              rgba(var(--fx-accent-rgb), 0.45),
+              rgba(var(--fx-accent-rgb), 0.0),
+              rgba(var(--fx-accent-2-rgb), 0.5),
+              rgba(var(--fx-accent-2-rgb), 0.0),
+              rgba(var(--fx-accent-rgb), 0.35),
+              rgba(var(--fx-accent-rgb), 0.0)
+            );
+          background-blend-mode: normal;
+          animation: initiateSpin 6.5s linear infinite;
+          -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          padding: 2px;
         }
 
         .initiate-btn span {
@@ -916,8 +938,7 @@ export default function Landing() {
         }
 
         .initiate-btn:hover::after {
-          transform: translateY(-50%) scale(1.03);
-          filter: brightness(1.1);
+          filter: brightness(1.08);
         }
 
         .hero-right-orb {
