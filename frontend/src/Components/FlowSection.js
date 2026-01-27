@@ -104,6 +104,7 @@ export default function FlowSection() {
                 padding: "12px 14px",
                 background: "rgba(6, 14, 28, 0.72)",
                 display: "flex",
+                alignItems: "center",
                 justifyContent: "space-between",
                 gap: "12px",
               }}
@@ -111,10 +112,11 @@ export default function FlowSection() {
               <div
                 className="hud-node__label"
                 style={{
-                  fontSize: "13px",
+                  fontSize: "12px",
                   fontWeight: "700",
                   color: "var(--fx-accent)",
                   fontFamily: "var(--fx-font-display)",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {node.label}
