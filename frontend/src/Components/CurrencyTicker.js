@@ -31,7 +31,7 @@ export default function CurrencyTicker() {
       });
       el.appendChild(script);
     });
-  }, [assets]);
+  }, []);
 
   return (
     <section
