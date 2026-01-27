@@ -390,7 +390,7 @@ export default function Landing() {
                 textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.55)",
               }}
             >
-              Signal Execute Scale
+              Signal  Execute  Scale
             </span>
             <span style={{ display: "block", fontSize: "16px", color: "var(--fx-muted-2)" }}>
               No noise, just results.
@@ -596,6 +596,16 @@ export default function Landing() {
           0% { left: -50%; }
           100% { left: 120%; }
         }
+        @keyframes borderSweep {
+          0% { background-position: -200% 0, 200% 0, 0 0; opacity: 0.35; }
+          50% { opacity: 0.9; }
+          100% { background-position: 200% 0, -200% 0, 0 0; opacity: 0.35; }
+        }
+        @keyframes initiateTextPulse {
+          0% { text-shadow: 0 0 6px rgba(31, 215, 255, 0.45), 0 0 14px rgba(31, 215, 255, 0.25); opacity: 0.85; }
+          50% { text-shadow: 0 0 14px rgba(31, 215, 255, 0.9), 0 0 26px rgba(31, 215, 255, 0.55); opacity: 1; }
+          100% { text-shadow: 0 0 6px rgba(31, 215, 255, 0.45), 0 0 14px rgba(31, 215, 255, 0.25); opacity: 0.85; }
+        }
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-33.33%); }
@@ -641,11 +651,6 @@ export default function Landing() {
         @keyframes scanDown {
           0% { transform: translateY(-60%); }
           100% { transform: translateY(60%); }
-        }
-
-        @keyframes initiateSpin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
         }
 
         .hero-metrics {
@@ -856,35 +861,40 @@ export default function Landing() {
           min-width: 280px;
           text-align: left;
           overflow: hidden;
+          transform: translateY(0);
+          transform-style: preserve-3d;
+          box-shadow:
+            0 10px 22px rgba(2, 10, 18, 0.45);
         }
 
         .initiate-btn::before {
           content: "";
           position: absolute;
           inset: 0;
-          border-radius: 18px;
+          border-radius: 16px;
           background:
-            linear-gradient(135deg, rgba(8, 20, 36, 0.92) 0%, rgba(10, 30, 46, 0.94) 45%, rgba(6, 16, 30, 0.96) 100%);
-          border: 1px solid rgba(var(--fx-accent-rgb), 0.35);
+            linear-gradient(145deg, rgba(4, 10, 20, 0.98) 0%, rgba(6, 20, 34, 0.98) 55%, rgba(4, 10, 20, 0.98) 100%);
+          border: 1px solid rgba(31, 215, 255, 0.55);
           box-shadow:
-            0 18px 30px rgba(2, 10, 18, 0.55),
-            0 0 22px rgba(var(--fx-accent-rgb), 0.22),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-            inset 0 -10px 16px rgba(0, 0, 0, 0.35);
-          clip-path: polygon(0 0, 92% 0, 100% 18%, 100% 82%, 92% 100%, 0 100%, 0 74%, 4% 62%, 4% 38%, 0 26%);
+            0 0 18px rgba(31, 215, 255, 0.25),
+            0 0 40px rgba(31, 215, 255, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            inset 0 -12px 18px rgba(0, 0, 0, 0.45);
+          clip-path: none;
         }
 
         .initiate-btn::after {
           content: "";
           position: absolute;
           inset: 0;
-          border-radius: 18px;
+          border-radius: 16px;
           background:
-            radial-gradient(160px 90px at 18% 50%, rgba(var(--fx-accent-rgb), 0.22), transparent 60%),
-            radial-gradient(180px 120px at 82% 50%, rgba(var(--fx-accent-2-rgb), 0.18), transparent 62%),
-            linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
-          opacity: 0.85;
+            radial-gradient(120px 60px at 18% 30%, rgba(31, 215, 255, 0.22), transparent 65%),
+            radial-gradient(160px 90px at 85% 60%, rgba(31, 215, 255, 0.16), transparent 70%),
+            linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+          opacity: 0.75;
           pointer-events: none;
+          background-size: 100% 100%;
           animation: none;
         }
 
@@ -899,19 +909,14 @@ export default function Landing() {
 
         .initiate-btn::before {
           background:
-            linear-gradient(135deg, rgba(8, 20, 36, 0.92) 0%, rgba(10, 30, 46, 0.94) 45%, rgba(6, 16, 30, 0.96) 100%),
-            conic-gradient(
-              from 0deg,
-              rgba(var(--fx-accent-rgb), 0.0),
-              rgba(var(--fx-accent-rgb), 0.45),
-              rgba(var(--fx-accent-rgb), 0.0),
-              rgba(var(--fx-accent-2-rgb), 0.5),
-              rgba(var(--fx-accent-2-rgb), 0.0),
-              rgba(var(--fx-accent-rgb), 0.35),
-              rgba(var(--fx-accent-rgb), 0.0)
+            linear-gradient(145deg, rgba(4, 10, 20, 0.98) 0%, rgba(6, 20, 34, 0.98) 55%, rgba(4, 10, 20, 0.98) 100%),
+            linear-gradient(
+              90deg,
+              rgba(31, 215, 255, 0.2),
+              rgba(31, 215, 255, 0.45),
+              rgba(31, 215, 255, 0.2)
             );
           background-blend-mode: normal;
-          animation: initiateSpin 6.5s linear infinite;
           -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
@@ -921,24 +926,33 @@ export default function Landing() {
         .initiate-btn span {
           position: relative;
           z-index: 1;
-          color: #ffffff;
+          color: #dff6ff;
           font-family: var(--fx-font-display);
           text-shadow:
             0 0 8px rgba(255,255,255,0.35),
-            0 0 16px rgba(var(--fx-accent-rgb),0.45);
+            0 0 18px rgba(31, 215, 255, 0.7);
+          animation: initiateTextPulse 2.6s ease-in-out infinite;
         }
 
         .initiate-btn:hover::before {
           filter: brightness(1.12) saturate(1.1);
           box-shadow:
-            0 26px 40px rgba(2, 10, 18, 0.65),
-            0 0 36px rgba(var(--fx-accent-rgb), 0.38),
+            0 0 26px rgba(31, 215, 255, 0.4),
+            0 0 50px rgba(31, 215, 255, 0.25),
             inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-            inset 0 -16px 20px rgba(0, 0, 0, 0.35);
+            inset 0 -14px 20px rgba(0, 0, 0, 0.35);
         }
 
         .initiate-btn:hover::after {
           filter: brightness(1.08);
+        }
+
+        .initiate-btn:hover {
+          transform: translateY(-2px);
+        }
+
+        .initiate-btn:active {
+          transform: translateY(2px);
         }
 
         .hero-right-orb {

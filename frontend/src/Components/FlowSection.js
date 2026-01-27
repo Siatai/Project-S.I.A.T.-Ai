@@ -97,10 +97,11 @@ export default function FlowSection() {
               }}
             >
               <div
+                className="hud-node__label"
                 style={{
                   fontSize: "13px",
                   fontWeight: "700",
-                  color: "var(--fx-ink)",
+                  color: "#dff6ff",
                   fontFamily: "var(--fx-font-display)",
                 }}
               >
@@ -188,6 +189,18 @@ export default function FlowSection() {
         @keyframes orbit {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        @keyframes hudTextPulse {
+          0% { text-shadow: 0 0 6px rgba(31, 215, 255, 0.35), 0 0 12px rgba(31, 215, 255, 0.2); opacity: 0.9; }
+          50% { text-shadow: 0 0 10px rgba(31, 215, 255, 0.6), 0 0 18px rgba(31, 215, 255, 0.35); opacity: 1; }
+          100% { text-shadow: 0 0 6px rgba(31, 215, 255, 0.35), 0 0 12px rgba(31, 215, 255, 0.2); opacity: 0.9; }
+        }
+
+        .hud-node__label {
+          color: #dff6ff;
+          text-shadow: 0 0 8px rgba(31, 215, 255, 0.45);
+          animation: hudTextPulse 3.6s ease-in-out infinite;
         }
 
         @media (max-width: 720px) {
