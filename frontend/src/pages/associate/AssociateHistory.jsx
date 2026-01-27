@@ -305,6 +305,9 @@ const headerTitle = {
   letterSpacing: "0.2em",
   textTransform: "uppercase",
   whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  maxWidth: "100%",
 };
 
 const glowLine = {

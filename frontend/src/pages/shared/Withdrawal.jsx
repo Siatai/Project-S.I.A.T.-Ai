@@ -191,6 +191,11 @@ export default function Withdrawal() {
         <h3 style={subHeader}>Withdrawal History</h3>
         <div style={tableWrapper} className="withdraw-table">
           <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "44%" }} />
+              <col style={{ width: "28%" }} />
+              <col style={{ width: "28%" }} />
+            </colgroup>
             <thead>
               <tr style={{ background: "rgba(8, 10, 20, 0.7)" }}>
                 {["Date", "Amount", "Status"].map((h, i) => (
@@ -203,10 +208,10 @@ export default function Withdrawal() {
             <tbody>
               {summary.withdrawals.map((w, idx) => (
                 <tr key={idx} style={rowStyle}>
-                  <td style={{ ...tdStyle, whiteSpace: "nowrap", letterSpacing: "0.02em" }}>
+                  <td style={{ ...tdStyle, whiteSpace: "normal", lineHeight: 1.2 }}>
                     {new Date(w.timestamp).toLocaleString()}
                   </td>
-                  <td style={tdStyle}>${w.final_amount}</td>
+                  <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>${w.final_amount}</td>
                   <td
                     style={{
                       ...tdStyle,
@@ -217,6 +222,7 @@ export default function Withdrawal() {
                           ? "var(--fx-accent)"
                           : "var(--fx-danger)",
                       fontWeight: "600",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {w.status}
@@ -368,8 +374,9 @@ const thStyle = {
 const rowStyle = { borderBottom: "1px solid var(--fx-border)" };
 const tdStyle = {
   padding: "10px",
-  fontSize: "11px",
+  fontSize: "10px",
   color: "var(--fx-ink)",
   fontFamily: "var(--fx-font-body)",
   wordBreak: "break-word",
+  verticalAlign: "top",
 };
