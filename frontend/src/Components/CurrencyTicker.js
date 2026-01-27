@@ -1,18 +1,18 @@
 // src/Components/CurrencyTicker.js
 import React, { useEffect, useRef } from "react";
 
+const assets = [
+  { label: "XAUUSD", symbol: "OANDA:XAUUSD" },
+  { label: "XAGUSD", symbol: "OANDA:XAGUSD" },
+  { label: "EURUSD", symbol: "OANDA:EURUSD" },
+  { label: "GBPUSD", symbol: "OANDA:GBPUSD" },
+  { label: "XCUUSD", symbol: "OANDA:XCUUSD" },
+  { label: "BTCUSD", symbol: "COINBASE:BTCUSD" },
+  { label: "ETHUSD", symbol: "COINBASE:ETHUSD" },
+];
+
 export default function CurrencyTicker() {
   const tvRefs = useRef([]);
-
-  const assets = [
-    { label: "XAUUSD", symbol: "OANDA:XAUUSD" },
-    { label: "XAGUSD", symbol: "OANDA:XAGUSD" },
-    { label: "EURUSD", symbol: "OANDA:EURUSD" },
-    { label: "GBPUSD", symbol: "OANDA:GBPUSD" },
-    { label: "XCUUSD", symbol: "OANDA:XCUUSD" },
-    { label: "BTCUSD", symbol: "COINBASE:BTCUSD" },
-    { label: "ETHUSD", symbol: "COINBASE:ETHUSD" },
-  ];
 
   useEffect(() => {
     tvRefs.current.forEach((el, idx) => {
