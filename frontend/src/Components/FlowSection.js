@@ -137,16 +137,27 @@ export default function FlowSection() {
 
       <div style={{ position: "relative", display: "grid", placeItems: "center", flex: "1 1 260px" }}>
         <div className="orb-core">
-          <div className="orb-orbit orb-orbit--a">
+          <div className="orb-glass-layer orb-glass-layer--outer" />
+          <div className="orb-glass-layer orb-glass-layer--mid" />
+          <div className="orb-glass-layer orb-glass-layer--inner" />
+          <div className="orb-ring orb-ring--a" aria-hidden="true" />
+          <div className="orb-ring orb-ring--b" aria-hidden="true" />
+          <div className="orb-ring orb-ring--c" aria-hidden="true" />
+          <div className="orb-track">
             <div className="orb-electron orb-electron--a" />
           </div>
-          <div className="orb-orbit orb-orbit--b">
+          <div className="orb-track orb-track--b">
             <div className="orb-electron orb-electron--b" />
           </div>
-          <div className="orb-orbit orb-orbit--c">
+          <div className="orb-track orb-track--c">
             <div className="orb-electron orb-electron--c" />
           </div>
-          <div className="orb-triad" aria-hidden="true" />
+          <div className="orb-track orb-track--d">
+            <div className="orb-electron orb-electron--d" />
+          </div>
+          <div className="orb-track orb-track--e">
+            <div className="orb-electron orb-electron--e" />
+          </div>
           <div className="orb-sub">Adaptive Core</div>
           <div className="orb-hole" aria-hidden="true" />
         </div>
@@ -158,84 +169,76 @@ export default function FlowSection() {
           width: 220px;
           height: 220px;
           border-radius: 50%;
-          background: radial-gradient(circle at 30% 30%, rgba(var(--fx-accent-rgb), 0.2), rgba(5, 12, 24, 0.98));
-          border: 1px solid rgba(var(--fx-accent-rgb), 0.5);
+          background: radial-gradient(circle at 30% 30%, rgba(31, 215, 255, 0.18), rgba(6, 12, 22, 0.92));
+          border: 1px solid rgba(31, 215, 255, 0.45);
           display: grid;
           placeItems: center;
           position: relative;
           text-align: center;
           box-shadow: 0 24px 40px rgba(2, 8, 18, 0.6);
           perspective: 800px;
+          overflow: hidden;
         }
 
-        .orb-orbit {
+        .orb-glass-layer {
           position: absolute;
-          inset: 18px;
+          inset: 10px;
+          border-radius: 50%;
+          border: 1px solid rgba(31, 215, 255, 0.2);
+          background:
+            radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.18), transparent 60%),
+            radial-gradient(circle at 70% 75%, rgba(31, 215, 255, 0.12), transparent 55%);
+          backdrop-filter: blur(2px);
+          mix-blend-mode: screen;
+        }
+
+        .orb-glass-layer--outer { inset: 6px; opacity: 0.6; }
+        .orb-glass-layer--mid { inset: 18px; opacity: 0.45; }
+        .orb-glass-layer--inner { inset: 32px; opacity: 0.35; }
+
+        .orb-ring {
+          position: absolute;
+          inset: 8px;
+          border-radius: 50%;
+          border: 1px solid rgba(31, 215, 255, 0.35);
+          box-shadow: 0 0 14px rgba(31, 215, 255, 0.28);
+          pointer-events: none;
+        }
+
+        .orb-ring--a { inset: 14px; opacity: 0.7; }
+        .orb-ring--b { inset: 24px; opacity: 0.55; }
+        .orb-ring--c { inset: 36px; opacity: 0.45; }
+
+        .orb-track {
+          position: absolute;
+          inset: 14px;
           border-radius: 50%;
           border: none;
           transform-style: preserve-3d;
           background: transparent;
-          box-shadow: none;
-          mix-blend-mode: screen;
-          animation: orbitSpin 8s linear infinite;
+          animation: orbitSpin 6.5s linear infinite;
         }
 
-        .orb-orbit::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          background:
-            conic-gradient(
-              from 210deg,
-              rgba(150, 210, 240, 0.85) 0deg,
-              rgba(150, 210, 240, 0.45) 70deg,
-              rgba(150, 210, 240, 0.12) 170deg,
-              rgba(150, 210, 240, 0.02) 250deg,
-              rgba(150, 210, 240, 0.65) 360deg
-            );
-          -webkit-mask:
-            radial-gradient(transparent calc(50% - 2.5px), #000 calc(50% - 2px), #000 calc(50% + 2px), transparent calc(50% + 2.5px));
-          mask:
-            radial-gradient(transparent calc(50% - 2.5px), #000 calc(50% - 2px), #000 calc(50% + 2px), transparent calc(50% + 2.5px));
-          filter:
-            drop-shadow(0 0 10px rgba(120, 190, 230, 0.55))
-            drop-shadow(0 0 24px rgba(120, 190, 230, 0.25));
-          opacity: 0.9;
+        .orb-track--b {
+          inset: 26px;
+          animation-duration: 9s;
         }
 
-        .orb-orbit--a {
-          inset: 20px;
-          --tilt-x: 22deg;
-          --tilt-y: 6deg;
-          transform: scaleX(1.28) scaleY(0.85);
-        }
-
-        .orb-orbit--b {
+        .orb-track--c {
           inset: 6px;
-          --tilt-x: -18deg;
-          --tilt-y: 18deg;
-          transform: scaleX(0.95) scaleY(1.25);
+          animation-duration: 12s;
           animation-direction: reverse;
         }
 
-        .orb-orbit--c {
-          inset: -4px;
-          border-style: solid;
-          --tilt-x: 12deg;
-          --tilt-y: -22deg;
-          transform: scaleX(1.15) scaleY(1.05);
+        .orb-track--d {
+          inset: 34px;
+          animation-duration: 10s;
+          animation-direction: reverse;
         }
 
-        .orb-triad {
-          position: absolute;
-          inset: 48px;
-          border-radius: 10px;
-          border: 1px solid rgba(150, 210, 240, 0.18);
-          clip-path: polygon(50% 0%, 95% 85%, 5% 85%);
-          transform: rotate(10deg);
-          filter: drop-shadow(0 0 8px rgba(120, 190, 230, 0.2));
-          opacity: 0.6;
+        .orb-track--e {
+          inset: 20px;
+          animation-duration: 8s;
         }
 
         .orb-electron {
@@ -245,17 +248,20 @@ export default function FlowSection() {
           width: 9px;
           height: 9px;
           border-radius: 999px;
-          background: radial-gradient(circle at 30% 30%, #f2f7ff 0%, #cfe5f5 55%, #96b5c8 100%);
+          background: radial-gradient(circle at 30% 30%, #e9fbff 0%, rgba(31, 215, 255, 0.95) 55%, rgba(31, 215, 255, 0.35) 100%);
           box-shadow:
-            0 0 8px rgba(150, 200, 230, 0.7),
+            0 0 10px rgba(31, 215, 255, 0.8),
+            0 0 18px rgba(31, 215, 255, 0.45),
             0 2px 6px rgba(0, 0, 0, 0.35);
           transform: translateX(-50%);
           animation: electronDepth 2.8s ease-in-out infinite;
         }
 
         .orb-electron--a { animation-delay: 0s; }
-        .orb-electron--b { animation-delay: 0s; }
-        .orb-electron--c { animation-delay: 0s; }
+        .orb-electron--b { animation-delay: 0.6s; }
+        .orb-electron--c { animation-delay: 1.2s; }
+        .orb-electron--d { animation-delay: 1.8s; }
+        .orb-electron--e { animation-delay: 2.4s; }
 
         .orb-label {
           font-size: 22px;
@@ -292,10 +298,10 @@ export default function FlowSection() {
           box-shadow:
             inset 0 0 24px rgba(0, 0, 0, 0.8),
             0 0 20px rgba(31, 215, 255, 0.15);
-          border: 1px solid rgba(31, 215, 255, 0.35);
+          border: 0.5px solid rgba(31, 215, 255, 0.28);
           box-shadow:
             inset 0 0 26px rgba(0, 0, 0, 0.8),
-            0 0 18px rgba(31, 215, 255, 0.35);
+            0 0 12px rgba(31, 215, 255, 0.28);
         }
 
         .orb-grid {
@@ -310,8 +316,8 @@ export default function FlowSection() {
         }
 
         @keyframes orbitSpin {
-          0% { transform: rotate(0deg) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); }
-          100% { transform: rotate(360deg) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); }
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
 
         @keyframes electronDepth {
