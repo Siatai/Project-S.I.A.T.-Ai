@@ -311,7 +311,7 @@ export default function Landing() {
               background: "transparent",
               color: "var(--fx-bg)",
               border: "none",
-              padding: "12px 20px 12px 88px",
+              padding: "12px 20px",
               borderRadius: "14px",
               fontSize: "13px",
               fontWeight: "700",
@@ -754,6 +754,17 @@ export default function Landing() {
             max-width: 220px;
             font-size: 12px;
           }
+          .initiate-btn {
+            width: 100%;
+            max-width: 320px;
+            min-width: 0;
+            text-align: center;
+          }
+          .initiate-btn span {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+          }
           .hero-cta-row {
             justify-content: center;
           }
@@ -865,7 +876,7 @@ export default function Landing() {
         .initiate-btn {
           position: relative;
           min-width: 280px;
-          text-align: left;
+          text-align: center;
           overflow: hidden;
           transform: translateY(0);
           transform-style: preserve-3d;
