@@ -1,10 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@500;700;800&display=swap');
 
+@font-face {
+  font-family: 'Dune Rise';
+  src:
+    url('./assets/fonts/dune_rise/Dune_Rise.ttf') format('truetype'),
+    url('./assets/fonts/dune_rise/Dune_Rise.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --fx-font-display: 'Orbitron', 'Space Grotesk', sans-serif;
+  --fx-font-display: 'Dune Rise', 'Orbitron', 'Space Grotesk', sans-serif;
   --fx-font-body: 'Michroma', 'Space Grotesk', sans-serif;
   --fx-font-mono: 'IBM Plex Mono', monospace;
-  --fx-brand-font: 'Syne', 'Space Grotesk', sans-serif;
+  --fx-brand-font: 'Dune Rise', 'Syne', 'Space Grotesk', sans-serif;
 
   --fx-bg: #040911;
   --fx-bg-2: #091427;
@@ -119,7 +129,10 @@ img {
   display: block;
 }
 
-button,
+button {
+  font-family: var(--fx-font-display);
+}
+
 input,
 select,
 textarea {

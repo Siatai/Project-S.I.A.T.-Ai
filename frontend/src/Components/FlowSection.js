@@ -44,7 +44,7 @@ export default function FlowSection() {
             fontSize: "11px",
             letterSpacing: "0.28em",
             textTransform: "uppercase",
-            fontFamily: "var(--fx-font-mono)",
+            fontFamily: "var(--fx-font-display)",
           }}
         >
           AlgoM3 Neural Stack
@@ -57,7 +57,7 @@ export default function FlowSection() {
             fontWeight: "800",
             color: "var(--fx-ink)",
             textShadow: "0 0 16px rgba(var(--fx-accent-rgb),0.25)",
-            fontFamily: "var(--fx-font-display)",
+            fontFamily: "var(--fx-font-body)",
             textAlign: "center",
           }}
         >
@@ -101,6 +101,7 @@ export default function FlowSection() {
                   fontSize: "13px",
                   fontWeight: "700",
                   color: "var(--fx-ink)",
+                  fontFamily: "var(--fx-font-display)",
                 }}
               >
                 {node.label}

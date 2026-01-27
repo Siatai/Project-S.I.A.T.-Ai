@@ -229,10 +229,10 @@ export default function Landing() {
               borderRadius: "999px",
               border: "1px solid rgba(var(--fx-accent-rgb), 0.3)",
               color: "var(--fx-accent)",
-              fontSize: "11px",
+              fontSize: "9px",
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              fontFamily: "var(--fx-font-mono)",
+              fontFamily: "var(--fx-font-display)",
               marginBottom: "20px",
               background: "rgba(var(--fx-accent-rgb), 0.08)",
             }}
@@ -367,7 +367,21 @@ export default function Landing() {
               width: "100%",
             }}
           >
-            <span style={{ display: "block", fontSize: "20px" }}>
+            <span
+              style={{
+                display: "block",
+                fontSize: "20px",
+                fontFamily: "var(--fx-font-display)",
+                textTransform: "uppercase",
+                letterSpacing: "0.22em",
+                fontWeight: "700",
+                background:
+                  "linear-gradient(120deg, rgba(255,255,255,0.95), rgba(31,215,255,0.9), rgba(6,182,212,0.85))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.55)",
+              }}
+            >
               Signal. Execute. Scale.
             </span>
             <span style={{ display: "block", fontSize: "16px", color: "var(--fx-muted-2)" }}>
@@ -499,6 +513,8 @@ export default function Landing() {
                   fontSize: "17px",
                   color: "var(--fx-accent)",
                   fontWeight: "600",
+                  fontFamily: "var(--fx-font-display)",
+                  letterSpacing: "0.08em",
                   lineHeight: "1.2",
                   wordBreak: "normal",
                   hyphens: "manual",
@@ -795,6 +811,8 @@ export default function Landing() {
           font-weight: 700;
           color: var(--fx-ink);
           margin: 10px 0 8px;
+          font-family: var(--fx-font-display);
+          letter-spacing: 0.08em;
         }
 
         .hero-right-line {
@@ -815,26 +833,31 @@ export default function Landing() {
         .hero-right-metric strong {
           color: var(--fx-accent);
           font-weight: 600;
+          font-family: var(--fx-font-display);
+          letter-spacing: 0.08em;
         }
 
         .initiate-btn {
           position: relative;
           min-width: 280px;
           text-align: left;
+          overflow: hidden;
         }
 
         .initiate-btn::before {
           content: "";
           position: absolute;
           inset: 0;
-          border-radius: 16px;
+          border-radius: 18px;
           background:
-            linear-gradient(135deg, rgba(var(--fx-accent-rgb), 0.95), rgba(var(--fx-accent-rgb), 0.6));
-          border: 1px solid rgba(var(--fx-accent-rgb), 0.85);
+            linear-gradient(135deg, rgba(10, 24, 40, 0.92) 0%, rgba(12, 40, 58, 0.95) 45%, rgba(8, 20, 36, 0.95) 100%);
+          border: 1px solid rgba(var(--fx-accent-rgb), 0.7);
           box-shadow:
-            0 16px 30px rgba(var(--fx-accent-rgb), 0.28),
-            inset 0 -10px 18px rgba(0, 0, 0, 0.25);
-          clip-path: polygon(0 0, 92% 0, 100% 20%, 100% 80%, 92% 100%, 0 100%, 0 70%, 4% 62%, 4% 38%, 0 30%);
+            0 22px 36px rgba(2, 10, 18, 0.6),
+            0 0 28px rgba(var(--fx-accent-rgb), 0.28),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+            inset 0 -12px 18px rgba(0, 0, 0, 0.35);
+          clip-path: polygon(0 0, 90% 0, 100% 18%, 100% 82%, 90% 100%, 0 100%, 0 72%, 5% 62%, 5% 38%, 0 28%);
         }
 
         .initiate-btn::after {
@@ -847,23 +870,45 @@ export default function Landing() {
           transform: translateY(-50%);
           border-radius: 50%;
           background:
-            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 45%),
-            radial-gradient(circle, rgba(var(--fx-accent-rgb), 0.95), rgba(6, 20, 40, 0.9));
-          border: 2px solid rgba(var(--fx-accent-rgb), 0.85);
+            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 48%),
+            radial-gradient(circle, rgba(var(--fx-accent-rgb), 0.85), rgba(6, 20, 40, 0.95));
+          border: 2px solid rgba(var(--fx-accent-rgb), 0.7);
           box-shadow:
-            0 0 16px rgba(var(--fx-accent-rgb), 0.6),
-            inset 0 0 12px rgba(0,0,0,0.4);
+            0 0 18px rgba(var(--fx-accent-rgb), 0.65),
+            inset 0 0 14px rgba(0,0,0,0.5);
+        }
+
+        .initiate-btn::marker {
+          content: "";
+        }
+
+        .initiate-btn::before,
+        .initiate-btn::after {
+          transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
         }
 
         .initiate-btn span {
           position: relative;
           z-index: 1;
-          color: #04121f;
-          text-shadow: 0 0 6px rgba(255,255,255,0.3);
+          color: #ffffff;
+          font-family: var(--fx-font-display);
+          text-shadow:
+            0 0 8px rgba(255,255,255,0.35),
+            0 0 16px rgba(var(--fx-accent-rgb),0.45);
         }
 
         .initiate-btn:hover::before {
-          filter: brightness(1.08);
+          filter: brightness(1.12) saturate(1.1);
+          box-shadow:
+            0 26px 40px rgba(2, 10, 18, 0.65),
+            0 0 36px rgba(var(--fx-accent-rgb), 0.38),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+            inset 0 -16px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .initiate-btn:hover::after {
+          transform: translateY(-50%) scale(1.03);
+          filter: brightness(1.1);
         }
 
         .hero-right-orb {
