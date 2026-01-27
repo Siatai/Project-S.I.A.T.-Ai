@@ -22,7 +22,7 @@ const Divider = () => (
       borderRadius: "4px",
       background:
         "linear-gradient(90deg, rgba(0,0,0,0) 0%, var(--fx-accent) 20%, var(--fx-accent) 50%, var(--fx-accent) 80%, rgba(0,0,0,0) 100%)",
-      boxShadow: "0 0 30px 8px rgba(var(--fx-accent-rgb),0.9)",
+      boxShadow: "0 0 16px 4px rgba(var(--fx-accent-rgb),0.35)",
       position: "relative",
       overflow: "hidden",
     }}
@@ -36,7 +36,7 @@ const Divider = () => (
         height: "100%",
         background:
           "linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)",
-        animation: "shine 3s linear infinite",
+        animation: "shine 4.8s ease-in-out infinite",
       }}
     />
   </div>

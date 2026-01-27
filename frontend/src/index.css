@@ -445,3 +445,10 @@ code {
   font-family: var(--fx-brand-font);
   animation: algom3GlowPulse 3.2s ease-in-out infinite;
 }
+
+@media (max-width: 640px) {
+  .algom3-pulse {
+    animation: none;
+    text-shadow: 0 0 6px rgba(var(--fx-accent-rgb), 0.35);
+  }
+}
