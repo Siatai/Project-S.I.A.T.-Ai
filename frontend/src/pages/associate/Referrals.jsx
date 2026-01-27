@@ -122,7 +122,13 @@ export default function Referrals() {
         <div style={cardStyle}>
           <div style={glowRow}>
             <span>Total from All Referrals</span>
-            <strong>
+            <strong
+              style={{
+                fontFamily: "var(--fx-font-display)",
+                letterSpacing: "0.08em",
+                fontSize: "12px",
+              }}
+            >
               ${totalEarned.toFixed(2)} / ${totalAll.toFixed(2)}
             </strong>
           </div>
@@ -157,10 +163,24 @@ export default function Referrals() {
               }}
             >
               <div style={glowRow}>
-                <span style={{ color: "var(--fx-accent)", fontWeight: "600" }}>
+                <span
+                  style={{
+                    color: "var(--fx-accent)",
+                    fontWeight: "600",
+                    fontFamily: "var(--fx-font-display)",
+                    letterSpacing: "0.08em",
+                    fontSize: "12px",
+                  }}
+                >
                   {r.name}
                 </span>
-                <strong>
+                <strong
+                  style={{
+                    fontFamily: "var(--fx-font-display)",
+                    letterSpacing: "0.08em",
+                    fontSize: "12px",
+                  }}
+                >
                   ${r.earned.toFixed(2)} / ${r.total.toFixed(2)}
                 </strong>
               </div>
@@ -304,8 +324,23 @@ const pageWrapper = {
   color: "var(--fx-ink)",
 };
 const mainContent = { padding: "20px", marginTop: "80px" };
-const headerTitle = { marginBottom: "20px", color: "var(--fx-accent)" };
-const subHeader = { margin: "20px 0 12px", color: "var(--fx-accent)" };
+const headerTitle = {
+  marginBottom: "20px",
+  color: "var(--fx-accent)",
+  fontFamily: "var(--fx-font-display)",
+  fontSize: "18px",
+  letterSpacing: "0.2em",
+  textTransform: "uppercase",
+  whiteSpace: "nowrap",
+};
+const subHeader = {
+  margin: "20px 0 12px",
+  color: "var(--fx-accent)",
+  fontFamily: "var(--fx-font-display)",
+  fontSize: "14px",
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+};
 const cardStyle = {
   padding: "16px",
   borderRadius: "14px",
@@ -314,7 +349,14 @@ const cardStyle = {
   border: "1px solid var(--fx-border)",
   boxShadow: "var(--fx-shadow)",
 };
-const glowRow = { display: "flex", justifyContent: "space-between", marginBottom: "8px" };
+const glowRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "8px",
+  fontSize: "12px",
+  letterSpacing: "0.02em",
+};
 const progressTrack = {
   background: "var(--fx-rail)",
   borderRadius: "6px",

@@ -175,7 +175,7 @@ const rightHeader = { display: "flex", alignItems: "center", gap: "10px" };
 
 const panelText = {
   color: "var(--fx-muted-2)",
-  fontSize: "11px",
+  fontSize: "10px",
   fontWeight: "700",
   textTransform: "uppercase",
   letterSpacing: "0.14em",

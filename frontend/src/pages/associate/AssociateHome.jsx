@@ -237,7 +237,13 @@ const walletIconBox = {
 
 const walletIcon = { fontSize: "20px", color: "var(--fx-accent)" };
 const walletLabel = { fontSize: "13px", color: "var(--fx-muted)", margin: 0 };
-const walletValue = { fontSize: "20px", color: "var(--fx-accent)", margin: 0 };
+const walletValue = {
+  fontSize: "18px",
+  color: "var(--fx-accent)",
+  margin: 0,
+  fontFamily: "var(--fx-font-display)",
+  letterSpacing: "0.08em",
+};
 
 const cardStyle3D = {
   background: "var(--fx-card-strong)",
@@ -323,6 +329,9 @@ const sectionCaption = {
   fontSize: "13px",
   color: "var(--fx-muted)",
   marginBottom: "6px",
+  fontFamily: "var(--fx-font-display)",
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
 };
 
 const glowLine = {

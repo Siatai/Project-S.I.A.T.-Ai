@@ -126,10 +126,28 @@ export default function Deposit() {
                   : "0 0 8px rgba(var(--fx-accent-rgb),0.2)",
             }}
           >
-            <h3 style={{ fontSize: "16px", marginBottom: "10px", fontWeight: "600" }}>
+            <h3
+              style={{
+                fontSize: "14px",
+                marginBottom: "10px",
+                fontWeight: "600",
+                fontFamily: "var(--fx-font-display)",
+                letterSpacing: "0.06em",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {m.name}
             </h3>
-            <p style={{ fontSize: "13px", color: "var(--fx-muted)" }}>
+            <p
+              style={{
+                fontSize: "11px",
+                color: "var(--fx-muted)",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
+            >
               {m.active ? "Processing: Instant – 15 minutes" : "Coming soon"}
             </p>
 

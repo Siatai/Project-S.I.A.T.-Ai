@@ -114,6 +114,10 @@ export default function Wallet() {
           marginBottom: "10px",
           fontFamily: "var(--fx-font-display)",
           color: "var(--fx-accent)",
+          fontSize: "18px",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
         }}
       >
         My Wallet
@@ -245,7 +249,8 @@ const policyBox = {
   border: "1px solid var(--fx-border)",
   borderRadius: "8px",
   padding: "12px",
-  fontSize: "13px",
+  fontSize: "12px",
+  letterSpacing: "0.02em",
   color: "var(--fx-ink)",
   textAlign: "left",
   lineHeight: "1.6",

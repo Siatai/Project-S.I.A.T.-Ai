@@ -42,6 +42,12 @@ const Divider = () => (
 
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
+  const isNarrow = window.innerWidth < 720;
+  const isTight = window.innerWidth < 640;
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
     <div
@@ -50,7 +56,9 @@ export default function Landing() {
         minHeight: "100vh",
         fontFamily: "var(--fx-font-body)",
         paddingTop: "70px",
-        backgroundImage: `radial-gradient(1200px 600px at 0% 0%, rgba(var(--fx-accent-rgb),0.16), transparent 60%), url(${bg})`,
+        backgroundImage: isTight
+          ? "radial-gradient(1200px 600px at 0% 0%, rgba(var(--fx-accent-rgb),0.16), transparent 60%)"
+          : `radial-gradient(1200px 600px at 0% 0%, rgba(var(--fx-accent-rgb),0.16), transparent 60%), url(${bg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         overflowX: "hidden",
@@ -146,8 +154,8 @@ export default function Landing() {
             "linear-gradient(145deg, rgba(6, 14, 30, 0.9), rgba(10, 22, 42, 0.88))",
           border: "1px solid rgba(var(--fx-accent-rgb), 0.35)",
           borderRadius: "20px",
-          boxShadow: "0 24px 40px rgba(2, 8, 18, 0.55)",
-          backdropFilter: "blur(12px)",
+          boxShadow: isTight ? "0 14px 24px rgba(2, 8, 18, 0.45)" : "0 24px 40px rgba(2, 8, 18, 0.55)",
+          backdropFilter: isTight ? "none" : "blur(12px)",
           overflow: "hidden",
         }}
       >
@@ -219,8 +227,8 @@ export default function Landing() {
           <motion.div
             className="landing-kicker"
             initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            animate={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+            transition={{ duration: reduceMotion ? 0.2 : 0.6 }}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -252,11 +260,11 @@ export default function Landing() {
         <motion.h2
           className="landing-title"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          animate={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+          transition={{ duration: reduceMotion ? 0.2 : 0.8 }}
           style={{
             fontFamily: "var(--fx-font-display)",
-            fontSize: "42px",
+            fontSize: isNarrow ? "32px" : "42px",
             fontWeight: "800",
             marginBottom: "24px",
             textShadow: "0 0 22px rgba(var(--fx-accent-rgb),0.35)",
@@ -354,9 +362,9 @@ export default function Landing() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 1 }}
+            transition={{ delay: reduceMotion ? 0 : 0.8, duration: reduceMotion ? 0.3 : 1 }}
             style={{
-              fontSize: "22px",
+              fontSize: isNarrow ? "18px" : "22px",
               marginTop: "18px",
               color: "var(--fx-accent)",
               fontWeight: "600",
@@ -370,7 +378,7 @@ export default function Landing() {
             <span
               style={{
                 display: "block",
-                fontSize: "20px",
+                fontSize: isNarrow ? "16px" : "20px",
                 fontFamily: "var(--fx-font-display)",
                 textTransform: "uppercase",
                 letterSpacing: "0.22em",
@@ -742,7 +750,8 @@ export default function Landing() {
             opacity: 0.25;
           }
           .hero-scan {
-            opacity: 0.35;
+            opacity: 0.2;
+            animation: none;
           }
           .hero-right-orb__core svg {
             display: none;

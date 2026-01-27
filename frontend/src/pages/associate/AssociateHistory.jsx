@@ -96,11 +96,16 @@ export default function AssociateHistory() {
               key={btn.key}
               onClick={() => setFilter(btn.key)}
               style={{
-                padding: "8px 16px",
+                padding: "7px 14px",
                 borderRadius: "20px",
                 border: "none",
                 cursor: "pointer",
                 fontWeight: "600",
+                fontSize: "11px",
+                fontFamily: "var(--fx-font-display)",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
                 background:
                   filter === btn.key
                     ? "linear-gradient(135deg, var(--fx-button), var(--fx-button-2))"
@@ -182,11 +187,11 @@ export default function AssociateHistory() {
                   >
                     <strong>Tx:</strong> {t.tx}
                   </p>
-                  <p>
+                  <p style={{ fontSize: "12px", letterSpacing: "0.02em" }}>
                     <strong style={{ color: colors.textSecondary }}>
                       Date:
                     </strong>{" "}
-                    <span style={{ color: colors.textPrimary }}>
+                    <span style={{ color: colors.textPrimary, whiteSpace: "nowrap" }}>
                       {t.date.toLocaleString()}
                     </span>
                   </p>
@@ -296,6 +301,10 @@ const headerTitle = {
   marginBottom: "10px",
   fontFamily: "var(--fx-font-display)",
   color: "var(--fx-accent)",
+  fontSize: "18px",
+  letterSpacing: "0.2em",
+  textTransform: "uppercase",
+  whiteSpace: "nowrap",
 };
 
 const glowLine = {

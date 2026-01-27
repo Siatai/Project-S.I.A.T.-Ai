@@ -203,7 +203,7 @@ export default function Withdrawal() {
             <tbody>
               {summary.withdrawals.map((w, idx) => (
                 <tr key={idx} style={rowStyle}>
-                  <td style={tdStyle}>
+                  <td style={{ ...tdStyle, whiteSpace: "nowrap", letterSpacing: "0.02em" }}>
                     {new Date(w.timestamp).toLocaleString()}
                   </td>
                   <td style={tdStyle}>${w.final_amount}</td>
@@ -344,6 +344,10 @@ const subHeader = {
   marginTop: "20px",
   color: "var(--fx-accent)",
   fontWeight: "600",
+  fontSize: "14px",
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+  fontFamily: "var(--fx-font-display)",
 };
 const tableWrapper = {
   borderRadius: "12px",
@@ -355,13 +359,16 @@ const tableWrapper = {
 const thStyle = {
   padding: "10px",
   textAlign: "left",
-  fontSize: "12px",
+  fontSize: "11px",
   color: "var(--fx-muted)",
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
+  fontFamily: "var(--fx-font-display)",
 };
 const rowStyle = { borderBottom: "1px solid var(--fx-border)" };
 const tdStyle = {
   padding: "10px",
-  fontSize: "12px",
+  fontSize: "11px",
   color: "var(--fx-ink)",
   fontFamily: "var(--fx-font-body)",
   wordBreak: "break-word",

@@ -248,10 +248,11 @@ const contentWrapper = {
 
 const welcomeText = {
   fontFamily: "var(--fx-font-display)",
-  fontSize: "22px",
+  fontSize: "20px",
   color: "var(--fx-accent)",
   width: "100%",
   maxWidth: "920px",
+  letterSpacing: "0.12em",
 };
 
 const cardStyle = {
@@ -399,9 +400,12 @@ const infoIcon = {
 
 const depositTitle = {
   marginBottom: "10px",
-  fontSize: "18px",
+  fontSize: "16px",
   fontWeight: "600",
   color: "var(--fx-accent)",
+  fontFamily: "var(--fx-font-display)",
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
 };
 
 const progressBigTrack = {
