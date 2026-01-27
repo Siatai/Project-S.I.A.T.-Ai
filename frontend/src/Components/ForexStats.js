@@ -26,6 +26,9 @@ export default function ForexStats() {
           fontWeight: "700",
           marginBottom: "20px",
           textAlign: "center",
+          marginLeft: "auto",
+          marginRight: "auto",
+          width: "fit-content",
           letterSpacing: "0.12em",
           textTransform: "uppercase",
         }}
