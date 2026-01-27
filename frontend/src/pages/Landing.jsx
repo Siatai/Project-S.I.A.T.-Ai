@@ -7,6 +7,8 @@ import avatar from "../Components/avatar.png";
 // Externalized sections
 import FlowSection from "../Components/FlowSection";
 import ForexStats from "../Components/ForexStats";
+import CryptoStats from "../Components/CryptoStats";
+import CurrencyTicker from "../Components/CurrencyTicker";
 import ComingSoon from "../Components/ComingSoon";
 import LiveNow from "../Components/LiveNow";
 
@@ -118,7 +120,7 @@ export default function Landing() {
               textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb),0.5)",
             }}
           >
-            AlgoM3
+            <span className="algom3-pulse">AlgoM3</span>
           </h1>
         </div>
 
@@ -543,9 +545,13 @@ export default function Landing() {
       {/* Externalized Sections */}
       <FlowSection />
       <Divider />
+      <LiveNow />
+      <Divider />
       <ForexStats />
       <Divider />
-      <LiveNow />
+      <CryptoStats />
+      <Divider />
+      <CurrencyTicker />
       <Divider />
       <ComingSoon />
       <Divider />

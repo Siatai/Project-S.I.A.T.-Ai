@@ -140,7 +140,7 @@ export default function SidebarLayout({
               textShadow: "0 0 12px rgba(var(--fx-accent-legacy-rgb),0.6)",
             }}
           >
-            AlgoM3
+            <span className="algom3-pulse">AlgoM3</span>
           </h1>
           <span style={{ fontSize: "12px", color: "var(--fx-muted-2)", fontWeight: "700", letterSpacing: "0.14em" }}>
             {role.toUpperCase()} PANEL

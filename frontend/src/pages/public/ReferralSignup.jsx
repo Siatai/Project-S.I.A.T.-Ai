@@ -192,6 +192,7 @@ export default function ReferralSignup() {
         >
           <span style={{ color: "var(--fx-ink)" }}>Welcome to </span>
           <span
+            className="algom3-pulse"
             style={{
               color: "var(--fx-accent-legacy)",
               textShadow: "0 0 10px rgba(var(--fx-accent-legacy-rgb),0.6)",

@@ -1,12 +1,12 @@
-// src/Components/ForexStats.js
+// src/Components/CryptoStats.js
 import React from "react";
 
-export default function ForexStats() {
+export default function CryptoStats() {
   const stats = [
-    { stat: "$7T+", desc: "Daily Trading Volume" },
-    { stat: "24/5", desc: "Market Open Hours" },
-    { stat: "190+", desc: "Countries Trading" },
-    { stat: "88%", desc: "Liquidity vs Stocks" },
+    { stat: "$2T+", desc: "Total Market Cap" },
+    { stat: "24/7", desc: "Always-On Markets" },
+    { stat: "100M+", desc: "Active Wallets" },
+    { stat: "0.1s", desc: "Avg Block Finality" },
   ];
 
   return (
@@ -33,7 +33,7 @@ export default function ForexStats() {
           textTransform: "uppercase",
         }}
       >
-        About Forex
+        About Crypto
       </h3>
 
       <div
@@ -55,7 +55,6 @@ export default function ForexStats() {
             padding: "10px 0 20px",
           }}
         >
-          {/* Infinite carousel by repeating 3 times */}
           {[...stats, ...stats, ...stats].map((item, i) => (
             <div
               key={i}

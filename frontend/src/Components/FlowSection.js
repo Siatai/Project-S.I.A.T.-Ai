@@ -47,7 +47,7 @@ export default function FlowSection() {
             fontFamily: "var(--fx-font-display)",
           }}
         >
-          AlgoM3 Neural Stack
+          <span className="algom3-pulse">AlgoM3</span> Neural Stack
         </div>
         <h2
           style={{
@@ -72,7 +72,7 @@ export default function FlowSection() {
             marginRight: "auto",
           }}
         >
-          Each layer is tuned for stability and speed, so AlgoM3 stays composed through
+          Each layer is tuned for stability and speed, so <span className="algom3-pulse">AlgoM3</span> stays composed through
           volatility while capturing clean entries.
         </p>
         <div
@@ -101,7 +101,7 @@ export default function FlowSection() {
                 style={{
                   fontSize: "13px",
                   fontWeight: "700",
-                  color: "#dff6ff",
+                  color: "var(--fx-accent)",
                   fontFamily: "var(--fx-font-display)",
                 }}
               >
@@ -110,7 +110,10 @@ export default function FlowSection() {
               <div
                 style={{
                   fontSize: "12px",
-                  color: "var(--fx-muted)",
+                  color: "#ffffff",
+                  textAlign: "right",
+                  marginLeft: "auto",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {node.detail}
@@ -124,7 +127,7 @@ export default function FlowSection() {
         <div className="orb-core">
           <div className="orb-ring" />
           <div className="orb-ring orb-ring--outer" />
-          <div className="orb-label">AlgoM3</div>
+          <div className="orb-label algom3-pulse">AlgoM3</div>
           <div className="orb-sub">Adaptive Core</div>
         </div>
         <div className="orb-grid" />

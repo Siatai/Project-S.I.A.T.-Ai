@@ -170,6 +170,10 @@ h5::after {
   opacity: 0.9;
 }
 
+.no-underline::after {
+  display: none;
+}
+
 header h1,
 header h2,
 header h3,
@@ -419,4 +423,25 @@ code {
 
 .fx-table tbody tr:hover td {
   background: rgba(8, 22, 40, 0.65);
+}
+
+@keyframes algom3GlowPulse {
+  0% {
+    text-shadow: 0 0 6px rgba(var(--fx-accent-rgb), 0.35), 0 0 14px rgba(var(--fx-accent-rgb), 0.2);
+    opacity: 0.9;
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(var(--fx-accent-rgb), 0.7), 0 0 22px rgba(var(--fx-accent-rgb), 0.4);
+    opacity: 1;
+  }
+  100% {
+    text-shadow: 0 0 6px rgba(var(--fx-accent-rgb), 0.35), 0 0 14px rgba(var(--fx-accent-rgb), 0.2);
+    opacity: 0.9;
+  }
+}
+
+.algom3-pulse {
+  color: var(--fx-accent);
+  font-family: var(--fx-brand-font);
+  animation: algom3GlowPulse 3.2s ease-in-out infinite;
 }
