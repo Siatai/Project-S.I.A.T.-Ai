@@ -335,8 +335,8 @@ const sectionCaption = {
 };
 
 const glowLine = {
-  height: "2px",
-  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
-  boxShadow: "0 0 10px var(--fx-accent)",
-  margin: "8px 0 18px 0",
+  height: "0",
+  background: "transparent",
+  boxShadow: "none",
+  margin: "6px 0 14px 0",
 };

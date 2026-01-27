@@ -340,8 +340,8 @@ const closeBtn = {
   cursor: "pointer",
 };
 const glowLine = {
-  height: "2px",
-  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
-  boxShadow: "0 0 10px var(--fx-accent)",
-  marginBottom: "20px",
+  height: "0",
+  background: "transparent",
+  boxShadow: "none",
+  marginBottom: "14px",
 };

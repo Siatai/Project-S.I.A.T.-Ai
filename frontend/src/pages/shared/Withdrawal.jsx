@@ -223,6 +223,9 @@ export default function Withdrawal() {
                           : "var(--fx-danger)",
                       fontWeight: "600",
                       whiteSpace: "nowrap",
+                      fontFamily: "var(--fx-font-display)",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
                     }}
                   >
                     {w.status}
@@ -305,13 +308,16 @@ const miniRow = {
   marginBottom: "6px",
   fontSize: "12px",
   color: "var(--fx-ink)",
+  fontFamily: "var(--fx-font-display)",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
 };
 
 const glowLine = {
-  height: "2px",
-  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
-  boxShadow: "0 0 10px var(--fx-accent)",
-  margin: "16px 0 20px",
+  height: "0",
+  background: "transparent",
+  boxShadow: "none",
+  margin: "10px 0 16px",
 };
 
 const btnTeal = {

@@ -146,6 +146,43 @@ h4,
 h5 {
   font-family: var(--fx-font-display);
   letter-spacing: 0.02em;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+h1::after,
+h2::after,
+h3::after,
+h4::after,
+h5::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fx-accent), transparent);
+  box-shadow: 0 0 12px rgba(var(--fx-accent-rgb), 0.45);
+  opacity: 0.9;
+}
+
+header h1,
+header h2,
+header h3,
+header h4,
+header h5 {
+  text-align: left;
+  padding-bottom: 0;
+}
+
+header h1::after,
+header h2::after,
+header h3::after,
+header h4::after,
+header h5::after {
+  display: none;
 }
 
 p,

@@ -222,6 +222,9 @@ export default function AssociateWithdrawal() {
                           : "var(--fx-danger)",
                       fontWeight: "600",
                       whiteSpace: "nowrap",
+                      fontFamily: "var(--fx-font-display)",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
                     }}
                   >
                     {w.status}
@@ -303,6 +306,9 @@ const miniRow = {
   marginBottom: "6px",
   fontSize: "12px",
   color: "var(--fx-ink)",
+  fontFamily: "var(--fx-font-display)",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
 };
 const btnTeal = {
   marginTop: "15px",

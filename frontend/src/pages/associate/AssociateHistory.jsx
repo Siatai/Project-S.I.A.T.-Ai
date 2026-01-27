@@ -230,6 +230,9 @@ export default function AssociateHistory() {
                             ? colors.accentCyan
                             : colors.accentRed,
                         fontWeight: "600",
+                        fontFamily: "var(--fx-font-display)",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
                       }}
                     >
                       {t.status}
@@ -311,10 +314,10 @@ const headerTitle = {
 };
 
 const glowLine = {
-  height: "2px",
-  background: "linear-gradient(90deg, transparent, var(--fx-accent), transparent)",
-  boxShadow: "0 0 10px var(--fx-accent)",
-  margin: "8px 0 20px 0",
+  height: "0",
+  background: "transparent",
+  boxShadow: "none",
+  margin: "6px 0 14px 0",
 };
 
 const mobileCard = {
