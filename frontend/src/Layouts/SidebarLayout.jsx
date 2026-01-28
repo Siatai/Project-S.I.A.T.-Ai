@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { formatAmount } from "../utils/format";
 
 export default function SidebarLayout({
   role = "associate",
@@ -74,7 +75,7 @@ export default function SidebarLayout({
               {user.name || "User"}
             </h2>
             <p style={{ fontSize: "14px", color: "var(--fx-accent)", fontWeight: "600" }}>
-              Balance: ${user.wallet_balance?.toLocaleString() || 0}
+              Balance: ${formatAmount(user.wallet_balance)}
             </p>
           </div>
 

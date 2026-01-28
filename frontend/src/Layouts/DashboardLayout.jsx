@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { formatAmount } from "../utils/format";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -126,7 +127,7 @@ export default function DashboardLayout() {
           <div style={{ flex: 1 }}>
             <h2 className="user-name">{user.name || "User"}</h2>
             <p className="user-balance">
-              Balance: ${user.withdrawable_balance.toLocaleString() || "0"}
+              Balance: ${formatAmount(user.withdrawable_balance)}
             </p>
 
             {/* Divider line */}

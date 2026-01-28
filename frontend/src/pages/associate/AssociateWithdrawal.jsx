@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar"; //  Associate Navbar
 import HudLoader from "../../Components/HudLoader";
+import { formatAmount } from "../../utils/format";
 
 export default function AssociateWithdrawal() {
   const [summary, setSummary] = useState(null);
@@ -133,29 +134,29 @@ export default function AssociateWithdrawal() {
         {/*  Total Earnings Card */}
         <div style={highlightCard}>
           <h3 style={cardTitle}>Total Earnings</h3>
-          <p style={bigValue}>${summary.total.toFixed(2)}</p>
+          <p style={bigValue}>${formatAmount(summary.total)}</p>
         </div>
 
         {/*  Main Balance Card */}
         <div style={mainCard}>
           <h3 style={cardTitle}>Withdrawable Balance</h3>
-          <p style={bigValueTeal}>${summary.withdrawable.toFixed(2)}</p>
+          <p style={bigValueTeal}>${formatAmount(summary.withdrawable)}</p>
 
           <div style={miniRows}>
             <div style={miniRow}>
               <span>Withdrawn</span>
-              <strong>${summary.withdrawn.toFixed(2)}</strong>
+              <strong>${formatAmount(summary.withdrawn)}</strong>
             </div>
             <div style={miniRow}>
               <span>Pending</span>
               <strong style={{ color: "var(--fx-gold)" }}>
-                ${summary.pending.toFixed(2)}
+                ${formatAmount(summary.pending)}
               </strong>
             </div>
             <div style={miniRow}>
               <span>Deductions</span>
               <strong style={{ color: "var(--fx-danger)" }}>
-                -${summary.deductions.toFixed(2)}
+                -${formatAmount(summary.deductions)}
               </strong>
             </div>
           </div>
@@ -210,7 +211,7 @@ export default function AssociateWithdrawal() {
                   <td style={{ ...tdStyle, whiteSpace: "normal", lineHeight: 1.2 }}>
                     {new Date(w.timestamp).toLocaleString()}
                   </td>
-                  <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>${w.final_amount}</td>
+                  <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>${formatAmount(w.final_amount)}</td>
                   <td
                     style={{
                       ...tdStyle,

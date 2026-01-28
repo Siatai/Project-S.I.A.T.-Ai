@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { formatAmount } from "../../utils/format";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -64,7 +65,7 @@ export default function AdminUsers() {
       <h2>Manage Users</h2>
 
       <h3 style={{ margin: "10px 0", color: "var(--fx-accent)" }}>
-        Total Deposits: ${totalDeposits}
+        Total Deposits: ${formatAmount(totalDeposits)}
       </h3>
 
       <input
@@ -103,8 +104,8 @@ export default function AdminUsers() {
                     ? "Associate"
                     : "Investor"}
                 </td>
-                <td>${u.balance}</td>
-                <td>${u.deposit || 0}</td>
+                <td>${formatAmount(u.balance)}</td>
+                <td>${formatAmount(u.deposit || 0)}</td>
                 <td style={{ textAlign: "center" }}>
                   {u.pending_associate ? (
                     <span

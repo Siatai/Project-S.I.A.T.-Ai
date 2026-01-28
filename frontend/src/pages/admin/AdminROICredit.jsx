@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { formatAmount } from "../../utils/format";
 
 export default function AdminROICredit() {
   const [loading, setLoading] = useState(false);
@@ -174,9 +175,9 @@ export default function AdminROICredit() {
                   {result.credited.map((c, idx) => (
                     <tr key={idx} style={{ borderBottom: "1px solid var(--fx-rail)" }}>
                       <td style={{ padding: "6px" }}>{c.email}</td>
-                      <td style={{ padding: "6px" }}>{c.investment} USDT</td>
+                      <td style={{ padding: "6px" }}>{formatAmount(c.investment)} USDT</td>
                       <td style={{ padding: "6px" }}>{c.days}</td>
-                      <td style={{ padding: "6px" }}>{c.credited_profit} USDT</td>
+                      <td style={{ padding: "6px" }}>{formatAmount(c.credited_profit)} USDT</td>
                       <td style={{ padding: "6px" }}>
                         {c.force_mode ? "Force" : "Safe"}
                       </td>

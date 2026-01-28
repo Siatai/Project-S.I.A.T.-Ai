@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { formatAmount } from "../../utils/format";
 
 export default function AdminHome() {
   const [stats, setStats] = useState(null);
@@ -58,7 +59,7 @@ export default function AdminHome() {
         >
           <h3>Total Deposits</h3>
           <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-            {stats.total_deposits} USDT
+            {formatAmount(stats.total_deposits)} USDT
           </p>
         </div>
 
@@ -73,7 +74,7 @@ export default function AdminHome() {
         >
           <h3>Total Withdrawals</h3>
           <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-            {stats.total_withdrawals} USDT
+            {formatAmount(stats.total_withdrawals)} USDT
           </p>
         </div>
 
@@ -88,7 +89,7 @@ export default function AdminHome() {
         >
           <h3>Total Commissions</h3>
           <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-            {stats.total_commissions} USDT
+            {formatAmount(stats.total_commissions)} USDT
           </p>
         </div>
       </div>

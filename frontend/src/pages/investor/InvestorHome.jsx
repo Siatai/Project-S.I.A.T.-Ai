@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaWallet } from "react-icons/fa";
 import InvestorNavbar from "./Navbar";
 import HudLoader from "../../Components/HudLoader";
+import { formatAmount } from "../../utils/format";
 
 export default function InvestorHome() {
   const [applied, setApplied] = useState(false);
@@ -97,8 +98,8 @@ export default function InvestorHome() {
             </p>
             <h3 style={{ fontSize: "20px", color: "var(--fx-accent)", margin: 0 }}>
               {user.wallet_balance !== undefined
-                ? user.wallet_balance.toFixed(2)
-                : 0}{" "}
+                ? formatAmount(user.wallet_balance)
+                : "0.00"}{" "}
               USDT
             </h3>
           </div>
@@ -123,7 +124,7 @@ export default function InvestorHome() {
             <div style={{ marginBottom: "25px" }}>
               <div style={glowRowTotal}>
                 <span>Total Deposits</span>
-                <span>{summary.total_invested} USDT</span>
+                <span>{formatAmount(summary.total_invested)} USDT</span>
               </div>
               <DepletingBar
                 received={summary.total_received}
@@ -138,7 +139,7 @@ export default function InvestorHome() {
             deposits.map((d, idx) => (
               <div key={idx} style={{ marginBottom: "18px" }}>
                 <div style={glowRowGreen}>
-                  <span>{d.capital} USDT</span>
+                  <span>{formatAmount(d.capital)} USDT</span>
                   <span>
                     {d.timestamp
                       ? new Date(d.timestamp).toLocaleDateString()
@@ -180,7 +181,7 @@ export default function InvestorHome() {
               <h3 style={{ color: "var(--fx-accent)", marginBottom: "12px" }}>Info</h3>
               <p style={{ fontSize: "14px", color: "var(--fx-ink)" }}>
                 Maximum Receivable:{" "}
-                <strong>{summary.total_max_return} USDT</strong>
+                <strong>{formatAmount(summary.total_max_return)} USDT</strong>
               </p>
             </div>
           </div>
@@ -215,7 +216,7 @@ function DepletingBar({ received, max }) {
         <span style={progressBigText}>{Math.round(percentLeft)}%</span>
       </div>
       <p style={progressCaption}>
-        Remaining: {Math.max(max - received, 0)} / {max} USDT
+        Remaining: {formatAmount(Math.max(max - received, 0))} / {formatAmount(max)} USDT
       </p>
     </div>
   );

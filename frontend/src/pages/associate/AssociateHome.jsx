@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaCopy, FaWallet } from "react-icons/fa";
 import AssociateNavbar from "./AssociateNavbar"; //  Fixed Navbar
 import HudLoader from "../../Components/HudLoader";
+import { formatAmount } from "../../utils/format";
 
 export default function AssociateHome() {
   const [user, setUser] = useState(null);
@@ -105,7 +106,7 @@ export default function AssociateHome() {
             </div>
             <div>
               <p style={walletLabel}>Wallet Balance</p>
-              <h3 style={walletValue}>{walletBalance.toFixed(2)} USDT</h3>
+              <h3 style={walletValue}>{formatAmount(walletBalance)} USDT</h3>
             </div>
           </div>
 
@@ -137,12 +138,12 @@ export default function AssociateHome() {
           <div style={cardStyle3D}>
             <div style={glowRow}>
               <span>Total Commission</span>
-              <strong>{Math.round(totalTeam)} USDT</strong>
+              <strong>{formatAmount(totalTeam)} USDT</strong>
             </div>
             <ProgressBar percent={percentLeftTeam} />
             <p style={mutedText}>
-              Earned: {Math.round(earnedTeam)} USDT | Left:{" "}
-              {Math.round(leftTeam)} USDT
+              Earned: {formatAmount(earnedTeam)} USDT | Left:{" "}
+              {formatAmount(leftTeam)} USDT
             </p>
           </div>
 
@@ -150,14 +151,14 @@ export default function AssociateHome() {
           <div style={cardStyle3D}>
             <div style={glowRow}>
               <span>Total Deposits</span>
-              <strong>{Math.round(totalSelf)} USDT</strong>
+              <strong>{formatAmount(totalSelf)} USDT</strong>
             </div>
             <ProgressBar percent={percentLeftSelf} />
             <p style={mutedText}>
-              ROI: {Math.round(roiReceivedSelf)} / {Math.round(maxSelf)} USDT
+              ROI: {formatAmount(roiReceivedSelf)} / {formatAmount(maxSelf)} USDT
             </p>
             <p style={{ color: "var(--fx-gold)", fontSize: "13px" }}>
-              {Math.round(leftSelf)} USDT left to receive
+              {formatAmount(leftSelf)} USDT left to receive
             </p>
           </div>
         </div>

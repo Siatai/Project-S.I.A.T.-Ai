@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar";
 import HudLoader from "../../Components/HudLoader";
+import { formatAmount } from "../../utils/format";
 
 export default function Referrals() {
   const [referees, setReferees] = useState([]);
@@ -129,7 +130,7 @@ export default function Referrals() {
                 fontSize: "12px",
               }}
             >
-              ${totalEarned.toFixed(2)} / ${totalAll.toFixed(2)}
+              ${formatAmount(totalEarned)} / ${formatAmount(totalAll)}
             </strong>
           </div>
           <div style={progressTrack}>
@@ -142,7 +143,7 @@ export default function Referrals() {
             />
           </div>
           <p style={mutedText}>
-            Earned: ${totalEarned.toFixed(2)} | Left: ${totalLeft.toFixed(2)}
+            Earned: ${formatAmount(totalEarned)} | Left: ${formatAmount(totalLeft)}
           </p>
         </div>
 
@@ -181,7 +182,7 @@ export default function Referrals() {
                     fontSize: "12px",
                   }}
                 >
-                  ${r.earned.toFixed(2)} / ${r.total.toFixed(2)}
+                  ${formatAmount(r.earned)} / ${formatAmount(r.total)}
                 </strong>
               </div>
               <div style={progressTrack}>
@@ -194,7 +195,7 @@ export default function Referrals() {
                 />
               </div>
               <p style={mutedText}>
-                Earned: ${r.earned.toFixed(2)} | Left: ${r.left.toFixed(2)}
+                Earned: ${formatAmount(r.earned)} | Left: ${formatAmount(r.left)}
               </p>
             </div>
           );
@@ -244,10 +245,10 @@ export default function Referrals() {
                   return (
                     <div key={pkg.id || i} style={depositCard}>
                       <p>
-                        <strong>Bonus Amount:</strong> {pkg.bonus_amount} USDT
+                        <strong>Bonus Amount:</strong> {formatAmount(pkg.bonus_amount)} USDT
                       </p>
                       <p>
-                        <strong>From Deposit:</strong> {pkg.amount} USDT
+                        <strong>From Deposit:</strong> {formatAmount(pkg.amount)} USDT
                       </p>
                       <p>
                         <strong>Start Date:</strong>{" "}

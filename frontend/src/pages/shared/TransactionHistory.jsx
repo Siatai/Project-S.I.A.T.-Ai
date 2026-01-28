@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import InvestorNavbar from "../investor/Navbar"; //  Import Navbar
 import HudLoader from "../../Components/HudLoader";
+import { formatAmount } from "../../utils/format";
 
 export default function TransactionHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -155,7 +156,7 @@ export default function TransactionHistory() {
                     <strong>Type:</strong> {t.type}
                   </p>
                   <p>
-                    <strong>Amount:</strong> ${t.amount}
+                    <strong>Amount:</strong> ${formatAmount(t.amount)}
                   </p>
                   {t.fee && (
                     <p>
@@ -209,7 +210,7 @@ export default function TransactionHistory() {
                 {filteredTx.map((t, i) => (
                   <tr key={i} style={{ borderBottom: "1px solid var(--fx-border)" }}>
                     <td style={tdStyle}>{t.type}</td>
-                    <td style={tdStyle}>${t.amount}</td>
+                    <td style={tdStyle}>${formatAmount(t.amount)}</td>
                     <td style={tdStyle}>{t.fee ? `$${t.fee}` : "-"}</td>
                     <td
                       style={{

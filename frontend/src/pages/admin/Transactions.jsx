@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { formatAmount } from "../../utils/format";
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -96,7 +97,7 @@ export default function Transactions() {
             {transactions.map((t) => (
               <tr key={t.id}>
                 <td>{t.type}</td>
-                <td>${t.amount}</td>
+                <td>${formatAmount(t.amount)}</td>
                 <td>
                   {new Date(t.date).toLocaleString()}
                 </td>

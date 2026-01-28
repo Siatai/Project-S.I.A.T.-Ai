@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { formatAmount } from "../../utils/format";
 
 export default function WithdrawApprovals() {
   const [withdrawals, setWithdrawals] = useState([]);
@@ -94,9 +95,9 @@ export default function WithdrawApprovals() {
               <tr key={w.id}>
                 <td>{w.email}</td>
                 <td>{w.wallet}</td>
-                <td>${w.amount}</td>
-                <td>${w.fee}</td>
-                <td>${w.final_amount}</td>
+                <td>${formatAmount(w.amount)}</td>
+                <td>${formatAmount(w.fee)}</td>
+                <td>${formatAmount(w.final_amount)}</td>
                 <td
                   style={{
                     color:

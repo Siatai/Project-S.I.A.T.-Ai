@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AssociateNavbar from "./AssociateNavbar"; //  Navbar for associates
 import HudLoader from "../../Components/HudLoader";
+import { formatAmount } from "../../utils/format";
 
 export default function AssociateHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -147,7 +148,7 @@ export default function AssociateHistory() {
                       Amount:
                     </strong>{" "}
                     <span style={{ color: colors.accentCyan }}>
-                      ${t.amount}
+                      ${formatAmount(t.amount)}
                     </span>
                   </p>
                   {t.fee && (
@@ -220,7 +221,7 @@ export default function AssociateHistory() {
                   <tr key={i} style={rowStyle}>
                     <td style={tdStyle}>{t.type}</td>
                     <td style={{ ...tdStyle, color: colors.accentCyan }}>
-                      ${t.amount}
+                      ${formatAmount(t.amount)}
                     </td>
                     <td style={tdStyle}>{t.fee ? `$${t.fee}` : "-"}</td>
                     <td

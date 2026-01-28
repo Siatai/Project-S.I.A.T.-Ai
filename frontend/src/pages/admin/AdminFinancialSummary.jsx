@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { formatAmount } from "../../utils/format";
 
 export default function AdminFinancialSummary() {
   const [summary, setSummary] = useState(null);
@@ -38,7 +39,7 @@ export default function AdminFinancialSummary() {
         }}
       >
         <h3>👤 Investors</h3>
-        <p><strong>Total Deposits:</strong> {summary.investors.total_deposits} USDT</p>
+        <p><strong>Total Deposits:</strong> {formatAmount(summary.investors.total_deposits)} USDT</p>
       </div>
 
       {/* Associates */}
@@ -52,10 +53,10 @@ export default function AdminFinancialSummary() {
         }}
       >
         <h3>🤝 Associates</h3>
-        <p><strong>Total Deposits:</strong> {summary.associates.total_deposits} USDT</p>
-        <p><strong>Locked:</strong> {summary.associates.locked} USDT</p>
-        <p><strong>Matured:</strong> {summary.associates.matured} USDT</p>
-        <p><strong>Withdrawn/Reinvested:</strong> {summary.associates.withdrawn_or_reinvested} USDT</p>
+        <p><strong>Total Deposits:</strong> {formatAmount(summary.associates.total_deposits)} USDT</p>
+        <p><strong>Locked:</strong> {formatAmount(summary.associates.locked)} USDT</p>
+        <p><strong>Matured:</strong> {formatAmount(summary.associates.matured)} USDT</p>
+        <p><strong>Withdrawn/Reinvested:</strong> {formatAmount(summary.associates.withdrawn_or_reinvested)} USDT</p>
       </div>
 
       {/* Global */}
@@ -69,10 +70,10 @@ export default function AdminFinancialSummary() {
         }}
       >
         <h3>🌍 Global</h3>
-        <p><strong>Total Deposits:</strong> {summary.global.total_deposits} USDT</p>
-        <p><strong>Total Withdrawals:</strong> {summary.global.total_withdrawals} USDT</p>
-        <p><strong>Total Commissions:</strong> {summary.global.total_commissions} USDT</p>
-        <p><strong>Wallet Balances:</strong> {summary.global.wallet_balances} USDT</p>
+        <p><strong>Total Deposits:</strong> {formatAmount(summary.global.total_deposits)} USDT</p>
+        <p><strong>Total Withdrawals:</strong> {formatAmount(summary.global.total_withdrawals)} USDT</p>
+        <p><strong>Total Commissions:</strong> {formatAmount(summary.global.total_commissions)} USDT</p>
+        <p><strong>Wallet Balances:</strong> {formatAmount(summary.global.wallet_balances)} USDT</p>
       </div>
     </div>
   );
