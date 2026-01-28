@@ -982,6 +982,7 @@ export default function Landing() {
           place-items: center;
           pointer-events: none;
           opacity: 0.9;
+          filter: blur(0.6px);
         }
 
         .hero-right-orb__ring {

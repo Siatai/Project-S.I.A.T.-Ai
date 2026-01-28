@@ -67,8 +67,8 @@ export default function FlowSection() {
             marginBottom: "12px",
             fontSize: "26px",
             fontWeight: "800",
-            color: "var(--fx-ink)",
-            textShadow: "0 0 16px rgba(var(--fx-accent-rgb),0.25)",
+            color: "rgba(255, 170, 60, 0.95)",
+            textShadow: "0 0 16px rgba(255, 170, 60, 0.95)",
             fontFamily: "var(--fx-font-body)",
             textAlign: "center",
           }}
