@@ -67,13 +67,14 @@ export default function FlowSection() {
             marginBottom: "12px",
             fontSize: "26px",
             fontWeight: "800",
-            color: "rgba(255, 170, 60, 0.95)",
-            textShadow: "0 0 16px rgba(255, 170, 60, 0.95)",
+            color: "rgba(255, 170, 90, 0.95)",
+            textShadow: "0 0 18px rgba(255, 160, 70, 0.45)",
             fontFamily: "var(--fx-font-body)",
             textAlign: "center",
           }}
         >
-          <span className="algom3-pulse">AlgoM3</span> Core
+          <span className="algom3-pulse">AlgoM3</span>{" "}
+          <span className="core-amber-pulse">Core</span>
         </h2>
         <p
           style={{
@@ -326,6 +327,17 @@ export default function FlowSection() {
           color: #dff6ff;
           text-shadow: 0 0 8px rgba(31, 215, 255, 0.45);
           animation: hudTextPulse 3.6s ease-in-out infinite;
+        }
+
+        @keyframes coreAmberPulse {
+          0% { text-shadow: 0 0 10px rgba(255, 160, 70, 0.35), 0 0 18px rgba(255, 140, 60, 0.2); opacity: 0.85; }
+          50% { text-shadow: 0 0 18px rgba(255, 170, 90, 0.8), 0 0 32px rgba(255, 140, 60, 0.45); opacity: 1; }
+          100% { text-shadow: 0 0 10px rgba(255, 160, 70, 0.35), 0 0 18px rgba(255, 140, 60, 0.2); opacity: 0.85; }
+        }
+
+        .core-amber-pulse {
+          color: rgba(255, 170, 90, 0.95);
+          animation: coreAmberPulse 3.2s ease-in-out infinite;
         }
 
         @media (max-width: 720px) {
