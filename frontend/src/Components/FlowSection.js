@@ -215,7 +215,7 @@ export default function FlowSection() {
 
         .reactor-amber-rings {
           position: absolute;
-          inset: 30px;
+          inset: 28px;
           border-radius: 50%;
           pointer-events: none;
         }
@@ -224,18 +224,18 @@ export default function FlowSection() {
           position: absolute;
           inset: 0;
           border-radius: 50%;
-          border: 2px solid rgba(255, 160, 60, 0.75);
-          box-shadow: 0 0 22px rgba(255, 140, 40, 0.55);
+          border: 3px solid rgba(255, 160, 60, 0.82);
+          box-shadow: 0 0 28px rgba(255, 140, 40, 0.65);
           opacity: 0.8;
         }
 
         .reactor-amber-ring.ring-1 { inset: 0; opacity: 0.85; }
-        .reactor-amber-ring.ring-2 { inset: 10px; opacity: 0.7; }
-        .reactor-amber-ring.ring-3 { inset: 20px; opacity: 0.55; }
+        .reactor-amber-ring.ring-2 { inset: 12px; opacity: 0.7; }
+        .reactor-amber-ring.ring-3 { inset: 24px; opacity: 0.55; }
 
         .reactor-core {
           position: absolute;
-          inset: 54px;
+          inset: 60px;
           border-radius: 50%;
           background: radial-gradient(circle, rgba(10, 20, 35, 0.9), rgba(5, 8, 16, 0.95));
           border: 1px solid rgba(60, 120, 170, 0.5);
@@ -250,8 +250,9 @@ export default function FlowSection() {
           position: absolute;
           inset: 8px;
           border-radius: 50%;
-          border: 2px solid rgba(40, 200, 255, 0.8);
-          box-shadow: 0 0 18px rgba(40, 200, 255, 0.6);
+          border: 2px solid rgba(255, 208, 40, 0.8);
+          box-shadow: 0 0 26px rgba(40, 255, 234, 0.5);
+          filter: blur(0.9px);
           animation: corePulse 3.2s ease-in-out infinite;
         }
 
@@ -269,8 +270,8 @@ export default function FlowSection() {
         }
 
         .orb-sub {
-          font-size: 11px;
-          letter-spacing: 0.3em;
+          font-size: 7px;
+          letter-spacing: 0.26em;
           text-transform: uppercase;
           color: #cfe5f5;
           position: absolute;
