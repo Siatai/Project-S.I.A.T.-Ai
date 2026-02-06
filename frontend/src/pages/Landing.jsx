@@ -11,6 +11,7 @@ import CryptoStats from "../Components/CryptoStats";
 import CurrencyTicker from "../Components/CurrencyTicker";
 import ComingSoon from "../Components/ComingSoon";
 import LiveNow from "../Components/LiveNow";
+import CircuitSection from "../Components/CircuitSection";
 
 // Divider with neon glow + shine
 const Divider = () => (
@@ -245,6 +246,7 @@ export default function Landing() {
               fontFamily: "var(--fx-font-display)",
               marginBottom: "20px",
               background: "rgba(var(--fx-accent-rgb), 0.08)",
+              whiteSpace: "nowrap",
             }}
           >
             <span
@@ -544,6 +546,8 @@ export default function Landing() {
 
       {/* Externalized Sections */}
       <FlowSection />
+      <Divider />
+      <CircuitSection />
       <Divider />
       <LiveNow />
       <Divider />
