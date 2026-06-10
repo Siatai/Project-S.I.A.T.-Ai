@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import re
+import shutil
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -24,6 +25,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[3]
 AUDIT_DIR = PROJECT_DIR / "audit_service"
 AUDIT_DATA_DIR = AUDIT_DIR / "data"
 AUDIT_DB_FILE = AUDIT_DATA_DIR / "checker.sqlite"
+AUDIT_SEED_DB_FILE = AUDIT_DATA_DIR / "checker.seed.sqlite"
 
 TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 TRANSFER_SELECTOR = "0xa9059cbb"
@@ -56,8 +58,46 @@ def ensure_data_dir() -> None:
     AUDIT_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def count_rows(connection: sqlite3.Connection, table_name: str) -> int:
+    try:
+        row = connection.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()
+        return int(row[0] or 0) if row else 0
+    except sqlite3.Error:
+        return 0
+
+
+def is_audit_db_effectively_empty(connection: sqlite3.Connection) -> bool:
+    return count_rows(connection, "transactions") == 0 and count_rows(connection, "telegram_messages") == 0
+
+
+def bootstrap_audit_db_from_seed_if_needed() -> None:
+    ensure_data_dir()
+    if not AUDIT_SEED_DB_FILE.exists():
+        return
+
+    if not AUDIT_DB_FILE.exists():
+        shutil.copyfile(AUDIT_SEED_DB_FILE, AUDIT_DB_FILE)
+        return
+
+    try:
+        connection = sqlite3.connect(AUDIT_DB_FILE)
+        try:
+            if is_audit_db_effectively_empty(connection):
+                connection.close()
+                shutil.copyfile(AUDIT_SEED_DB_FILE, AUDIT_DB_FILE)
+                return
+        finally:
+            try:
+                connection.close()
+            except Exception:
+                pass
+    except sqlite3.Error:
+        shutil.copyfile(AUDIT_SEED_DB_FILE, AUDIT_DB_FILE)
+
+
 def connect_db() -> sqlite3.Connection:
     ensure_data_dir()
+    bootstrap_audit_db_from_seed_if_needed()
     connection = sqlite3.connect(AUDIT_DB_FILE)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA journal_mode = WAL")
@@ -1651,4 +1691,5 @@ async def audit_status():
         "processRunning": True,
         "target": "fastapi-native",
         "database": str(AUDIT_DB_FILE),
+        "seedDatabase": str(AUDIT_SEED_DB_FILE) if AUDIT_SEED_DB_FILE.exists() else None,
     }
