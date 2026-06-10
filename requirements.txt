@@ -50,3 +50,5 @@ psycopg2-binary>=2.9.9
 dotenv
 APScheduler==3.10.4
 psycopg2-binary
+beautifulsoup4==4.12.3
+openpyxl==3.1.5
