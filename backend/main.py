@@ -14,6 +14,8 @@ from api.routes.auth_routes import router as auth_router
 from api.routes.investment_router import router as investment_router
 from api.routes.associate import router as associate_router
 from api.routes.audit_routes import router as audit_router
+from api.routes.audit_routes import CONFIG as AUDIT_CONFIG
+from api.routes.audit_routes import schedule_audit_sync
 
 # ✅ Import models
 from db import SessionLocal
@@ -139,8 +141,11 @@ def poll_deposit_auto():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 App starting...")
+    schedule_audit_sync("incremental")
 
     async def poller():
+        audit_poll_interval_seconds = max(30, int(AUDIT_CONFIG["poll_interval_ms"] / 1000))
+        last_audit_schedule_at = 0.0
         while True:
             try:
                 # 1. Blockchain deposits
@@ -150,6 +155,11 @@ async def lifespan(app: FastAPI):
                 # 2. DB → referral/associate logic
                 print("🔄 Running poll_deposit_auto...")
                 poll_deposit_auto()
+
+                now = asyncio.get_running_loop().time()
+                if now - last_audit_schedule_at >= audit_poll_interval_seconds:
+                    schedule_audit_sync("incremental")
+                    last_audit_schedule_at = now
 
             except Exception as e:
                 print(f"⚠️ Poller crash: {e}")
