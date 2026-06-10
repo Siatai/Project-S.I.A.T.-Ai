@@ -27,6 +27,8 @@ AUDIT_DB_FILE = AUDIT_DATA_DIR / "checker.sqlite"
 
 TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 TRANSFER_SELECTOR = "0xa9059cbb"
+audit_sync_lock = asyncio.Lock()
+audit_sync_task: asyncio.Task | None = None
 
 CONFIG = {
     "deposit_wallet_address": os.getenv("DEPOSIT_WALLET_ADDRESS", "0xc2b65f40b8361F9eCf27FB03F2ce3992D1F0211c").lower(),
@@ -34,7 +36,12 @@ CONFIG = {
     "usdt_contract": os.getenv("USDT_CONTRACT", "0x55d398326f99059fF775485246999027B3197955").lower(),
     "bsc_api_key": os.getenv("BSCSCAN_API_KEY", ""),
     "bsc_api_base": os.getenv("BSCSCAN_API_BASE", "https://api.bscscan.com/api"),
-    "rpc_url": os.getenv("BSC_RPC_URL", "https://bsc-dataseed.bnbchain.org"),
+    "rpc_url": os.getenv("BSC_RPC_URL", "https://public-bsc-mainnet.fastnode.io"),
+    "rpc_fallback_urls": [
+        item.strip()
+        for item in os.getenv("BSC_RPC_FALLBACK_URLS", "https://bsc.leorpc.com/?api_key=FREE").split(",")
+        if item.strip()
+    ],
     "poll_interval_ms": int(os.getenv("POLL_INTERVAL_MS", "45000")),
     "telegram_bot_token": os.getenv("TELEGRAM_BOT_TOKEN", ""),
     "telegram_chat_id": os.getenv("TELEGRAM_CHAT_ID", ""),
@@ -869,6 +876,47 @@ async def rpc_call(method: str, params: list[Any]) -> Any:
     return data.get("result")
 
 
+def is_rpc_limit_error(error: Exception) -> bool:
+    message = str(error).lower()
+    return any(
+        token in message
+        for token in [
+            "limit exceeded",
+            "query returned more than",
+            "response size exceeded",
+            "block range is too wide",
+            "rate limit",
+            "too many results",
+        ]
+    )
+
+
+async def rpc_call_with_backoff(method: str, params: list[Any], attempts: int = 5) -> Any:
+    delay = 0.4
+    last_error: Exception | None = None
+    endpoints = [CONFIG["rpc_url"], *CONFIG["rpc_fallback_urls"]]
+    for _ in range(attempts):
+        for endpoint in endpoints:
+            try:
+                payload = {"jsonrpc": "2.0", "id": 1, "method": method, "params": params}
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.post(endpoint, json=payload)
+                    response.raise_for_status()
+                    data = response.json()
+                if data.get("error"):
+                    raise RuntimeError(data["error"].get("message") or f"{method} failed")
+                return data.get("result")
+            except Exception as exc:
+                last_error = exc
+                if not is_rpc_limit_error(exc):
+                    continue
+        await asyncio.sleep(delay)
+        delay *= 1.8
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError(f"{method} failed")
+
+
 def to_hex_quantity(value: int) -> str:
     return hex(max(0, int(value)))
 
@@ -972,35 +1020,51 @@ async def enrich_telegram_fees(store: dict[str, Any]) -> dict[str, Any]:
 
 async def fetch_transactions_from_rpc(wallet_address: str, start_block: int, full_history: bool = False) -> list[dict[str, Any]]:
     latest_block = int(await rpc_call("eth_blockNumber", []), 16)
-    initial_from_block = start_block if start_block > 0 else (0 if full_history else max(0, latest_block - 20000))
+    initial_from_block = start_block if start_block > 0 else (0 if full_history else max(0, latest_block - 12000))
     recipient_topic = padded_topic_address(wallet_address)
     sender_topic = padded_topic_address(wallet_address)
-    step = 2000
     logs: list[dict[str, Any]] = []
-    for from_block in range(initial_from_block, latest_block + 1, step + 1):
-        to_block = min(latest_block, from_block + step)
-        incoming_batch, outgoing_batch = await asyncio.gather(
-            rpc_call(
-                "eth_getLogs",
-                [{
-                    "address": CONFIG["usdt_contract"],
-                    "fromBlock": to_hex_quantity(from_block),
-                    "toBlock": to_hex_quantity(to_block),
-                    "topics": [TRANSFER_TOPIC, None, recipient_topic],
-                }],
-            ),
-            rpc_call(
-                "eth_getLogs",
-                [{
-                    "address": CONFIG["usdt_contract"],
-                    "fromBlock": to_hex_quantity(from_block),
-                    "toBlock": to_hex_quantity(to_block),
-                    "topics": [TRANSFER_TOPIC, sender_topic, None],
-                }],
-            ),
+
+    async def fetch_window(from_block: int, to_block: int) -> list[dict[str, Any]]:
+        incoming_batch = await rpc_call_with_backoff(
+            "eth_getLogs",
+            [{
+                "address": CONFIG["usdt_contract"],
+                "fromBlock": to_hex_quantity(from_block),
+                "toBlock": to_hex_quantity(to_block),
+                "topics": [TRANSFER_TOPIC, None, recipient_topic],
+            }],
         )
-        logs.extend(incoming_batch or [])
-        logs.extend(outgoing_batch or [])
+        outgoing_batch = await rpc_call_with_backoff(
+            "eth_getLogs",
+            [{
+                "address": CONFIG["usdt_contract"],
+                "fromBlock": to_hex_quantity(from_block),
+                "toBlock": to_hex_quantity(to_block),
+                "topics": [TRANSFER_TOPIC, sender_topic, None],
+            }],
+        )
+        return [*(incoming_batch or []), *(outgoing_batch or [])]
+
+    max_step = 120 if full_history else 240
+    min_step = 1
+    current_block = initial_from_block
+    while current_block <= latest_block:
+        step = min(max_step, latest_block - current_block)
+        while True:
+            to_block = min(latest_block, current_block + step)
+            try:
+                logs.extend(await fetch_window(current_block, to_block))
+                current_block = to_block + 1
+                if step < max_step:
+                    max_step = min(max_step, step * 2)
+                break
+            except Exception as exc:
+                if not is_rpc_limit_error(exc) or step <= min_step:
+                    raise
+                step = max(min_step, step // 2)
+                await asyncio.sleep(0.25)
+
     unique_block_numbers = sorted({int(log["blockNumber"], 16) for log in logs})
     blocks_by_number: dict[int, Any] = {}
     for block_number in unique_block_numbers:
@@ -1288,6 +1352,28 @@ async def sync_transactions_safe(mode: str = "incremental") -> dict[str, Any]:
         return store
 
 
+async def run_audit_sync(mode: str = "incremental") -> dict[str, Any]:
+    async with audit_sync_lock:
+        return await sync_transactions_safe(mode)
+
+
+def schedule_audit_sync(mode: str = "incremental") -> bool:
+    global audit_sync_task
+    if audit_sync_task and not audit_sync_task.done():
+        return False
+    audit_sync_task = asyncio.create_task(run_audit_sync(mode))
+    return True
+
+
+def audit_sync_needed(state: dict[str, Any]) -> bool:
+    if state["depositTransactions"] or state["withdrawalTransactions"] or state["interWalletTransfers"]:
+        last_checked = state["sync"]["wallets"]["deposit"].get("lastCheckedAt")
+        if last_checked:
+            age = (datetime.now(timezone.utc) - parse_any_datetime(last_checked)).total_seconds()
+            return age >= max(30, CONFIG["poll_interval_ms"] / 1000)
+    return True
+
+
 async def get_state() -> dict[str, Any]:
     store = read_store()
     await enrich_telegram_fees(store)
@@ -1486,14 +1572,18 @@ def build_workbook(state: dict[str, Any]) -> BytesIO:
 
 @router.get("/audit-api/state", include_in_schema=False)
 async def audit_state():
-    return await get_state()
+    state = await get_state()
+    if audit_sync_needed(state):
+        schedule_audit_sync("incremental")
+    return state
 
 
 @router.post("/audit-api/sync/wallet", include_in_schema=False)
 async def audit_sync_wallet(payload: dict[str, Any]):
     mode = "full" if payload.get("mode") == "full" else "incremental"
-    await sync_transactions_safe(mode)
-    return await get_state()
+    scheduled = schedule_audit_sync(mode)
+    state = await get_state()
+    return JSONResponse(status_code=202, content={"scheduled": scheduled, "mode": mode, "state": state})
 
 
 @router.post("/audit-api/sync/telegram", include_in_schema=False)
