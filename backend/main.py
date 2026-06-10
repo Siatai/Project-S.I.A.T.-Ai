@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import asyncio
@@ -37,15 +37,26 @@ AUDIT_PUBLIC_DIR = os.path.join(AUDIT_DIR, "public")
 AUDIT_INDEX_FILE = os.path.join(AUDIT_PUBLIC_DIR, "index.html")
 AUDIT_LOCAL_URL = "http://127.0.0.1:3010"
 audit_process = None
+audit_status = {
+    "available": False,
+    "reason": "Audit service has not been started yet.",
+}
+
+
+def set_audit_status(available: bool, reason: str):
+    audit_status["available"] = available
+    audit_status["reason"] = reason
 
 
 def ensure_audit_dependencies():
     package_marker = os.path.join(AUDIT_DIR, "node_modules", "better-sqlite3", "package.json")
     if os.path.exists(package_marker):
+        set_audit_status(True, "Audit service dependencies are installed.")
         return True
 
     npm_executable = "npm.cmd" if os.name == "nt" else "npm"
     if not shutil.which(npm_executable):
+        set_audit_status(False, f"{npm_executable} not found on host; /AUDIT service cannot install dependencies.")
         print("⚠️ npm not found, skipping /AUDIT dependency install")
         return False
 
@@ -57,10 +68,34 @@ def ensure_audit_dependencies():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+        set_audit_status(True, "Audit service dependencies installed successfully.")
         return True
     except (subprocess.CalledProcessError, OSError):
+        set_audit_status(False, "audit_service dependency install failed on host.")
         print("⚠️ audit_service dependency install failed, skipping /AUDIT service startup")
         return False
+
+
+async def probe_audit_service():
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(f"{AUDIT_LOCAL_URL}/api/state")
+        if response.is_success:
+            set_audit_status(True, "Audit service is online.")
+            return True
+        set_audit_status(False, f"Audit service replied with HTTP {response.status_code}.")
+        return False
+    except httpx.HTTPError as exc:
+        set_audit_status(False, f"Audit service is unreachable at {AUDIT_LOCAL_URL}: {exc}")
+        return False
+
+
+async def ensure_audit_service_ready():
+    if not audit_process or audit_process.poll() is not None:
+        set_audit_status(False, "Audit service process is not running on this host.")
+        raise HTTPException(status_code=503, detail=audit_status["reason"])
+    if not await probe_audit_service():
+        raise HTTPException(status_code=503, detail=audit_status["reason"])
 
 
 def start_audit_process():
@@ -68,9 +103,15 @@ def start_audit_process():
     if audit_process and audit_process.poll() is None:
         return
     if not os.path.exists(os.path.join(AUDIT_DIR, "server.js")):
+        set_audit_status(False, "audit_service/server.js is missing from deployment.")
         print("⚠️ audit_service/server.js not found, skipping /AUDIT service startup")
         return
     if not ensure_audit_dependencies():
+        return
+    node_executable = "node.exe" if os.name == "nt" else "node"
+    if not shutil.which(node_executable):
+        set_audit_status(False, f"{node_executable} not found on host; /AUDIT service cannot start.")
+        print("⚠️ node not found, skipping /AUDIT service startup")
         return
 
     audit_env = os.environ.copy()
@@ -86,6 +127,7 @@ def start_audit_process():
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    set_audit_status(True, "Audit service process launched, waiting for health check.")
 
 
 def stop_audit_process():
@@ -97,6 +139,7 @@ def stop_audit_process():
         except subprocess.TimeoutExpired:
             audit_process.kill()
     audit_process = None
+    set_audit_status(False, "Audit service process stopped.")
 
 
 # ────────────────────────────────
@@ -263,6 +306,7 @@ def hidden_audit_page():
 
 @app.api_route("/audit-api/{path:path}", methods=["GET", "POST"], include_in_schema=False)
 async def audit_api_proxy(path: str, request: Request):
+    await ensure_audit_service_ready()
     target_url = f"{AUDIT_LOCAL_URL}/api/{path}"
     headers = {
         key: value
@@ -270,25 +314,35 @@ async def audit_api_proxy(path: str, request: Request):
         if key.lower() not in {"host", "content-length"}
     }
 
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        if request.method == "GET":
-            upstream = await client.get(target_url, headers=headers, params=dict(request.query_params))
-        else:
-            content_type = request.headers.get("content-type", "")
-            if "multipart/form-data" in content_type:
-                form = await request.form()
-                files = []
-                data = {}
-                for key, value in form.multi_items():
-                    filename = getattr(value, "filename", None)
-                    if filename is not None:
-                        files.append((key, (filename, await value.read(), value.content_type or "application/octet-stream")))
-                    else:
-                        data[key] = value
-                upstream = await client.post(target_url, headers=headers, params=dict(request.query_params), data=data, files=files)
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            if request.method == "GET":
+                upstream = await client.get(target_url, headers=headers, params=dict(request.query_params))
             else:
-                body = await request.body()
-                upstream = await client.post(target_url, headers=headers, params=dict(request.query_params), content=body)
+                content_type = request.headers.get("content-type", "")
+                if "multipart/form-data" in content_type:
+                    form = await request.form()
+                    files = []
+                    data = {}
+                    for key, value in form.multi_items():
+                        filename = getattr(value, "filename", None)
+                        if filename is not None:
+                            files.append((key, (filename, await value.read(), value.content_type or "application/octet-stream")))
+                        else:
+                            data[key] = value
+                    upstream = await client.post(target_url, headers=headers, params=dict(request.query_params), data=data, files=files)
+                else:
+                    body = await request.body()
+                    upstream = await client.post(target_url, headers=headers, params=dict(request.query_params), content=body)
+    except httpx.HTTPError as exc:
+        set_audit_status(False, f"Audit service proxy request failed: {exc}")
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "Audit service unavailable",
+                "detail": audit_status["reason"],
+            },
+        )
 
     response_headers = {
         key: value
@@ -300,18 +354,36 @@ async def audit_api_proxy(path: str, request: Request):
 
 @app.get("/audit-api/export.xlsx", include_in_schema=False)
 async def audit_export_proxy(request: Request):
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        upstream = await client.get(f"{AUDIT_LOCAL_URL}/api/export.xlsx", headers={
-            key: value
-            for key, value in request.headers.items()
-            if key.lower() not in {"host", "content-length"}
-        })
+    await ensure_audit_service_ready()
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            upstream = await client.get(f"{AUDIT_LOCAL_URL}/api/export.xlsx", headers={
+                key: value
+                for key, value in request.headers.items()
+                if key.lower() not in {"host", "content-length"}
+            })
+    except httpx.HTTPError as exc:
+        set_audit_status(False, f"Audit export proxy request failed: {exc}")
+        raise HTTPException(status_code=503, detail=audit_status["reason"])
     response_headers = {
         key: value
         for key, value in upstream.headers.items()
         if key.lower() not in {"content-encoding", "transfer-encoding", "connection"}
     }
     return Response(content=upstream.content, status_code=upstream.status_code, headers=response_headers, media_type=upstream.headers.get("content-type"))
+
+
+@app.get("/audit-api/status", include_in_schema=False)
+async def audit_proxy_status():
+    process_running = bool(audit_process and audit_process.poll() is None)
+    if process_running:
+        await probe_audit_service()
+    return {
+        "available": audit_status["available"],
+        "reason": audit_status["reason"],
+        "processRunning": process_running,
+        "target": AUDIT_LOCAL_URL,
+    }
 
 
 # ✅ Root endpoint

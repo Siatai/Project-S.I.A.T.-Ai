@@ -108,6 +108,16 @@ button:disabled {
   display: none;
 }
 
+.service-notice {
+  margin-bottom: 1rem;
+  border-radius: 1.15rem;
+  padding: 0.95rem 1rem;
+  background: rgba(172, 104, 64, 0.1);
+  border: 1px solid rgba(172, 104, 64, 0.22);
+  color: #7b4b2e;
+  box-shadow: var(--shadow);
+}
+
 .hero-panel,
 .glass-panel,
 .metric-card,

@@ -3,6 +3,15 @@ let currentState = null;
 let telegramStatusFilter = "all";
 let activeView = "overview";
 
+function setServiceNotice(message = "") {
+  const node = document.getElementById("serviceNotice");
+  if (!node) {
+    return;
+  }
+  node.textContent = message;
+  node.classList.toggle("hidden", !message);
+}
+
 function short(value, start = 6, end = 4) {
   if (!value) {
     return "-";
@@ -84,9 +93,20 @@ function configRow(label, value) {
 }
 
 async function loadState() {
-  const response = await fetch(stateUrl);
-  currentState = await response.json();
-  render(currentState);
+  try {
+    const response = await fetch(stateUrl);
+    const payload = await response.json();
+    if (!response.ok) {
+      const detail = payload?.detail || payload?.error || "Audit service is unavailable.";
+      setServiceNotice(detail);
+      return;
+    }
+    setServiceNotice("");
+    currentState = payload;
+    render(currentState);
+  } catch (error) {
+    setServiceNotice(`Unable to load audit state: ${error.message}`);
+  }
 }
 
 function setView(nextView) {
@@ -319,47 +339,71 @@ async function uploadTelegramExports(event) {
   button.textContent = "Uploading...";
   status.textContent = "Importing Telegram export files...";
 
-  const response = await fetch("/audit-api/telegram/import", {
-    method: "POST",
-    body: formData,
-  });
+  try {
+    const response = await fetch("/audit-api/telegram/import", {
+      method: "POST",
+      body: formData,
+    });
 
-  const payload = await response.json();
-  status.textContent = response.ok
-    ? `Imported ${payload.imported} messages. Skipped ${payload.skipped || 0}. Total stored: ${payload.totalMessages}.`
-    : (payload.error || "Upload failed.");
-
-  await loadState();
-  button.disabled = false;
-  button.textContent = "Upload export files";
+    const payload = await response.json();
+    status.textContent = response.ok
+      ? `Imported ${payload.imported} messages. Skipped ${payload.skipped || 0}. Total stored: ${payload.totalMessages}.`
+      : (payload.detail || payload.error || "Upload failed.");
+    await loadState();
+  } catch (error) {
+    status.textContent = `Upload failed: ${error.message}`;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Upload export files";
+  }
 }
 
 async function syncWallet(mode, buttonId, idleText, busyText) {
   const button = document.getElementById(buttonId);
   button.disabled = true;
   button.textContent = busyText;
-  await fetch("/audit-api/sync/wallet", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode }),
-  });
-  await loadState();
-  button.disabled = false;
-  button.textContent = idleText;
+  try {
+    const response = await fetch("/audit-api/sync/wallet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode }),
+    });
+    if (!response.ok) {
+      const payload = await response.json();
+      setServiceNotice(payload.detail || payload.error || "Wallet sync failed.");
+      return;
+    }
+    await loadState();
+  } catch (error) {
+    setServiceNotice(`Wallet sync failed: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = idleText;
+  }
 }
 
 async function syncTelegram(mode, buttonId, idleText, busyText) {
   const button = document.getElementById(buttonId);
   button.disabled = true;
   button.textContent = busyText;
-  await fetch("/audit-api/sync/telegram", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode }),
-  });
-  await loadState();
-  button.disabled = false;
-  button.textContent = idleText;
+  try {
+    const response = await fetch("/audit-api/sync/telegram", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode }),
+    });
+    if (!response.ok) {
+      const payload = await response.json();
+      setServiceNotice(payload.detail || payload.error || "Telegram sync failed.");
+      return;
+    }
+    await loadState();
+  } catch (error) {
+    setServiceNotice(`Telegram sync failed: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = idleText;
+  }
 }
 
 document.getElementById("overviewViewButton").addEventListener("click", () => setView("overview"));
