@@ -1,10 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import asyncio
+import os
+import shutil
+import subprocess
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
+import httpx
 
 # ✅ Import routers
 from api.routes.auth_routes import router as auth_router
@@ -22,6 +28,75 @@ from models.DirectReferralBonus import DirectReferralBonus
 
 # ✅ Import blockchain checker
 from utils.usdt_checker import check_for_trc20_deposit
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+AUDIT_DIR = os.path.join(PROJECT_DIR, "audit_service")
+AUDIT_PUBLIC_DIR = os.path.join(AUDIT_DIR, "public")
+AUDIT_INDEX_FILE = os.path.join(AUDIT_PUBLIC_DIR, "index.html")
+AUDIT_LOCAL_URL = "http://127.0.0.1:3010"
+audit_process = None
+
+
+def ensure_audit_dependencies():
+    package_marker = os.path.join(AUDIT_DIR, "node_modules", "better-sqlite3", "package.json")
+    if os.path.exists(package_marker):
+        return True
+
+    npm_executable = "npm.cmd" if os.name == "nt" else "npm"
+    if not shutil.which(npm_executable):
+        print("⚠️ npm not found, skipping /AUDIT dependency install")
+        return False
+
+    try:
+        subprocess.run(
+            [npm_executable, "install", "--omit=dev"],
+            cwd=AUDIT_DIR,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except (subprocess.CalledProcessError, OSError):
+        print("⚠️ audit_service dependency install failed, skipping /AUDIT service startup")
+        return False
+
+
+def start_audit_process():
+    global audit_process
+    if audit_process and audit_process.poll() is None:
+        return
+    if not os.path.exists(os.path.join(AUDIT_DIR, "server.js")):
+        print("⚠️ audit_service/server.js not found, skipping /AUDIT service startup")
+        return
+    if not ensure_audit_dependencies():
+        return
+
+    audit_env = os.environ.copy()
+    audit_env.setdefault("PORT", "3010")
+    audit_env.setdefault("DEPOSIT_WALLET_ADDRESS", "0xc2b65f40b8361F9eCf27FB03F2ce3992D1F0211c")
+    audit_env.setdefault("WITHDRAWAL_WALLET_ADDRESS", "0x876F2A2EfE1B20E38018c8292823d814bf195216")
+    audit_env.setdefault("USDT_CONTRACT", "0x55d398326f99059fF775485246999027B3197955")
+    audit_env.setdefault("BSC_RPC_URL", "https://bsc-dataseed.bnbchain.org")
+    audit_process = subprocess.Popen(
+        ["node", "server.js"],
+        cwd=AUDIT_DIR,
+        env=audit_env,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def stop_audit_process():
+    global audit_process
+    if audit_process and audit_process.poll() is None:
+        audit_process.terminate()
+        try:
+            audit_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            audit_process.kill()
+    audit_process = None
 
 
 # ────────────────────────────────
@@ -128,6 +203,7 @@ def poll_deposit_auto():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 App starting...")
+    start_audit_process()
 
     async def poller():
         while True:
@@ -148,6 +224,7 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(poller())
 
     yield
+    stop_audit_process()
     print("🛑 App shutting down...")
 
 
@@ -169,10 +246,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+if os.path.isdir(AUDIT_PUBLIC_DIR):
+    app.mount("/audit-assets", StaticFiles(directory=AUDIT_PUBLIC_DIR), name="audit-assets")
+
 # ✅ Register routers
 app.include_router(auth_router)
 app.include_router(investment_router)
 app.include_router(associate_router)
+
+
+@app.get("/AUDIT", include_in_schema=False)
+@app.get("/AUDIT/", include_in_schema=False)
+def hidden_audit_page():
+    return FileResponse(AUDIT_INDEX_FILE)
+
+
+@app.api_route("/audit-api/{path:path}", methods=["GET", "POST"], include_in_schema=False)
+async def audit_api_proxy(path: str, request: Request):
+    target_url = f"{AUDIT_LOCAL_URL}/api/{path}"
+    headers = {
+        key: value
+        for key, value in request.headers.items()
+        if key.lower() not in {"host", "content-length"}
+    }
+
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        if request.method == "GET":
+            upstream = await client.get(target_url, headers=headers, params=dict(request.query_params))
+        else:
+            content_type = request.headers.get("content-type", "")
+            if "multipart/form-data" in content_type:
+                form = await request.form()
+                files = []
+                data = {}
+                for key, value in form.multi_items():
+                    filename = getattr(value, "filename", None)
+                    if filename is not None:
+                        files.append((key, (filename, await value.read(), value.content_type or "application/octet-stream")))
+                    else:
+                        data[key] = value
+                upstream = await client.post(target_url, headers=headers, params=dict(request.query_params), data=data, files=files)
+            else:
+                body = await request.body()
+                upstream = await client.post(target_url, headers=headers, params=dict(request.query_params), content=body)
+
+    response_headers = {
+        key: value
+        for key, value in upstream.headers.items()
+        if key.lower() not in {"content-encoding", "transfer-encoding", "connection"}
+    }
+    return Response(content=upstream.content, status_code=upstream.status_code, headers=response_headers, media_type=upstream.headers.get("content-type"))
+
+
+@app.get("/audit-api/export.xlsx", include_in_schema=False)
+async def audit_export_proxy(request: Request):
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        upstream = await client.get(f"{AUDIT_LOCAL_URL}/api/export.xlsx", headers={
+            key: value
+            for key, value in request.headers.items()
+            if key.lower() not in {"host", "content-length"}
+        })
+    response_headers = {
+        key: value
+        for key, value in upstream.headers.items()
+        if key.lower() not in {"content-encoding", "transfer-encoding", "connection"}
+    }
+    return Response(content=upstream.content, status_code=upstream.status_code, headers=response_headers, media_type=upstream.headers.get("content-type"))
 
 
 # ✅ Root endpoint

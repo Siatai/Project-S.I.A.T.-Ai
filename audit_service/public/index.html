@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Treasury Twin Watch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/audit-assets/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="kicker">Treasury Twin Watch</p>
+          <h1>Deposit, withdrawal, and internal flow in one view.</h1>
+          <div class="hero-links">
+            <a id="depositWalletLink" class="ghost-link" href="#" target="_blank" rel="noreferrer">Open deposit wallet</a>
+            <a id="withdrawalWalletLink" class="ghost-link" href="#" target="_blank" rel="noreferrer">Open withdrawal wallet</a>
+            <span class="live-pill">Auto refresh every 15 seconds</span>
+          </div>
+        </div>
+
+        <div class="hero-aside">
+          <div class="wallet-card spotlight">
+            <span class="card-label">Current operating note</span>
+            <strong id="heroHeadline">Loading wallet signals...</strong>
+            <p id="heroMeta" class="card-note"></p>
+          </div>
+          <div class="action-cluster">
+            <button id="walletIncrementalSyncButton" type="button">Sync both wallets</button>
+            <button id="walletFullSyncButton" type="button" class="secondary-action">Full wallet history</button>
+            <button id="telegramIncrementalSyncButton" type="button" class="secondary-action">Telegram refresh</button>
+            <a class="button secondary" href="/audit-api/export.xlsx">Export workbook</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="nav-strip">
+        <button id="overviewViewButton" class="nav-button active" type="button">Main</button>
+        <button id="depositViewButton" class="nav-button" type="button">Deposit Wallet</button>
+        <button id="withdrawalViewButton" class="nav-button" type="button">Withdrawal Wallet</button>
+        <button id="internalViewButton" class="nav-button" type="button">Internal Transfers</button>
+      </section>
+
+      <section id="overviewView">
+        <section id="summaryCards" class="summary-grid"></section>
+
+        <section class="signal-band">
+          <div>
+            <p class="section-tag">Current signal</p>
+            <h2 id="syncHeadline">Waiting for wallet state...</h2>
+          </div>
+          <p id="syncRibbon" class="signal-copy"></p>
+        </section>
+
+        <section class="ops-grid">
+          <article class="glass-panel">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Deposit wallet</p>
+                <h3>Summary</h3>
+              </div>
+            </div>
+            <div id="depositSummaryGrid" class="config-grid"></div>
+          </article>
+
+          <article class="glass-panel">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Withdrawal wallet</p>
+                <h3>Summary</h3>
+              </div>
+            </div>
+            <div id="withdrawalSummaryGrid" class="config-grid"></div>
+          </article>
+        </section>
+      </section>
+
+      <section id="depositView" class="hidden">
+        <section id="depositTabSummary" class="summary-grid"></section>
+
+        <section class="glass-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Exceptions</p>
+              <h3>Unmatched deposit rows</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Amount</th>
+                  <th>From</th>
+                  <th>Status</th>
+                  <th>Hash</th>
+                </tr>
+              </thead>
+              <tbody id="depositUnmatchedTransactionsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="glass-panel">
+          <div class="panel-head panel-head-wrap">
+            <div>
+              <p class="section-tag">Telegram archive</p>
+              <h3>Historical import</h3>
+            </div>
+          </div>
+          <form id="telegramUploadForm" class="upload-row">
+            <input id="telegramFiles" type="file" accept=".html,text/html" multiple />
+            <button id="telegramUploadButton" type="submit">Upload export files</button>
+          </form>
+          <p id="uploadStatus" class="muted-copy"></p>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="glass-panel">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Deposit feed</p>
+                <h3>On-chain deposit transactions</h3>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th>From</th>
+                    <th>Status</th>
+                    <th>Hash</th>
+                  </tr>
+                </thead>
+                <tbody id="depositTransactionsBody"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="glass-panel">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Telegram queue</p>
+                <h3>Deposit reconciliation messages</h3>
+              </div>
+              <div class="panel-controls">
+                <select id="telegramStatusFilter">
+                  <option value="all">All Telegram rows</option>
+                  <option value="matched">Matched only</option>
+                  <option value="unmatched">Unmatched only</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Sender</th>
+                    <th>Amount</th>
+                    <th>Chain context</th>
+                  </tr>
+                </thead>
+                <tbody id="messagesBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section id="withdrawalView" class="hidden">
+        <section id="withdrawalTabSummary" class="summary-grid"></section>
+
+        <section class="glass-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Withdrawal feed</p>
+              <h3>User withdrawal wallet activity</h3>
+              <p class="muted-copy">This view tracks the wallet used to send funds out to users and the incoming top-ups that maintain its balance.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Amount</th>
+                  <th>Direction</th>
+                  <th>Counterparty</th>
+                  <th>Hash</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawalTransactionsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="internalView" class="hidden">
+        <section id="internalTabSummary" class="summary-grid"></section>
+
+        <section class="glass-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Internal transfer page</p>
+              <h3>Transfers between deposit and withdrawal wallets</h3>
+              <p class="muted-copy">Use this to monitor treasury rebalancing from the deposit side into the withdrawal side, or the reverse if it ever happens.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Amount</th>
+                  <th>Flow</th>
+                  <th>Hash</th>
+                </tr>
+              </thead>
+              <tbody id="internalTransfersBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/audit-assets/app.js"></script>
+  </body>
+</html>

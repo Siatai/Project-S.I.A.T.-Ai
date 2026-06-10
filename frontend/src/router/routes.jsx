@@ -7,6 +7,7 @@ import DashboardLayout from "../Layouts/DashboardLayout";
 // Public
 import Landing from "../pages/Landing";
 import ReferralSignup from "../pages/public/ReferralSignup";
+import AuditPortal from "../pages/public/AuditPortal";
 
 // Investor pages
 import InvestorHome from "../pages/investor/InvestorHome";
@@ -67,6 +68,7 @@ export default function AppRoutes() {
         {/* 🌍 Public Pages */}
         <Route path="/" element={<Landing />} />
         <Route path="/referral-signup" element={<ReferralSignup />} />
+        <Route path="/AUDIT" element={<AuditPortal />} />
 
         {/* 👤 Investor Pages (no DashboardLayout) */}
         <Route path="/investor" element={<InvestorHome />} />

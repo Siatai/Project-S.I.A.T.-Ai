@@ -1,0 +1,25 @@
+{
+  "name": "checker",
+  "version": "1.0.0",
+  "description": "USDT BEP-20 deposit dashboard with Telegram reconciliation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.17.0",
+    "better-sqlite3": "^12.10.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.16.0",
+    "express": "^5.2.1",
+    "multer": "^2.1.1",
+    "telegraf": "^4.16.3",
+    "xlsx": "^0.18.5"
+  }
+}
