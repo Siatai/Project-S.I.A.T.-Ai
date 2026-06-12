@@ -1610,6 +1610,70 @@ def build_workbook(state: dict[str, Any]) -> BytesIO:
     return output
 
 
+def get_deposit_calendar_date(timestamp: str | None) -> str:
+    if not timestamp:
+        return ""
+    try:
+        return datetime.fromisoformat(str(timestamp).replace("Z", "+00:00")).date().isoformat()
+    except ValueError:
+        return ""
+
+
+def build_daywise_deposit_workbook(state: dict[str, Any]) -> BytesIO:
+    workbook = Workbook()
+    summary_sheet = workbook.active
+    summary_sheet.title = "Day Wise Summary"
+    deposits_sheet = workbook.create_sheet("All Deposits")
+
+    summary_sheet.append(["date", "noOfDeposit", "amtOfDeposit"])
+    deposits_sheet.append(["date", "timestamp", "amount", "hash", "from", "to", "status"])
+
+    daily_summary: dict[str, dict[str, Any]] = {}
+    dated_deposits: list[dict[str, Any]] = []
+
+    for tx in state["depositTransactions"]:
+        deposit_date = get_deposit_calendar_date(tx.get("timestamp"))
+        amount = float(tx.get("amount") or 0)
+
+        daily_summary.setdefault(
+            deposit_date,
+            {"date": deposit_date, "noOfDeposit": 0, "amtOfDeposit": 0.0},
+        )
+        daily_summary[deposit_date]["noOfDeposit"] += 1
+        daily_summary[deposit_date]["amtOfDeposit"] = round(daily_summary[deposit_date]["amtOfDeposit"] + amount, 8)
+
+        dated_deposits.append(
+            {
+                "date": deposit_date,
+                "timestamp": tx.get("timestamp") or "",
+                "amount": amount,
+                "hash": tx.get("hash") or "",
+                "from": tx.get("from") or "",
+                "to": tx.get("to") or "",
+                "status": tx.get("reconciliation", {}).get("status") or "",
+            }
+        )
+
+    for row in sorted(daily_summary.values(), key=lambda item: item["date"]):
+        summary_sheet.append([row["date"], row["noOfDeposit"], row["amtOfDeposit"]])
+
+    for row in sorted(dated_deposits, key=lambda item: item["timestamp"]):
+        deposits_sheet.append([
+            row["date"],
+            row["timestamp"],
+            row["amount"],
+            row["hash"],
+            row["from"],
+            row["to"],
+            row["status"],
+        ])
+
+    output = BytesIO()
+    workbook.save(output)
+    output.seek(0)
+    return output
+
+
 @router.get("/audit-api/state", include_in_schema=False)
 async def audit_state():
     state = await get_state()
@@ -1676,6 +1740,17 @@ async def audit_import_telegram(files: list[UploadFile] = File(...)):
 async def audit_export():
     workbook = build_workbook(await get_state())
     headers = {"Content-Disposition": "attachment; filename=usdt-dashboard-export.xlsx"}
+    return Response(
+        content=workbook.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers,
+    )
+
+
+@router.get("/audit-api/export-daywise.xlsx", include_in_schema=False)
+async def audit_export_daywise():
+    workbook = build_daywise_deposit_workbook(await get_state())
+    headers = {"Content-Disposition": "attachment; filename=usdt-daywise-deposits.xlsx"}
     return Response(
         content=workbook.getvalue(),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

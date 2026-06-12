@@ -4,8 +4,6 @@ from db import SessionLocal, get_db
 from models.user_model import User
 import secrets
 import string
-from fastapi import Depends, HTTPException
-from utils.auth_middleware import verify_token
 # ─────────────────────────────── OTP IN-MEMORY DB ─────────────────────────────── #
 otps_db = {}
 
@@ -89,11 +87,3 @@ def get_all_users():
     db.close()
     return users
 
-def get_current_user(
-    token_data=Depends(verify_token), 
-    db: Session = Depends(get_db)
-):
-    user = db.query(User).filter(User.email == token_data["email"]).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user

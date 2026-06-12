@@ -1693,6 +1693,91 @@ function buildWorkbook(state) {
   return workbook;
 }
 
+function getDepositCalendarDate(timestamp) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+function buildDayWiseDepositWorkbook(state) {
+  const workbook = XLSX.utils.book_new();
+  const dailySummaryMap = new Map();
+
+  const depositRows = state.depositTransactions.map((tx) => {
+    const depositDate = getDepositCalendarDate(tx.timestamp);
+    const amount = Number(tx.amount || 0);
+    const current = dailySummaryMap.get(depositDate) || {
+      date: depositDate,
+      noOfDeposit: 0,
+      amtOfDeposit: 0,
+    };
+
+    current.noOfDeposit += 1;
+    current.amtOfDeposit = Number((current.amtOfDeposit + amount).toFixed(8));
+    dailySummaryMap.set(depositDate, current);
+
+    return {
+      date: depositDate,
+      timestamp: tx.timestamp,
+      amount,
+      hash: tx.hash,
+      from: tx.from,
+      to: tx.to,
+      status: tx.reconciliation?.status || "",
+    };
+  });
+
+  const dailySummaryRows = Array.from(dailySummaryMap.values())
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((row) => ({
+      date: row.date,
+      noOfDeposit: row.noOfDeposit,
+      amtOfDeposit: row.amtOfDeposit,
+    }));
+
+  const datedDepositsRows = depositRows.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  const summarySheet = XLSX.utils.json_to_sheet(dailySummaryRows, {
+    header: ["date", "noOfDeposit", "amtOfDeposit"],
+  });
+  const datedDepositsSheet = XLSX.utils.json_to_sheet(datedDepositsRows, {
+    header: ["date", "timestamp", "amount", "hash", "from", "to", "status"],
+  });
+
+  summarySheet["!cols"] = [
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 16 },
+  ];
+  datedDepositsSheet["!cols"] = [
+    { wch: 14 },
+    { wch: 24 },
+    { wch: 14 },
+    { wch: 68 },
+    { wch: 46 },
+    { wch: 46 },
+    { wch: 14 },
+  ];
+
+  datedDepositsRows.forEach((row, index) => {
+    const excelRow = index + 2;
+    if (row.hash) {
+      datedDepositsSheet[`D${excelRow}`] = {
+        t: "s",
+        v: row.hash,
+        l: { Target: `https://bscscan.com/tx/${row.hash}`, Tooltip: "Open deposit transaction on BscScan" },
+      };
+    }
+  });
+
+  XLSX.utils.book_append_sheet(workbook, summarySheet, "Day Wise Summary");
+  XLSX.utils.book_append_sheet(workbook, datedDepositsSheet, "All Deposits");
+  return workbook;
+}
+
 async function getState() {
   const store = readStore();
   await enrichTelegramFees(store);
@@ -1769,18 +1854,25 @@ async function getState() {
 }
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/audit-assets", express.static(path.join(__dirname, "public")));
 
-app.get("/api/state", async (_req, res) => {
+async function handleState(_req, res) {
   res.json(await getState());
-});
+}
 
-app.post("/api/sync/wallet", async (req, res) => {
+app.get("/api/state", handleState);
+app.get("/audit-api/state", handleState);
+
+async function handleWalletSync(req, res) {
   const mode = req.body?.mode === "full" ? "full" : "incremental";
   await syncTransactionsSafe(mode);
   res.json(await getState());
-});
+}
 
-app.post("/api/sync/telegram", async (req, res) => {
+app.post("/api/sync/wallet", handleWalletSync);
+app.post("/audit-api/sync/wallet", handleWalletSync);
+
+async function handleTelegramSync(req, res) {
   const store = readStore();
   const mode = req.body?.mode === "all" ? "all" : "incremental";
   store.sync.telegram.lastCheckedAt = new Date().toISOString();
@@ -1790,9 +1882,12 @@ app.post("/api/sync/telegram", async (req, res) => {
   store.sync.telegram.lastMode = mode;
   writeStore(store);
   res.json(await getState());
-});
+}
 
-app.post("/api/telegram/import", upload.array("files"), async (req, res) => {
+app.post("/api/sync/telegram", handleTelegramSync);
+app.post("/audit-api/sync/telegram", handleTelegramSync);
+
+async function handleTelegramImport(req, res) {
   const files = req.files || [];
   if (!files.length) {
     res.status(400).json({ error: "No files uploaded" });
@@ -1831,7 +1926,10 @@ app.post("/api/telegram/import", upload.array("files"), async (req, res) => {
     totalMessages: store.telegramMessages.length,
     state: await getState(),
   });
-});
+}
+
+app.post("/api/telegram/import", upload.array("files"), handleTelegramImport);
+app.post("/audit-api/telegram/import", upload.array("files"), handleTelegramImport);
 
 app.post("/api/telegram/mock", async (req, res) => {
   const { text, amount, sender, timestamp } = req.body || {};
@@ -1880,13 +1978,26 @@ app.post("/api/reconcile/manual-batch", async (req, res) => {
   res.json({ saved, state: await getState() });
 });
 
-app.get("/api/export.xlsx", async (_req, res) => {
+async function handleExport(_req, res) {
   const workbook = buildWorkbook(await getState());
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
   res.setHeader("Content-Disposition", "attachment; filename=usdt-dashboard-export.xlsx");
   res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
   res.send(buffer);
-});
+}
+
+async function handleDaywiseExport(_req, res) {
+  const workbook = buildDayWiseDepositWorkbook(await getState());
+  const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+  res.setHeader("Content-Disposition", "attachment; filename=usdt-daywise-deposits.xlsx");
+  res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  res.send(buffer);
+}
+
+app.get("/api/export.xlsx", handleExport);
+app.get("/audit-api/export.xlsx", handleExport);
+app.get("/api/export-daywise.xlsx", handleDaywiseExport);
+app.get("/audit-api/export-daywise.xlsx", handleDaywiseExport);
 
 let bot;
 if (CONFIG.telegramBotToken) {

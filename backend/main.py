@@ -121,15 +121,15 @@ def poll_deposit_auto():
                 db.add(direct_bonus)
 
         db.commit()
-        print("✅ poll_deposit_auto executed successfully")
+        print("poll_deposit_auto executed successfully")
 
     except IntegrityError:
         db.rollback()
-        print("⚠️ Integrity error while polling deposits")
+        print("Integrity error while polling deposits")
 
     except Exception as e:
         db.rollback()
-        print(f"⚠️ Poller error: {e}")
+        print(f"Poller error: {e}")
 
     finally:
         db.close()
@@ -140,7 +140,7 @@ def poll_deposit_auto():
 # ────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 App starting...")
+    print("App starting...")
     schedule_audit_sync("incremental")
 
     async def poller():
@@ -149,11 +149,11 @@ async def lifespan(app: FastAPI):
         while True:
             try:
                 # 1. Blockchain deposits
-                print("🔎 Checking TRC20 deposits...")
+                print("Checking TRC20 deposits...")
                 check_for_trc20_deposit()
 
                 # 2. DB → referral/associate logic
-                print("🔄 Running poll_deposit_auto...")
+                print("Running poll_deposit_auto...")
                 poll_deposit_auto()
 
                 now = asyncio.get_running_loop().time()
@@ -162,14 +162,14 @@ async def lifespan(app: FastAPI):
                     last_audit_schedule_at = now
 
             except Exception as e:
-                print(f"⚠️ Poller crash: {e}")
+                print(f"Poller crash: {e}")
 
             await asyncio.sleep(10)  # every 10 sec
 
     asyncio.create_task(poller())
 
     yield
-    print("🛑 App shutting down...")
+    print("App shutting down...")
 
 
 # ────────────────────────────────
